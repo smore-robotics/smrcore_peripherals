@@ -1,0 +1,26 @@
+# Build outputs
+build/
+build_*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+install_manifest.txt
+
+# Downloaded release artifacts and dependencies
+third_party/
+3rdparty/
+artifacts/
+.deps/
+
+# Archives
+*.tar.gz
+*.zip
+*.artifact
+
+# Python caches and local environments
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
