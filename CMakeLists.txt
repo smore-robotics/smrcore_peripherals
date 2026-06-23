@@ -45,7 +45,5 @@ if(SMRCORE_PERIPHERALS_BUILD_SDK_EXAMPLES)
         target_link_libraries(${name} PRIVATE ${SMRC_PERIPHERALS_TARGET} ${SMRC_SDK_TARGET})
     endfunction()
 
-    add_sdk_example(teleop_spacemouse_sdk)
-    add_sdk_example(fdcc_external_ft_sensor)
-    add_sdk_example(ft_sensor_calib_external)
+    add_sdk_example(peripherals_sdk)
 endif()

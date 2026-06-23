@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import time
 
-from smrcore_peripherals import FtSensor, FtSensorOptions
+from rcore_peripherals import FtSensor, FtSensorOptions
 
 
 def parse_args() -> argparse.Namespace:

@@ -1,0 +1,231 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # PR / manual runs validate candidate peripheral assets from the `prerelease`
+  # release, using the version pinned in .peripherals-version. Bridge examples
+  # also pull smrcore_sdk candidate assets from smrcore_sdk `prerelease`.
+  # Official releases are validated separately by release-smoke.yml.
+  linux-peripherals-smoke:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            curl \
+            g++ \
+            python3 \
+            python3-pip
+
+      - name: Resolve versions
+        run: |
+          peripherals_version="$(tr -d '[:space:]' < .peripherals-version)"
+          sdk_version="$(tr -d '[:space:]' < .sdk-version)"
+          for label in peripherals sdk; do
+            var="${label}_version"
+            value="${!var}"
+            if ! printf '%s\n' "$value" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo ".${label}-version must contain x.y.z, got: $value" >&2
+              exit 1
+            fi
+          done
+          {
+            echo "PERIPHERALS_VERSION=$peripherals_version"
+            echo "SDK_VERSION=$sdk_version"
+            echo "PERIPHERALS_RELEASE_TAG=prerelease"
+            echo "SDK_RELEASE_TAG=prerelease"
+          } >> "$GITHUB_ENV"
+
+      - name: Download C++ packages
+        run: ./scripts/download.sh
+
+      - name: Build C++ examples
+        run: ./scripts/build.sh
+
+      - name: Check linked libraries
+        run: |
+          ldd build/bin/probe | grep libsmrcore_peripherals
+          ldd build/bin/read_spacemouse | grep libsmrcore_peripherals
+          ldd build/bin/read_ft_sensor | grep libsmrcore_peripherals
+          ldd build/bin/peripherals_sdk | grep libsmrcore_peripherals
+          ldd build/bin/peripherals_sdk | grep librcoresdk
+
+      - name: Download Python wheels
+        run: |
+          PY_TAG=cp310-cp310-linux_x86_64
+          curl -L --fail --show-error \
+            "https://github.com/smore-robotics/smrcore_peripherals/releases/download/${PERIPHERALS_RELEASE_TAG}/rcore_peripherals_py-${PERIPHERALS_VERSION}-${PY_TAG}.whl" \
+            -o "rcore_peripherals_py-${PERIPHERALS_VERSION}-${PY_TAG}.whl"
+          curl -L --fail --show-error \
+            "https://github.com/smore-robotics/smrcore_sdk/releases/download/${SDK_RELEASE_TAG}/rcore_sdk_py-${SDK_VERSION}-${PY_TAG}.whl" \
+            -o "rcore_sdk_py-${SDK_VERSION}-${PY_TAG}.whl"
+
+      - name: Install and verify Python wheels
+        run: |
+          python3 -m pip install \
+            "./rcore_peripherals_py-${PERIPHERALS_VERSION}-cp310-cp310-linux_x86_64.whl" \
+            "./rcore_sdk_py-${SDK_VERSION}-cp310-cp310-linux_x86_64.whl"
+          python3 - <<'PY'
+          import os
+
+          import rcore_peripherals
+          import rcore_sdk
+          from rcore_sdk import _native
+
+          peripherals_version = os.environ["PERIPHERALS_VERSION"]
+          sdk_version = os.environ["SDK_VERSION"]
+
+          assert rcore_peripherals.__version__ == peripherals_version
+
+          info = _native.linked_sdk()
+          print("peripherals:", rcore_peripherals.__version__)
+          print("sdk:", info)
+          assert rcore_sdk.__version__ == sdk_version
+          assert info["linked"] is True
+          assert info["version"] == sdk_version
+          PY
+
+      - name: Check Python examples
+        run: ./scripts/check_python_examples.sh
+
+  windows-peripherals-smoke:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Resolve versions
+        shell: pwsh
+        run: |
+          $peripheralsVersion = (Get-Content .peripherals-version -Raw).Trim()
+          $sdkVersion = (Get-Content .sdk-version -Raw).Trim()
+          foreach ($pair in @(
+            @{ Label = "peripherals"; Value = $peripheralsVersion },
+            @{ Label = "sdk"; Value = $sdkVersion }
+          )) {
+            if ($pair.Value -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+              throw ".${pair.Label}-version must contain x.y.z, got: $($pair.Value)"
+            }
+          }
+          "PERIPHERALS_VERSION=$peripheralsVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "SDK_VERSION=$sdkVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "PERIPHERALS_RELEASE_TAG=prerelease" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "SDK_RELEASE_TAG=prerelease" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Download C++ packages
+        shell: bash
+        run: ./scripts/download.sh
+
+      - name: Build C++ examples
+        shell: pwsh
+        run: |
+          $prefix = "$pwd/third_party/smrcore_sdk;$pwd/third_party/smrcore_peripherals"
+          cmake -S . -B build `
+            -DCMAKE_PREFIX_PATH="$prefix" `
+            -DSMRCORE_PERIPHERALS_BUILD_SDK_EXAMPLES=ON
+          cmake --build build --config Release
+
+      - name: Check C++ example outputs
+        shell: pwsh
+        run: |
+          $examples = @(
+            "probe",
+            "read_spacemouse",
+            "read_spacemouse_raw",
+            "read_ft_sensor",
+            "peripherals_sdk"
+          )
+          foreach ($example in $examples) {
+            $path = "build/bin/Release/$example.exe"
+            if (!(Test-Path $path)) {
+              throw "Missing expected executable: $path"
+            }
+          }
+
+      - name: Download Python wheels
+        shell: pwsh
+        run: |
+          $pyTag = "cp310-cp310-win_amd64"
+          $peripheralsAsset = "rcore_peripherals_py-$env:PERIPHERALS_VERSION-$pyTag.whl"
+          $sdkAsset = "rcore_sdk_py-$env:SDK_VERSION-$pyTag.whl"
+          curl.exe -L --fail --show-error `
+            "https://github.com/smore-robotics/smrcore_peripherals/releases/download/$env:PERIPHERALS_RELEASE_TAG/$peripheralsAsset" `
+            -o $peripheralsAsset
+          curl.exe -L --fail --show-error `
+            "https://github.com/smore-robotics/smrcore_sdk/releases/download/$env:SDK_RELEASE_TAG/$sdkAsset" `
+            -o $sdkAsset
+
+      - name: Install and verify Python wheels
+        shell: pwsh
+        run: |
+          python -m pip install `
+            ".\rcore_peripherals_py-$env:PERIPHERALS_VERSION-cp310-cp310-win_amd64.whl" `
+            ".\rcore_sdk_py-$env:SDK_VERSION-cp310-cp310-win_amd64.whl"
+          python -c "import os, rcore_peripherals, rcore_sdk; from rcore_sdk import _native; info = _native.linked_sdk(); print('peripherals:', rcore_peripherals.__version__); print('sdk:', info); assert rcore_peripherals.__version__ == os.environ['PERIPHERALS_VERSION']; assert rcore_sdk.__version__ == os.environ['SDK_VERSION']; assert info['linked'] is True; assert info['version'] == os.environ['SDK_VERSION']"
+
+      - name: Check Python examples
+        shell: pwsh
+        run: |
+          Get-ChildItem examples/python -Recurse -Filter *.py | ForEach-Object {
+            python -m py_compile $_.FullName
+          }
+
+  # Pushes to main only run lightweight repo checks. Right after a PR merges,
+  # the official release for .peripherals-version may not exist yet, so main must
+  # not depend on release assets.
+  main-checks:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Check version file formats
+        run: |
+          peripherals_version="$(tr -d '[:space:]' < .peripherals-version)"
+          sdk_version="$(tr -d '[:space:]' < .sdk-version)"
+          for label in peripherals sdk; do
+            var="${label}_version"
+            value="${!var}"
+            if ! printf '%s\n' "$value" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo ".${label}-version must contain x.y.z, got: $value" >&2
+              exit 1
+            fi
+          done
+          echo "Peripherals version: $peripherals_version"
+          echo "SDK version: $sdk_version"
+
+      - name: Check shell scripts
+        run: |
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done
+
+      - name: Compile Python examples
+        run: ./scripts/check_python_examples.sh

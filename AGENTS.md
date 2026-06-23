@@ -9,9 +9,9 @@ release assets for `smrcore_peripherals` and, for robot bridge examples,
 
 | Path | What |
 |---|---|
-| `examples/cpp/` | C++ examples for probing, reading, and injecting samples into the robot SDK |
-| `examples/python/` | Python examples for read-only peripheral workflows plus bridge skeletons |
-| `docs/` | Setup, dependency, and workflow notes |
+| `examples/cpp/` | C++ examples for probing, reading, and injecting samples into the robot SDK (`README.md` / `README.en.md`) |
+| `examples/python/` | Python examples for read-only peripheral workflows plus bridge skeletons (`README.md` / `README.en.md`) |
+| `docs/` | Platform setup notes (`platform_setup.md` / `platform_setup.en.md`) |
 | `scripts/` | Download and build helpers |
 | `.peripherals-version` | Peripheral SDK version (`x.y.z` or `latest`) targeted by examples |
 | `.sdk-version` | Robot SDK version (`x.y.z` or `latest`) targeted by bridge examples |
@@ -23,7 +23,7 @@ release assets for `smrcore_peripherals` and, for robot bridge examples,
 ./scripts/build.sh
 ./build/bin/probe
 ./build/bin/read_ft_sensor --serial-port /dev/ttyUSB0
-./build/bin/teleop_spacemouse_sdk
+./build/bin/peripherals_sdk
 ```
 
 Use `SMRCORE_PERIPHERALS_BUILD_SDK_EXAMPLES=OFF ./scripts/build.sh` when only
@@ -35,7 +35,7 @@ Expected GitHub Release assets:
 
 - `smrcore_peripherals-cpp-linux-x86_64-v<version>.tar.gz`
 - `smrcore_peripherals-cpp-windows-x86_64-v<version>.tar.gz`
-- `smrcore_peripherals_py-<version>-<python-tags>.whl`
+- `smrcore_peripherals_py-<python-tags>.whl`（版本在 release / 下载路径，不入包名）
 
 ## C++ conventions
 
