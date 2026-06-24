@@ -19,7 +19,7 @@ From the repository root:
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
 
-Recommended binaries are installed under `build_Release/install/bin/`:
+Recommended binaries are built under `build_Release/bin/`:
 
 | Binary | Description |
 |---|---|
@@ -32,12 +32,12 @@ Recommended binaries are installed under `build_Release/install/bin/`:
 ## Read Peripherals Only
 
 ```bash
-./build_Release/install/bin/app_peripherals_probe
-./build_Release/install/bin/app_peripherals_probe --serial-port /dev/ttyUSB0
+./build_Release/bin/app_peripherals_probe
+./build_Release/bin/app_peripherals_probe --serial-port /dev/ttyUSB0
 
-./build_Release/install/bin/app_peripherals_read_spacemouse --device /dev/input/event5 --sample-rate 125
-./build_Release/install/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
-./build_Release/install/bin/app_peripherals_read_ft_sensor \
+./build_Release/bin/app_peripherals_read_spacemouse --device /dev/input/event5 --sample-rate 125
+./build_Release/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
+./build_Release/bin/app_peripherals_read_ft_sensor \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
 ```
 
@@ -47,14 +47,14 @@ Recommended binaries are installed under `build_Release/install/bin/`:
 
 ```bash
 # Both SpaceMouse and F/T sensor are enabled by default, useful for FDCC
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
 
 # Teleop only or F/T only
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
 
 # Override device options
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> \
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> \
   --spacemouse-device /dev/input/event5 \
   --ft-serial-port /dev/ttyUSB0 \
   --ft-sensor-type xjc_serial

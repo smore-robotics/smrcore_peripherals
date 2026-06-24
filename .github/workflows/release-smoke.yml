@@ -1,0 +1,87 @@
+name: Release Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Released peripheral version to verify (x.y.z or vx.y.z)"
+        required: true
+
+jobs:
+  linux-release-smoke:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        run: |
+          version="${{ github.event.inputs.version }}"
+          version="${version#v}"
+          if ! printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "version must be x.y.z or vx.y.z, got: ${{ github.event.inputs.version }}" >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      # Verify the released smrcore_sdk assets against the examples as they
+      # were tagged in this repository.
+      - name: Checkout release tag
+        run: |
+          git fetch --force origin "refs/tags/v${VERSION}:refs/tags/v${VERSION}"
+          git checkout "v${VERSION}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            curl \
+            g++ \
+            ninja-build \
+            python3-pip
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "conan>=2.0"
+
+      - name: Download smrcore_sdk
+        run: ./scripts/download.sh
+
+      - name: Build C++ library, apps, and tests
+        env:
+          CI_COMMIT_TAG: v${{ env.VERSION }}
+        run: ./scripts/build.sh --with-sdk ON --tests ON
+
+      - name: Run C++ unit tests
+        run: ./scripts/run_tests.sh -t Release
+
+      - name: Check C++ binaries
+        run: |
+          bin_dir="build_Release/install/bin"
+          for name in \
+            app_peripherals_probe \
+            app_peripherals_read_spacemouse \
+            app_peripherals_read_ft_sensor \
+            app_peripherals_bridge; do
+            test -x "$bin_dir/$name"
+          done
+
+      - name: Check SDK bridge linkage
+        run: ldd build_Release/install/bin/app_peripherals_bridge | grep librcoresdk
+
+      - name: Build Python wheel
+        env:
+          CI_COMMIT_TAG: v${{ env.VERSION }}
+        run: ./scripts/build_py.sh --no-install
+
+      - name: Run Python unit tests
+        run: ./scripts/run_test_py.sh -t Release
+
+      - name: Check Python examples
+        run: ./scripts/check_python_examples.sh

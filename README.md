@@ -35,7 +35,7 @@ cd smrcore_peripherals
 ./scripts/build.sh --with-sdk OFF --tests ON
 ./scripts/run_tests.sh -t Release
 
-./build_Release/install/bin/app_peripherals_probe
+./build_Release/bin/app_peripherals_probe
 ```
 
 构建 SDK bridge app 需要先下载 `.sdk-version` 指定的 `smrcore_sdk`：
@@ -44,7 +44,7 @@ cd smrcore_peripherals
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
 ```
 
 ## 主要功能
@@ -88,7 +88,7 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 |---|---|
 | `.sdk-version` | standalone bridge 默认使用的 `smrcore_sdk` 版本 |
 
-`scripts/download.sh` 读取 `.sdk-version`，自动按当前 Linux 架构下载 `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` 到 `third_party/prebuilt/smrcore_sdk/`。V1 暂不支持 Windows standalone 下载/构建。
+`scripts/download.sh` 读取 `.sdk-version`，自动按当前 Linux 架构下载 `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` 到 `third_party/smrcore_sdk/`。V1 暂不支持 Windows standalone 下载/构建。
 
 ## 常用命令
 

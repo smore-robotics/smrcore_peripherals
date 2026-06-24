@@ -22,7 +22,7 @@ Public source repository for SMRCore peripheral integration. It contains the C++
 
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
 ```
 
 ## C++ Conventions

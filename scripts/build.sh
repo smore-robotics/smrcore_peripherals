@@ -53,7 +53,7 @@ show_help() {
   -a, --arch ARCH       目标架构: x86 (默认) 或 armv8；V1 暂不支持 Windows
   -j, --jobs N          并行编译核心数
       --with-sdk ON/OFF 构建 app_peripherals_bridge 等 SDK bridge 工具 (默认: ON)
-      --sdk-root PATH   smrcore_sdk 安装树 (默认: third_party/prebuilt/smrcore_sdk)
+      --sdk-root PATH   smrcore_sdk 安装树 (默认: third_party/smrcore_sdk)
       --tests ON/OFF    是否构建测试 (默认: ON)
   -G, --generator NAME  CMake 生成器 (默认: Ninja)
   -h, --help            显示帮助
@@ -96,7 +96,7 @@ if [[ "$WITH_SDK" != "ON" && "$WITH_SDK" != "OFF" ]]; then
     exit 1
 fi
 if [ -z "$SDK_ROOT" ]; then
-    SDK_ROOT="$PROJECT_ROOT/third_party/prebuilt/smrcore_sdk"
+    SDK_ROOT="$PROJECT_ROOT/third_party/smrcore_sdk"
 fi
 
 HOST_PROFILE="${CONAN_HOST_PROFILE:-}"

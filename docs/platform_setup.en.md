@@ -44,7 +44,7 @@ sudo usermod -aG dialout "$USER"
 Start the bridge before enabling Teleoperation or FDCC so rcore receives fresh external input:
 
 ```bash
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
 ```

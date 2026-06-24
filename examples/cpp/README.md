@@ -19,7 +19,7 @@
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
 
-当前推荐可执行文件位于 `build_Release/install/bin/`：
+当前推荐可执行文件位于 `build_Release/bin/`：
 
 | 可执行文件 | 说明 |
 |---|---|
@@ -32,12 +32,12 @@
 ## 仅读外设
 
 ```bash
-./build_Release/install/bin/app_peripherals_probe
-./build_Release/install/bin/app_peripherals_probe --serial-port /dev/ttyUSB0
+./build_Release/bin/app_peripherals_probe
+./build_Release/bin/app_peripherals_probe --serial-port /dev/ttyUSB0
 
-./build_Release/install/bin/app_peripherals_read_spacemouse --device /dev/input/event5 --sample-rate 125
-./build_Release/install/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
-./build_Release/install/bin/app_peripherals_read_ft_sensor \
+./build_Release/bin/app_peripherals_read_spacemouse --device /dev/input/event5 --sample-rate 125
+./build_Release/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
+./build_Release/bin/app_peripherals_read_ft_sensor \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
 ```
 
@@ -47,14 +47,14 @@
 
 ```bash
 # 默认同时启用 SpaceMouse 和 F/T，适合 FDCC 双外设输入
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
 
 # 仅遥操作或仅力传感器
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
 
 # 覆盖设备参数
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> \
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> \
   --spacemouse-device /dev/input/event5 \
   --ft-serial-port /dev/ttyUSB0 \
   --ft-sensor-type xjc_serial

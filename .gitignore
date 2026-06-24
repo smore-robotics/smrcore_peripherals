@@ -41,7 +41,7 @@ Release*/
 *Release/
 RelWithDebInfo*/
 _build/
-third_party/prebuilt/
+third_party/
 
 # IDE / editor
 .vscode/*

@@ -4,7 +4,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SDK_VERSION_FILE="$PROJECT_ROOT/.sdk-version"
-SDK_ROOT="${SMRCORE_PERIPHERALS_SDK_ROOT:-$PROJECT_ROOT/third_party/prebuilt/smrcore_sdk}"
+SDK_ROOT="${SMRCORE_PERIPHERALS_SDK_ROOT:-$PROJECT_ROOT/third_party/smrcore_sdk}"
 BASE_URL="${SMRCORE_SDK_DOWNLOAD_BASE_URL:-https://github.com/smore-robotics/smrcore_sdk/releases/download}"
 
 show_help() {
@@ -15,8 +15,10 @@ show_help() {
   $SDK_ROOT
 
 环境变量:
-  SMRCORE_PERIPHERALS_SDK_ROOT  覆盖解包目录
-  SMRCORE_SDK_DOWNLOAD_BASE_URL 覆盖下载 base URL
+  SDK_VERSION, VERSION            覆盖 .sdk-version（须为 x.y.z）
+  SDK_RELEASE_TAG                 下载使用的 release tag（默认 v<version>；CI 可用 prerelease）
+  SMRCORE_PERIPHERALS_SDK_ROOT    覆盖解包目录
+  SMRCORE_SDK_DOWNLOAD_BASE_URL   覆盖下载 base URL
 EOF
 }
 
@@ -26,10 +28,6 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
 fi
 if [ "$#" -ne 0 ]; then
     echo "download.sh 不接受版本或架构参数；请修改 .sdk-version 或使用环境变量覆盖下载源。" >&2
-    exit 1
-fi
-if [ ! -f "$SDK_VERSION_FILE" ]; then
-    echo "未找到 $SDK_VERSION_FILE" >&2
     exit 1
 fi
 
@@ -58,29 +56,33 @@ case "$(uname -m 2>/dev/null)" in
         ;;
 esac
 
-SDK_VERSION="$(tr -d '[:space:]' < "$SDK_VERSION_FILE")"
+SDK_VERSION="${SDK_VERSION:-${VERSION:-}}"
+if [ -z "$SDK_VERSION" ] && [ -f "$SDK_VERSION_FILE" ]; then
+    SDK_VERSION="$(tr -d '[:space:]' < "$SDK_VERSION_FILE")"
+fi
 if [ -z "$SDK_VERSION" ]; then
-    echo ".sdk-version 为空" >&2
+    echo "请设置 SDK_VERSION/VERSION 或在 .sdk-version 中指定版本。" >&2
     exit 1
 fi
 
-if [ "$SDK_VERSION" = "latest" ]; then
-    VERSION_SUFFIX="latest"
-    RELEASE_TAG="latest"
-else
-    VERSION_SUFFIX="v$SDK_VERSION"
-    RELEASE_TAG="v$SDK_VERSION"
+SDK_VERSION="${SDK_VERSION#v}"
+if ! printf '%s\n' "$SDK_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+    echo "SDK 版本须为 x.y.z，当前: $SDK_VERSION" >&2
+    exit 1
 fi
 
-TAR_NAME="smrcore_sdk-cpp-linux-${SDK_ARCH}-${VERSION_SUFFIX}.tar.gz"
-URL="${BASE_URL}/${RELEASE_TAG}/${TAR_NAME}"
+SDK_RELEASE_TAG="${SDK_RELEASE_TAG:-v$SDK_VERSION}"
+
+TAR_NAME="smrcore_sdk-cpp-linux-${SDK_ARCH}-v${SDK_VERSION}.tar.gz"
+URL="${BASE_URL}/${SDK_RELEASE_TAG}/${TAR_NAME}"
 TMP_DIR="$(mktemp -d)"
 cleanup() {
     rm -rf "$TMP_DIR"
 }
 trap cleanup EXIT
 
-echo "下载 smrcore_sdk: $URL"
+echo "下载 smrcore_sdk ${SDK_VERSION} (release: ${SDK_RELEASE_TAG})"
+echo "  $URL"
 if command -v curl >/dev/null 2>&1; then
     curl -fL "$URL" -o "$TMP_DIR/$TAR_NAME"
 elif command -v wget >/dev/null 2>&1; then

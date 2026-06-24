@@ -35,7 +35,7 @@ cd smrcore_peripherals
 ./scripts/build.sh --with-sdk OFF --tests ON
 ./scripts/run_tests.sh -t Release
 
-./build_Release/install/bin/app_peripherals_probe
+./build_Release/bin/app_peripherals_probe
 ```
 
 To build the SDK bridge app, first download the `smrcore_sdk` version pinned by `.sdk-version`:
@@ -44,7 +44,7 @@ To build the SDK bridge app, first download the `smrcore_sdk` version pinned by 
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
 ```
 
 ## Features
@@ -88,7 +88,7 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 |---|---|
 | `.sdk-version` | Default `smrcore_sdk` version for standalone bridge builds |
 
-`scripts/download.sh` reads `.sdk-version` and downloads `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` into `third_party/prebuilt/smrcore_sdk/`. V1 does not support standalone Windows download/build.
+`scripts/download.sh` reads `.sdk-version` and downloads `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` into `third_party/smrcore_sdk/`. V1 does not support standalone Windows download/build.
 
 ## Common Commands
 

@@ -44,7 +44,7 @@ sudo usermod -aG dialout "$USER"
 在启用遥操作或 FDCC 之前启动 bridge，使 rcore 能收到新鲜 external input：
 
 ```bash
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
 ```

@@ -80,6 +80,7 @@
   "python/tests/test_import.py": "python/tests/_index.md",
   "python/tests/test_data.py": "python/tests/_index.md",
   "scripts/build_py.sh": "scripts/_index.md",
+  "scripts/check_python_examples.sh": "scripts/_index.md",
   "scripts/download.sh": "scripts/_index.md",
   "scripts/run_test_py.sh": "scripts/_index.md",
   "scripts/package.sh": "scripts/_index.md"
