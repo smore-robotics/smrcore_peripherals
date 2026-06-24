@@ -41,7 +41,7 @@ sudo usermod -aG dialout "$USER"
 ./scripts/build.sh --with-sdk ON
 ```
 
-在启用遥操作或 FDCC 之前启动 bridge，使 rcore 能收到新鲜 external input：
+在启用遥操作或 FDCC 之前启动 bridge，确保控制器能持续收到外设采样：
 
 ```bash
 ./build_Release/bin/app_peripherals_bridge --robot <robot-ip>

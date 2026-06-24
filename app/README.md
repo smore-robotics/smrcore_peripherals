@@ -1,12 +1,12 @@
-# C++ 示例
+# C++ 应用
 
 [English](README.en.md) · **简体中文**
 
-本目录保留对外示例源码；当前源码仓库推荐优先使用仓库根目录 `app/` 下的 `app_peripherals_*` 工具。两者使用同一套 `smrcore::peripherals` C++ API。
+本目录包含外设调试与 SDK 桥接可执行工具，使用 `smrcore::peripherals` C++ API。
 
-平台权限与设备节点配置见 [平台配置](../../docs/platform_setup.md)。
+平台权限与设备节点配置见 [平台配置](../docs/platform_setup.md)。
 
-## 构建推荐路径
+## 构建
 
 在仓库根目录执行：
 
@@ -19,7 +19,7 @@
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
 
-当前推荐可执行文件位于 `build_Release/bin/`：
+可执行文件位于 `build_Release/bin/`：
 
 | 可执行文件 | 说明 |
 |---|---|
@@ -60,8 +60,8 @@
   --ft-sensor-type xjc_serial
 ```
 
-`--robot <robot-ip>` 可省略；省略时向 SDK 传入空 IP，由 SDK 使用默认连接行为。bridge 应在启用遥操作或 FDCC 之前启动，以便 rcore 收到新鲜 external input。
+`--robot <robot-ip>` 可省略；省略时向 SDK 传入空 IP，由 SDK 使用默认连接行为。bridge 应在启用遥操作或 FDCC 之前启动，确保控制器能持续收到外设采样。
 
 ## 安全提示
 
-> 机器人是危险设备。运行 bridge 示例前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据将直接影响控制器行为。
+> 机器人是危险设备。运行 bridge 前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据将直接影响控制器行为。

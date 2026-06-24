@@ -2,7 +2,7 @@
 
 # smrcore_peripherals
 
-**Build the SMRCore peripherals library from source, probe/read SpaceMouse and F/T sensors, and bridge samples into rcore through the robot SDK.**
+**Build the SMRCore peripherals library from source, probe/read SpaceMouse and F/T sensors, and bridge samples into the robot controller through smrcore_sdk.**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-1f6feb.svg)](LICENSE)
 
@@ -14,14 +14,14 @@
 
 `smrcore_peripherals` is the public source repository for SMRCore peripheral support. It contains local SpaceMouse and force/torque sensor readers, protocol parsers, sample normalization, C++/Python APIs, diagnostic tools, and SDK bridge applications.
 
-This repository does not depend on rcore source code and does not maintain robot IDL. To send peripheral data into the robot controller, use [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) and call `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`. High-rate peripheral data does not go through RPC.
+To send peripheral data into the robot controller, use [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) and call `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`.
 
 ## Documentation
 
 | Doc | Description |
 |---|---|
-| [C++ examples](examples/cpp/README.en.md) | Build and run the in-tree apps and legacy examples |
-| [Python examples](examples/python/README.en.md) | Build/install the Python wheel and run scripts |
+| [C++ applications](app/README.en.md) | Probe, read, and SDK bridge executables |
+| [Python applications](python/app/README.en.md) | Python wheel script usage |
 | [Platform setup](docs/platform_setup.en.md) | SpaceMouse event nodes, serial permissions, robot connectivity |
 
 ## Quick Start
@@ -55,16 +55,15 @@ To build the SDK bridge app, first download the `smrcore_sdk` version pinned by 
 | F/T Sensor | Supports Kunwei `kunwei_serial` and XJC `xjc_serial` serial protocols |
 | C++ API | `smrcore::peripherals` namespace with `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` lifecycle |
 | Python API | `rcore_peripherals` wheel aligned with the C++ facade |
-| SDK bridge | `app_peripherals_bridge` injects SpaceMouse / F/T samples into rcore through `smrcore_sdk` |
+| SDK bridge | `app_peripherals_bridge` pushes SpaceMouse / F/T samples into the robot controller through `smrcore_sdk` |
 
 ## Repository Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | Public API, internal helpers, protocol parsers, and device IO |
-| `app/` | Recommended C++ tools: probe, read, and bridge |
-| `python/` | pybind11 Python wheel, scripts, and tests |
-| `examples/` | Public example source; kept semantically aligned with `app/` |
+| `app/` | C++ tools: probe, read, and bridge |
+| `python/` | pybind11 Python wheel, application scripts, and tests |
 | `docs/` | Platform setup notes |
 | `scripts/download.sh` | Downloads `smrcore_sdk` only; it does not download this repository's own binaries |
 | `scripts/build.sh` | Builds the C++ library, apps, tests, and optional SDK bridge |

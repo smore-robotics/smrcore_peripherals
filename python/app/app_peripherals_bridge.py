@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Mirror of app/app_peripherals_bridge.cpp.
 
-单一 `rcore_sdk.Robot` 会话内按 CLI 启动 SpaceMouse 和/或 F/T reader，并通过
-`robot.Peripheral().Update*Sample()` 注入控制器 DDS topic。
+单一机器人 SDK 会话内按 CLI 启动 SpaceMouse 和/或 F/T reader，并通过
+`robot.Peripheral().Update*Sample()` 将采样送入机器人控制器。
 
 依赖（需分别安装 wheel）：
   pip install rcore-peripherals-py rcore-sdk-py

@@ -3,7 +3,7 @@
 
 # types.hpp
 
-外设公共 DTO，字段语义与 rcore SDK `data.hpp` 对齐。
+外设公共 DTO，字段语义与机器人 SDK 外设采样类型对齐。
 
 ## 类型
 

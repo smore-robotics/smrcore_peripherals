@@ -1,12 +1,12 @@
-# C++ Examples
+# C++ Applications
 
 **English** · [简体中文](README.md)
 
-This directory keeps public example source. In the current source repository, the recommended entry points are the `app_peripherals_*` tools under the repository-level `app/` directory. Both paths use the same `smrcore::peripherals` C++ API.
+This directory contains peripheral diagnostic tools and SDK bridge executables using the `smrcore::peripherals` C++ API.
 
-For platform permissions and device setup, see [Platform setup](../../docs/platform_setup.en.md).
+For platform permissions and device setup, see [Platform setup](../docs/platform_setup.en.md).
 
-## Recommended Build Path
+## Build
 
 From the repository root:
 
@@ -19,7 +19,7 @@ From the repository root:
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
 
-Recommended binaries are built under `build_Release/bin/`:
+Binaries are built under `build_Release/bin/`:
 
 | Binary | Description |
 |---|---|
@@ -60,8 +60,8 @@ Recommended binaries are built under `build_Release/bin/`:
   --ft-sensor-type xjc_serial
 ```
 
-`--robot <robot-ip>` is optional. When omitted, the app passes an empty IP and lets the SDK apply its default connection behavior. Start the bridge before enabling Teleoperation or FDCC so rcore sees fresh external input.
+`--robot <robot-ip>` is optional. When omitted, the app passes an empty IP and lets the SDK apply its default connection behavior. Start the bridge before enabling Teleoperation or FDCC so the controller receives fresh peripheral samples.
 
 ## Safety
 
-> Robots are hazardous machines. Before running bridge examples, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
+> Robots are hazardous machines. Before running bridge apps, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.

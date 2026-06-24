@@ -25,7 +25,7 @@ jobs:
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
 
-      # Verify the released smrcore_sdk assets against the examples as they
+      # Verify the released smrcore_sdk assets against the apps as they
       # were tagged in this repository.
       - name: Checkout release tag
         run: |
@@ -83,5 +83,5 @@ jobs:
       - name: Run Python unit tests
         run: ./scripts/run_test_py.sh -t Release
 
-      - name: Check Python examples
+      - name: Check Python app scripts
         run: ./scripts/check_python_examples.sh

@@ -21,8 +21,8 @@ namespace smrcore::peripherals
  * @brief SpaceMouse 本地读取器与归一化采样生产者
  *
  * 通过 Linux input 子系统读取原始事件（见 `protocols/spacemouse/`），
- * 以固定频率输出归一化状态。采样语义与 rcore SDK
- * `UpdateSpaceMouseSample()` 输入的 `SpaceMouseSample` 一致。
+ * 以固定频率输出归一化状态，可通过机器人 SDK
+ * `UpdateSpaceMouseSample()` 送入控制器。
  *
  * 线程安全：公共方法内部已同步；对象销毁不得与其他方法并发。
  */

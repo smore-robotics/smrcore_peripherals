@@ -11,6 +11,6 @@
 - build_py.sh: 在 C++ 已安装前提下构建 Python wheel（调用 `python/scripts/build_wheel.sh`）
 - run_tests.sh: C++ CTest（`unittests/`）
 - run_test_py.sh: Python pytest（需先 `build_py.sh`；调用 `python/scripts/verify_wheel.sh`）
-- check_python_examples.sh: 递归 `py_compile` `examples/python/`（CI main-checks / PR smoke 共用）
+- check_python_examples.sh: 递归 `py_compile` `python/app/`（CI main-checks / PR smoke 共用）
 - package.sh: 打包 C++ install 目录为 `rcore_peripherals.tar.gz`
 - ci/resolve_version: 从环境变量/Git 解析 `SMRCORE_PERIPHERALS_VERSION`（C++ 与 Python 共用）
