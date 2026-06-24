@@ -1,48 +1,51 @@
-# Python Examples
+# Python 示例
 
-Install wheels matching `.peripherals-version` (and `.sdk-version` for bridge workflows):
+[English](README.en.md) · **简体中文**
 
-```bash
-pip install smrcore_peripherals==$(cat ../../.peripherals-version)
-# Bridge skeletons also need smrcore_sdk when Python Peripheral APIs are available:
-# pip install smrcore_sdk==$(cat ../../.sdk-version)
-```
+当前源码仓库可直接构建 `rcore_peripherals` Python wheel。示例脚本位于本目录与 `python/app/`，两者使用同一套 Python API。
 
-Run from this directory (`examples/python/`).
+设备权限与节点配置见 [平台配置](../../docs/platform_setup.md)。
 
-## Read peripherals only
+## 构建和安装 wheel
 
-| Script | Purpose |
-|--------|---------|
-| `probe.py` | Print SpaceMouse and F/T sensor model, rate, and connected flags |
-| `read_spacemouse.py` | Stream decoded 6-DOF + gripper samples |
-| `read_spacemouse_raw.py` | Stream raw HID axis/button samples |
-| `read_ft_sensor.py` | Stream wrench samples after first valid frame |
-
-### Usage
+在仓库根目录执行：
 
 ```bash
-python3 probe.py
-python3 probe.py --serial-port /dev/ttyUSB1
-
-python3 read_spacemouse.py
-python3 read_spacemouse.py --device /dev/input/event5 --sample-rate 125
-
-python3 read_spacemouse_raw.py --device /dev/input/event5
-
-python3 read_ft_sensor.py --serial-port /dev/ttyUSB0 --sensor-type xjc_serial \
-  --baud-rate 460800 --sample-rate 1000
+./scripts/build.sh --with-sdk OFF --tests OFF
+./scripts/build_py.sh
+python3 -m pip install --force-reinstall python/dist/*.whl
 ```
 
-See `docs/platform_setup.md` for device permissions.
+包名：`rcore-peripherals-py`；import 名：`rcore_peripherals`。
 
-## Robot SDK bridge (skeleton)
+## 仅读外设
 
-| Script | C++ counterpart |
-|--------|-----------------|
-| `teleop_spacemouse_sdk.py` | `teleop_spacemouse_sdk` |
-| `fdcc_external_ft_sensor.py` | `fdcc_external_ft_sensor` |
+| 脚本 | 说明 |
+|---|---|
+| `probe.py` | 打印 SpaceMouse 与 F/T 传感器型号、采样率与连接状态 |
+| `read_spacemouse.py` | 流式输出解码后的 6-DOF + 夹爪采样 |
+| `read_spacemouse_raw.py` | 流式输出原始轴/按键采样 |
+| `read_ft_sensor.py` | 在首帧有效数据后流式输出六维力矩 |
 
-These exit with instructions until the Python SDK exposes the same
-`robot.Peripheral().Update*Sample()` APIs as the C++ SDK. Use the C++ bridge
-binaries for production teleop and FDCC external input.
+```bash
+python3 examples/python/probe.py --serial-port /dev/ttyUSB0
+python3 examples/python/read_spacemouse.py --device /dev/input/event5 --sample-rate 125
+python3 examples/python/read_spacemouse_raw.py --device /dev/input/event5
+python3 examples/python/read_ft_sensor.py \
+  --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
+```
+
+`python/app/` 下还有与安装产物一起维护的脚本：
+
+```bash
+python3 python/app/app_peripherals_read_spacemouse.py
+python3 python/app/app_peripherals_read_ft_sensor.py --serial-port /dev/ttyUSB0
+```
+
+## 机器人 SDK 桥接
+
+Python bridge 脚本 `python/app/app_peripherals_bridge.py` 需要同时安装外设 wheel 和机器人 SDK Python 包。若当前 Python SDK 尚未暴露与 C++ 一致的 `Peripheral().Update*Sample()` API，请使用 C++ `app_peripherals_bridge` 作为生产 bridge。
+
+## 安全提示
+
+> 机器人是危险设备。运行 bridge 脚本前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。

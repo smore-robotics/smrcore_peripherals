@@ -17,6 +17,5 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 - tests/: 导入与 DTO 单测，见 `tests/_index.md`
 - scripts/build_wheel.sh: wheel 打包（由 `../scripts/build_py.sh` 调用；要求已设置 `SMRCORE_PERIPHERALS_CPP_ROOT`）
 - scripts/verify_wheel.sh: 安装 wheel 冒烟导入（由 `../scripts/run_test_py.sh` 调用）
-- scripts/upload_artifacts.sh: 将 `dist/*.whl` 原样上传（`rcore_peripherals_py-<version>-<python-tags>.whl`）到 Generic Registry `smrcore_peripherals/<version|latest>/`
 
 > FLOW: C++ install → wheel 打包 native + Python → `import rcore_peripherals` → `FtSensor(options)` 同 C++ 语义

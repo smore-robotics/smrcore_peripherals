@@ -1,234 +1,123 @@
+<div align="center">
+
 # smrcore_peripherals
 
-公开的外设 SDK 源码仓库，负责 **SpaceMouse（3D 鼠标）** 与 **六维力/力矩传感器（F/T Sensor）** 的本地读取、协议解析、采样归一化，以及调试/桥接工具。
+**从源码构建 SMRCore 外设库，探测、读取 SpaceMouse 与六维力传感器，并通过机器人 SDK 桥接到 rcore。**
 
-本仓库不依赖 rcore 源码，也不维护机器人 IDL。需要将外设数据送入机器人控制器时，应通过 rcore SDK 的 `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()` 高频外部输入接口，而不是 RPC。
+[![License](https://img.shields.io/badge/License-Apache%202.0-1f6feb.svg)](LICENSE)
+
+[English](README.en.md) · **简体中文**
+
+</div>
+
+---
+
+`smrcore_peripherals` 是公开外设 SDK 源码仓库，包含 SpaceMouse 与六维力/力矩传感器的本地读取、协议解析、采样归一化、C++/Python API、调试工具和 SDK bridge app。
+
+本仓库不依赖 rcore 源码，也不维护机器人 IDL。需要将外设数据送入机器人控制器时，通过 [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) 的 `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()` 高频外部输入接口完成，不走 RPC。
+
+## 文档
+
+| 文档 | 说明 |
+|---|---|
+| [C++ 示例](examples/cpp/README.md) | 当前源码内 app 与历史 examples 的构建和运行方式 |
+| [Python 示例](examples/python/README.md) | Python wheel 构建、安装和脚本用法 |
+| [平台配置](docs/platform_setup.md) | SpaceMouse 设备节点、串口权限、机器人连接 |
+
+## 快速开始
+
+仅构建外设库、基础 app 和单元测试，不需要机器人 SDK：
+
+```bash
+git clone https://github.com/smore-robotics/smrcore_peripherals.git
+cd smrcore_peripherals
+
+./scripts/build.sh --with-sdk OFF --tests ON
+./scripts/run_tests.sh -t Release
+
+./build_Release/install/bin/app_peripherals_probe
+```
+
+构建 SDK bridge app 需要先下载 `.sdk-version` 指定的 `smrcore_sdk`：
+
+```bash
+./scripts/download.sh
+./scripts/build.sh --with-sdk ON --tests ON
+
+./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
+```
 
 ## 主要功能
 
 | 模块 | 说明 |
-|------|------|
-| **SpaceMouse** | 通过 Linux input 子系统读取原始事件，输出归一化六自由度 + 夹爪目标状态 |
-| **F/T Sensor** | 支持坤维（`kunwei_serial`）与鑫精诚 XJC（`xjc_serial`）串口协议，输出六维力/力矩 |
-| **C++ SDK** | `smrcore::peripherals` 命名空间，统一外设生命周期：`Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` |
-| **Python 绑定** | 基于 pybind11 的 `rcore_peripherals` 包，API 与 C++ 对齐 |
-| **示例应用** | `app/` 下提供探测、读数、SDK 桥接与标定辅助工具 |
+|---|---|
+| SpaceMouse | 通过 Linux input 子系统读取原始事件，输出归一化 6-DOF + 夹爪目标状态 |
+| F/T Sensor | 支持坤维 `kunwei_serial` 与鑫精诚 XJC `xjc_serial` 串口协议，输出六维力/力矩 |
+| C++ API | `smrcore::peripherals` 命名空间，统一 `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` 生命周期 |
+| Python API | `rcore_peripherals` wheel，API 与 C++ 门面对齐 |
+| SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向 rcore 注入 SpaceMouse / F/T sample |
 
-## 架构概览
+## 仓库结构
 
-```
-peripherals/          公开门面 API（FtSensor、SpaceMouse、types.hpp）
-    ↓
-protocols/            协议与设备 IO（串口、Linux input、帧解析）
-    ↓
-common/               时钟、consume-on-read 槽、资源路径解析等内部工具
-```
+| 路径 | 内容 |
+|---|---|
+| `src/` | 外设公开 API、内部工具和协议/设备 IO 实现 |
+| `app/` | 当前推荐的 C++ 可执行工具：probe、read、bridge |
+| `python/` | pybind11 Python wheel、示例脚本和测试 |
+| `examples/` | 对外示例源码；与 `app/` 能力保持同语义，后续逐步收口 |
+| `docs/` | 平台配置说明 |
+| `scripts/download.sh` | 只下载 `smrcore_sdk`，不下载本仓库自身制品 |
+| `scripts/build.sh` | 构建 C++ library、app、测试和可选 SDK bridge |
 
-- **门面层**（`src/peripherals/`）：派生自 `Peripheral` 基类，管理后台线程与采样槽，对外暴露 `*Options` 配置结构体。
-- **协议层**（`src/protocols/`）：品牌无关的 `SerialReader` + 各品牌 `Parser`/`Reader`；SpaceMouse 使用 `linux_input_reader`。
-- 类型语义与 rcore SDK `data.hpp` 中的外设采样类型对齐，便于桥接。
-
-## 目录结构
-
-```
-peripheral/
-├── app/              # 可执行示例与桥接工具
-├── cmake/            # CMake 包配置模板（find_package）
-├── infra/conan/      # Conan profile
-├── python/           # Python 绑定、示例脚本与测试
-├── scripts/          # 构建与测试脚本
-├── src/
-│   ├── common/       # 内部工具（时钟、LatestSlot、资源路径）
-│   ├── peripherals/  # 公开 API（types、Peripheral、FtSensor、SpaceMouse）
-│   └── protocols/    # 串口/Linux input 协议实现
-└── unittests/        # 无硬件单元测试
-```
-
-公开头文件位于 `src/peripherals/`，安装后映射到 `<peripherals/...>`。聚合入口：
+公开头文件安装到 `<peripherals/...>`，聚合入口：
 
 ```cpp
 #include "peripherals/peripherals.hpp"
 ```
 
-## 配置方式
+安装后外部项目可使用：
 
-外设参数通过 **C++ 配置结构体**（或 Python 同名类）在 `Initialize()` 时传入。运行中不支持原地修改，需 `Stop()` → `Shutdown()` 后以新参数重新 `Initialize()`。
-
-### 公共基类
-
-**`PeripheralOptions`**（`src/peripherals/types.hpp`）：
-
-| 字段 | 含义 | 默认值 |
-|------|------|--------|
-| `sample_rate_hz` | 请求采样/输出频率 [Hz]；≤0 时使用设备默认值 | `0` |
-
-设备默认值：SpaceMouse **125 Hz**，力传感器 **1000 Hz**。
-
-### 力传感器 — `FtSensorOptions`
-
-由 `FtSensor::Initialize()` 消费。`sensor_type` 支持 `kunwei_serial` / `kunwei` / `xjc_serial` / `xjc`。
-
-| 字段 | 含义 | 默认值 |
-|------|------|--------|
-| `serial_port` | 串口路径，如 `/dev/ttyUSB0` | — |
-| `sensor_type` | 协议类型 | `xjc_serial` |
-| `baud_rate` | 波特率 [bit/s] | `460800` |
-| `read_buffer_size` | 单次 read 缓冲区 [byte] | `512` |
-| `stale_timeout_ms` | 首帧等待基础超时 [ms]；实际超时为 `max(100, 5 × stale_timeout_ms)` | `20` |
-| `sample_rate_hz` | 请求采样率 [Hz]；XJC 会映射为 100/250/500/1000 | 继承基类 `0` → 1000 |
-
-C++ 示例：
-
-```cpp
-#include "peripherals/peripherals.hpp"
-
-smrcore::peripherals::FtSensorOptions options;
-options.serial_port = "/dev/ttyUSB0";
-options.sensor_type = "kunwei_serial";
-options.baud_rate = 460800;
-options.sample_rate_hz = 1000.0;
-
-smrcore::peripherals::FtSensor sensor;
-sensor.Initialize(options);
-sensor.Start();
-sensor.WaitForFirstSample();  // 可选：等待首帧有效数据
+```cmake
+find_package(smrcore_peripherals CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE smrcore::peripherals)
 ```
 
-### SpaceMouse — `SpaceMouseOptions`
+## 版本文件
 
-由 `SpaceMouse::Initialize()` 消费。`device_path` 为空时自动探测设备。
+| 文件 | 含义 |
+|---|---|
+| `.sdk-version` | standalone bridge 默认使用的 `smrcore_sdk` 版本 |
 
-| 字段 | 含义 | 默认值 |
-|------|------|--------|
-| `device_path` | Linux input 设备路径，如 `/dev/input/event7` | 空（自动探测） |
-| `sample_rate_hz` | 输出频率 [Hz] | 继承基类 `0` → 125 |
-| `axis_map` | 六轴映射（x,y,z,roll,pitch,yaw → 原始轴索引） | `{0,1,2,3,4,5}` |
-| `axis_sign` | 各轴符号（<0 取反） | Y/Z/pitch/yaw 取反 |
-| `axis_scale` | 归一化满量程原始计数值 | 各轴 `350` |
-| `deadzone` | 死区阈值 [0, 1] | `0.01` |
+`scripts/download.sh` 读取 `.sdk-version`，自动按当前 Linux 架构下载 `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` 到 `third_party/prebuilt/smrcore_sdk/`。V1 暂不支持 Windows standalone 下载/构建。
 
-C++ 示例：
-
-```cpp
-smrcore::peripherals::SpaceMouseOptions options;
-options.sample_rate_hz = 125.0;
-// options.device_path = "/dev/input/event7";  // 可选，留空则自动探测
-
-smrcore::peripherals::SpaceMouse mouse;
-mouse.Initialize(options);
-mouse.Start();
-```
-
-### 协议层配置（扩展/二次开发）
-
-集成方通常只需使用上述 `*Options`。若直接调用协议层 Reader，另有：
-
-| 类型 | 位置 | 说明 |
-|------|------|------|
-| `SerialReaderConfig` | `protocols/ft_sensor/serial_reader.hpp` | 串口路径、波特率、read 缓冲区 |
-| `KunweiReaderConfig` | `protocols/ft_sensor/kunwei/kunwei_reader.hpp` | 同 `SerialReaderConfig` |
-| `XjcReaderConfig` | `protocols/ft_sensor/xjc/xjc_reader.hpp` | 继承串口配置 + `active_reporting_hz`（100/250/500/1000） |
-
-`FtSensor` 门面会在内部将 `FtSensorOptions` 映射为对应品牌的 Reader 配置。
-
-### 命令行覆盖
-
-示例应用支持 CLI 参数覆盖 `*Options` 字段，无需 JSON 配置文件：
+## 常用命令
 
 ```bash
-./build_Release/install/bin/app_peripherals_read_ft_sensor \
-  --serial-port /dev/ttyUSB1 \
-  --sensor-type kunwei_serial \
-  --baud-rate 460800 \
-  --sample-rate 1000 \
-  --stale-timeout-ms 20 \
-  --read-buffer-size 512
-```
-
-Python 示例见 `python/README.md` 与 `python/app/`。
-
-## 编译
-
-### 环境要求
-
-- CMake ≥ 3.16、Conan 2.x、Ninja（Linux 默认）
-- Linux x86_64 本地开发（默认）或 Linux armv8/aarch64 交叉编译；V1 暂不支持 Windows standalone 构建
-
-### C++ 构建
-
-```bash
-# 默认构建 SDK bridge，需先下载 smrcore_sdk
-./scripts/download.sh
-./scripts/build.sh
-
-# 只构建外设库、基础 app 和单元测试，不依赖 smrcore_sdk
+# 无 SDK bridge 的轻量构建
 ./scripts/build.sh --with-sdk OFF --tests ON
 
-# Debug
-./scripts/build.sh -t Debug
-
-# armv8 交叉编译（在 Docker 内执行）
-rkbuild ./scripts/build.sh -a armv8
-
-# 运行单元测试
-./scripts/run_tests.sh -t Release
-```
-
-产物位于 `build_<Type>/`（`bin/`、`lib/`、`install/`）。
-
-### 构建 SDK 桥接工具
-
-`app_peripherals_bridge` 默认随 standalone 构建启用，依赖 `smrcore_sdk` 安装树：
-
-```bash
+# 下载 SDK 并构建 bridge
 ./scripts/download.sh
-./scripts/build.sh --with-sdk ON --sdk-root third_party/prebuilt/smrcore_sdk
-```
+./scripts/build.sh --with-sdk ON --tests ON
 
-嵌入 **rcore 主仓** 联合编译时，执行 `./scripts/build.sh -P`，rcore 会自动开启 `SMR_PERIPHERAL_WITH_SDK` 并链接同构建内的 `rcoresdk`。
+# 运行 C++ 单元测试
+./scripts/run_tests.sh -t Release
 
-### Python 绑定
-
-先完成 C++ 构建，再：
-
-```bash
+# 构建并验证 Python wheel
 ./scripts/build_py.sh
 ./scripts/run_test_py.sh -t Release
 ```
 
-详见 `python/README.md`。
+## 安全提示
 
-## 示例应用（`app/`）
+> 机器人是危险设备。运行任何 bridge 或运动相关示例前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据会直接影响控制器行为。
 
-构建后二进制位于 `build_Release/bin/` 或 `build_Release/install/bin/`。
+## 许可证
 
-| 应用 | 是否需要 SDK | 功能 |
-|------|:------------:|------|
-| `app_peripherals_probe` | 否 | 探测 SpaceMouse 与 F/T 传感器的连接状态、型号、采样率等管理面信息 |
-| `app_peripherals_read_spacemouse` | 否 | 持续打印归一化 SpaceMouse 采样（六自由度 + 夹爪状态） |
-| `app_peripherals_read_spacemouse_raw` | 否 | 持续打印 SpaceMouse 原始轴计数值与按键位掩码 |
-| `app_peripherals_read_ft_sensor` | 否 | 初始化力传感器、等待首帧有效数据后持续打印六维力/力矩；支持 CLI 参数 |
-| `app_peripherals_bridge` | 是 | 单一 `Robot` SDK 会话内桥接 SpaceMouse 和/或 F/T 传感器；默认两路都启，适合 FDCC 双外设输入；传 `--spacemouse` 或 `--ft-sensor` 时仅启用显式选择的外设 |
+本仓库以 [Apache License 2.0](LICENSE) 发布。第三方依赖遵循其各自许可证。
 
-未启用 SDK 时，带 `bridge` 后缀的应用会提示需在 rcore 主仓联合编译。
+<div align="center">
 
-### 快速验证
+Copyright © Smartmore Corporation
 
-```bash
-./build_Release/install/bin/app_peripherals_probe
-./build_Release/install/bin/app_peripherals_read_spacemouse
-./build_Release/install/bin/app_peripherals_read_ft_sensor --serial-port /dev/ttyUSB0
-```
-
-对应 Python 示例脚本位于 `python/app/`。
-
-## 远程仓库
-
-```text
-https://github.com/smore-robotics/smrcore_peripherals
-```
-
-## 相关仓库
-
-- **rcore**：机器人核心库与 SDK
-- **rcore-sdk-py**：Python 机器人 SDK
+</div>

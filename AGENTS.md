@@ -1,47 +1,33 @@
 # AGENTS.md - smrcore_peripherals
 
-Public examples and workflow notes for SMRCore peripheral integration. This
-repository does not contain peripheral reader source code; it consumes versioned
-release assets for `smrcore_peripherals` and, for robot bridge examples,
-`smrcore_sdk`.
+Public source repository for SMRCore peripheral integration. It contains the C++/Python peripheral reader implementation, diagnostic apps, examples, and the SDK bridge entry points.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `examples/cpp/` | C++ examples for probing, reading, and injecting samples into the robot SDK |
-| `examples/python/` | Python examples for read-only peripheral workflows plus bridge skeletons |
-| `docs/` | Setup, dependency, and workflow notes |
-| `scripts/` | Download and build helpers |
-| `.peripherals-version` | Peripheral SDK version (`x.y.z` or `latest`) targeted by examples |
-| `.sdk-version` | Robot SDK version (`x.y.z` or `latest`) targeted by bridge examples |
+| `src/` | Public C++ API, protocol parsers, and device IO |
+| `app/` | Recommended C++ tools: probe, read, and bridge |
+| `python/` | pybind11 wheel, Python scripts, and tests |
+| `examples/` | Public example source and bilingual usage docs |
+| `docs/` | Platform setup notes |
+| `scripts/` | Download, build, test, and package helpers |
+| `.sdk-version` | Robot SDK version used by standalone bridge builds |
 
-## Common tasks
+## Common Tasks
 
 ```bash
+./scripts/build.sh --with-sdk OFF --tests ON
+./scripts/run_tests.sh -t Release
+
 ./scripts/download.sh
-./scripts/build.sh
-./build/bin/probe
-./build/bin/read_ft_sensor --serial-port /dev/ttyUSB0
-./build/bin/teleop_spacemouse_sdk
+./scripts/build.sh --with-sdk ON --tests ON
+./build_Release/install/bin/app_peripherals_bridge --robot <robot-ip>
 ```
 
-Use `SMRCORE_PERIPHERALS_BUILD_SDK_EXAMPLES=OFF ./scripts/build.sh` when only
-the peripheral package is available.
-
-## Release assets
-
-Expected GitHub Release assets:
-
-- `smrcore_peripherals-cpp-linux-x86_64-v<version>.tar.gz`
-- `smrcore_peripherals-cpp-windows-x86_64-v<version>.tar.gz`
-- `smrcore_peripherals_py-<version>-<python-tags>.whl`
-
-## C++ conventions
+## C++ Conventions
 
 - C++17.
 - Function and method names use PascalCase.
 - Local variables and parameters use snake_case.
-- Do not add DDS publishing examples here; robot injection goes through
-  `robot.Peripheral().UpdateSpaceMouseSample()` and
-  `robot.Peripheral().UpdateFtSensorSample()`.
+- High-rate robot injection goes through `robot.Peripheral().UpdateSpaceMouseSample()` and `robot.Peripheral().UpdateFtSensorSample()`.

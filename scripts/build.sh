@@ -149,12 +149,6 @@ echo "Conan build profile: $BUILD_PROFILE"
 echo "版本: $SMRCORE_PERIPHERALS_CPP_VERSION (channel=$SMRCORE_PERIPHERALS_CHANNEL)"
 echo "========================================"
 
-if [ -n "${CI_JOB_TOKEN:-}" ]; then
-    conan remote login gitlab gitlab-ci-token -p "$CI_JOB_TOKEN" || true
-elif [ -n "${GITLAB_PRIVATE_TOKEN:-}" ]; then
-    conan remote login gitlab gitlab -p "$GITLAB_PRIVATE_TOKEN" || true
-fi
-
 BUILD_DIR="$PROJECT_ROOT/build_$TYPE"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"

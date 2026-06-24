@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from smrcore_peripherals import FtSensor, FtSensorOptions, SpaceMouse, SpaceMouseOptions
+from rcore_peripherals import FtSensor, FtSensorOptions, SpaceMouse, SpaceMouseOptions
 
 
 def parse_args() -> argparse.Namespace:

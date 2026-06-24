@@ -1,9 +1,0 @@
-# Check Generic Packages authentication.
-if [ -n "${CI_JOB_TOKEN:-}" ]; then
-    GENERIC_TOKEN_STR="JOB-TOKEN: ${CI_JOB_TOKEN}"
-elif [ -n "${GITLAB_PRIVATE_TOKEN:-}" ]; then
-    GENERIC_TOKEN_STR="PRIVATE-TOKEN: ${GITLAB_PRIVATE_TOKEN}"
-else
-    echo "ERROR: missing CI_JOB_TOKEN or GITLAB_PRIVATE_TOKEN" >&2
-    exit 1
-fi
