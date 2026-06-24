@@ -10,7 +10,7 @@ from __future__ import annotations
 
 def main() -> int:
     raise SystemExit(
-        "Install matching smrcore_sdk and smrcore_peripherals wheels, then mirror "
+        "Install matching smrcore_sdk and rcore_peripherals wheels, then mirror "
         "examples/cpp/fdcc_external_ft_sensor.cpp: stream F/T samples and call "
         "robot.Peripheral().UpdateFtSensorSample() when the Python SDK exposes it."
     )
