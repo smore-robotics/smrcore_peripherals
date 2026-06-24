@@ -1,0 +1,27 @@
+# 单一版本真源（仅供 source 使用）
+#
+# 解析 CI_COMMIT_TAG，导出后续 build / Conan 共用的版本变量：
+#   SMRCORE_PERIPHERALS_VERSION         打 tag 时为 x.y.z；无 tag 时为空
+#   SMRCORE_PERIPHERALS_CHANNEL         release（有 tag）/ latest（无 tag）
+#   SMRCORE_PERIPHERALS_CPP_VERSION     打 tag 时为 x.y.z；无 tag 时回落 0.0.0
+#
+# 用法：source "${SCRIPT_DIR}/ci/resolve_version"
+
+if [ -n "${CI_COMMIT_TAG:-}" ]; then
+    _rv_normalized="${CI_COMMIT_TAG#v}"
+    if ! printf '%s' "${_rv_normalized}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+        echo "resolve_version: CI_COMMIT_TAG 不是 x.y.z / vx.y.z 格式: ${CI_COMMIT_TAG}" >&2
+        unset _rv_normalized
+        return 1 2>/dev/null || exit 1
+    fi
+    SMRCORE_PERIPHERALS_VERSION="${_rv_normalized}"
+    SMRCORE_PERIPHERALS_CHANNEL="release"
+    SMRCORE_PERIPHERALS_CPP_VERSION="${_rv_normalized}"
+    unset _rv_normalized
+else
+    SMRCORE_PERIPHERALS_VERSION=""
+    SMRCORE_PERIPHERALS_CHANNEL="latest"
+    SMRCORE_PERIPHERALS_CPP_VERSION="0.0.0"
+fi
+
+export SMRCORE_PERIPHERALS_VERSION SMRCORE_PERIPHERALS_CHANNEL SMRCORE_PERIPHERALS_CPP_VERSION

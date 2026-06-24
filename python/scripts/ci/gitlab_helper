@@ -1,0 +1,8 @@
+#!/bin/bash
+
+function _gitlab_generic_artifacts_url() {
+    local project_id="${PACKAGE_REGISTRY_PROJECT_ID:-${GITLAB_PROJECT_ID:-5624}}"
+    echo "https://git.smoa.cc/api/v4/projects/${project_id}/packages/generic"
+}
+
+GENERIC_ARTIFACTS_URL="$(_gitlab_generic_artifacts_url)"

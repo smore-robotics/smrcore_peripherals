@@ -1,0 +1,13 @@
+function(add_peripheral_test name)
+    add_executable(${name} ${name}.cpp)
+    target_link_libraries(${name} PRIVATE smrcore_peripherals)
+    target_include_directories(${name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+    add_test(NAME ${name} COMMAND ${name})
+    set_tests_properties(${name} PROPERTIES WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    install(TARGETS ${name} RUNTIME DESTINATION bin)
+endfunction()
+
+add_peripheral_test(ut_spacemouse_sample_model)
+add_peripheral_test(ut_kunwei_parser)
+add_peripheral_test(ut_ft_sensor_options)
+add_peripheral_test(ut_xjc_parser)
