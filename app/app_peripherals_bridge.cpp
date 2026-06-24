@@ -2,10 +2,10 @@
  * @file app_peripherals_bridge.cpp
  * @brief 外设统一 SDK bridge 应用
  *
- * 本应用在一个进程内只创建一个 `rcore::sdk::Robot` 会话，然后按需启动
+ * 本应用在一个进程内只创建一个机器人 SDK 会话，然后按需启动
  * SpaceMouse 与/或六维力/力矩传感器 reader，并通过
  * `Robot::Peripheral().UpdateSpaceMouseSample()` /
- * `UpdateFtSensorSample()` 把采样写入 rcore 控制器使用的 DDS topic。
+ * `UpdateFtSensorSample()` 将采样送入机器人控制器。
  *
  * 使用方式：
  * - FDCC 同时需要 SpaceMouse 与力传感器：
@@ -21,7 +21,7 @@
  * 任一选择参数，则仅启动显式选择的外设。设备参数只影响对应外设，例如
  * `--spacemouse-device /dev/input/event7`、`--ft-serial-port /dev/ttyUSB0`。
  *
- * 构建要求：需启用 `SMR_PERIPHERAL_WITH_SDK=ON`，否则本应用只打印提示后退出。
+ * 构建要求：需启用 SDK bridge 支持（`--with-sdk ON`），否则本应用只打印提示后退出。
  */
 
 #include "peripherals/peripherals.hpp"

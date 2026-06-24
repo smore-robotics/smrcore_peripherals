@@ -41,7 +41,7 @@ sudo usermod -aG dialout "$USER"
 ./scripts/build.sh --with-sdk ON
 ```
 
-Start the bridge before enabling Teleoperation or FDCC so rcore receives fresh external input:
+Start the bridge before enabling Teleoperation or FDCC so the controller receives fresh peripheral samples:
 
 ```bash
 ./build_Release/bin/app_peripherals_bridge --robot <robot-ip>

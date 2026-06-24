@@ -2,7 +2,7 @@
 
 # Overview
 
-对应 C++ `app/` 读数工具与 SDK bridge 的 Python 脚本，依赖已安装的 `rcore-peripherals-py` wheel（import 名 `rcore_peripherals`）；bridge 另需 `rcore_sdk`（`rcore-sdk-py` wheel）。
+对应 C++ `app/` 读数工具与 SDK bridge 的 Python 脚本，依赖已安装的 `rcore-peripherals-py` wheel（import 名 `rcore_peripherals`）；bridge 另需 `rcore_sdk`（`rcore-sdk-py` wheel）。构建与运行说明见 `README.md` / `README.en.md`。
 
 # Contents
 

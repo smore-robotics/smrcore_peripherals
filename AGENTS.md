@@ -1,15 +1,14 @@
 # AGENTS.md - smrcore_peripherals
 
-Public source repository for SMRCore peripheral integration. It contains the C++/Python peripheral reader implementation, diagnostic apps, examples, and the SDK bridge entry points.
+Public source repository for SMRCore peripheral integration. It contains the C++/Python peripheral reader implementation, diagnostic apps, and the SDK bridge entry points.
 
 ## Layout
 
 | Path | What |
 |---|---|
 | `src/` | Public C++ API, protocol parsers, and device IO |
-| `app/` | Recommended C++ tools: probe, read, and bridge |
-| `python/` | pybind11 wheel, Python scripts, and tests |
-| `examples/` | Public example source and bilingual usage docs |
+| `app/` | C++ tools: probe, read, and bridge (see `app/README.md`) |
+| `python/` | pybind11 wheel, Python app scripts, and tests |
 | `docs/` | Platform setup notes |
 | `scripts/` | Download, build, test, and package helpers |
 | `.sdk-version` | Robot SDK version used by standalone bridge builds |
@@ -30,4 +29,4 @@ Public source repository for SMRCore peripheral integration. It contains the C++
 - C++17.
 - Function and method names use PascalCase.
 - Local variables and parameters use snake_case.
-- High-rate robot injection goes through `robot.Peripheral().UpdateSpaceMouseSample()` and `robot.Peripheral().UpdateFtSensorSample()`.
+- High-rate robot integration goes through `robot.Peripheral().UpdateSpaceMouseSample()` and `robot.Peripheral().UpdateFtSensorSample()`.

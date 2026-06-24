@@ -22,7 +22,7 @@ namespace smrcore::peripherals
  *
  * 基于坤维或鑫精诚（XJC）串口协议（见 `protocols/ft_sensor/kunwei/`、`xjc/`）
  * 以事件驱动方式读帧。
- * 采样语义与 rcore SDK `UpdateFtSensorSample()` 输入的 `FtSensorSample` 一致。
+ * 可通过机器人 SDK `UpdateFtSensorSample()` 送入控制器。
  *
  * 线程安全：公共方法内部已同步；对象销毁不得与其他方法并发。
  */

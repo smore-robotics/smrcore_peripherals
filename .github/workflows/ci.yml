@@ -75,7 +75,7 @@ jobs:
       - name: Run Python unit tests
         run: ./scripts/run_test_py.sh -t Release
 
-      - name: Check Python examples
+      - name: Check Python app scripts
         run: ./scripts/check_python_examples.sh
 
   # Pushes to main only run lightweight repo checks. Right after a PR merges,
@@ -109,7 +109,7 @@ jobs:
             bash -n "$script"
           done
 
-      - name: Check Python examples
+      - name: Check Python app scripts
         run: ./scripts/check_python_examples.sh
 
       - name: Compile Python tests

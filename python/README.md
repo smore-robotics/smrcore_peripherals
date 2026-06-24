@@ -1,6 +1,6 @@
 # rcore-peripherals-py
 
-面向 rcore 外设 SDK 的 Python 绑定，基于 pybind11 + scikit-build-core 构建，设置与 `rcore-sdk-py` 对齐（Python >= 3.10）。
+面向 SMRCore 外设 SDK 的 Python 绑定，基于 pybind11 + scikit-build-core 构建（Python >= 3.10）。
 
 ## C++ 依赖
 

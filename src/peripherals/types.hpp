@@ -2,8 +2,8 @@
  * @file types.hpp
  * @brief 外设库公共数据类型
  *
- * 类型语义与 rcore SDK `data.hpp` 中的外设采样类型保持一致，便于桥接
- * `robot.Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`。
+ * 类型语义与机器人 SDK 外设采样接口保持一致，便于通过
+ * `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()` 桥接。
  *
  * @author Smartmore Corporation
  * @date 2026-06-18
@@ -27,8 +27,8 @@ namespace smrcore::peripherals
  */
 enum class GripperCommand : uint8_t
 {
-    Open = 0,  ///< 张开目标；rcore 映射为配置的张开位置
-    Close = 1, ///< 闭合目标；rcore 映射为配置的闭合位置
+    Open = 0,  ///< 张开目标
+    Close = 1, ///< 闭合目标
 };
 
 /** @brief 外设初始化公共选项 */
@@ -87,8 +87,7 @@ struct SpaceMouseOptions : public PeripheralOptions
     std::array<int, 6> axis_map{{0, 1, 2, 3, 4, 5}};
 
     /**
-     * 各输出轴符号。>= 0 保持原符号，< 0 取反。默认与 rcore 遗留映射一致：
-     * Y/Z 与 pitch/yaw 取反。
+     * 各输出轴符号。>= 0 保持原符号，< 0 取反。默认 Y/Z 与 pitch/yaw 取反。
      */
     std::array<int, 6> axis_sign{{1, -1, -1, 1, -1, -1}};
 
@@ -134,8 +133,7 @@ struct PeripheralInfo
 /**
  * @brief 归一化 SpaceMouse 采样
  *
- * XYZRPY 为输入通道名，非机器人坐标系语义；rcore 按遥操作配置解释。
- * 与 rcore SDK `SpaceMouseSample` 字段一一对应。
+ * XYZRPY 为输入通道名，非机器人坐标系语义；具体含义由遥操作配置决定。
  */
 struct SpaceMouseSample
 {
@@ -153,10 +151,7 @@ struct SpaceMouseSample
     double yaw{0.0};
     /** 锁存夹爪目标状态，随每条采样一并携带 */
     GripperCommand gripper_command{GripperCommand::Open};
-    /**
-     * 生产者单调时钟时间戳 [s]，仅元数据；
-     * rcore 控制器以本地 DDS 到达时间判断新鲜度。
-     */
+    /** 生产者单调时钟时间戳 [s]，仅元数据。 */
     double timestamp_sec{0.0};
 };
 
@@ -178,8 +173,8 @@ struct SpaceMouseRawSample
 /**
  * @brief 力传感器协议坐标系下的原始六维力/力矩
  *
- * 与 rcore SDK `FtSensorSample` 字段一一对应。坤维 V1 解析器将协议
- * kg/kg·m 浮点转为 N/N·m，不施加法兰/工具变换或标定补偿。
+ * 坤维 V1 解析器将协议 kg/kg·m 浮点转为 N/N·m，
+ * 不施加法兰/工具变换或标定补偿。
  */
 struct FtSensorSample
 {
@@ -195,10 +190,7 @@ struct FtSensorSample
     double ty{0.0};
     /** 力矩 Z [N·m]，传感器协议坐标系 */
     double tz{0.0};
-    /**
-     * 生产者单调时钟时间戳 [s]，仅元数据；
-     * rcore 控制器以本地 DDS 到达时间判断新鲜度。
-     */
+    /** 生产者单调时钟时间戳 [s]，仅元数据。 */
     double timestamp_sec{0.0};
 };
 

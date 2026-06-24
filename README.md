@@ -2,7 +2,7 @@
 
 # smrcore_peripherals
 
-**从源码构建 SMRCore 外设库，探测、读取 SpaceMouse 与六维力传感器，并通过机器人 SDK 桥接到 rcore。**
+**从源码构建 SMRCore 外设库，探测、读取 SpaceMouse 与六维力传感器，并通过机器人 SDK 桥接到控制器。**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-1f6feb.svg)](LICENSE)
 
@@ -14,14 +14,14 @@
 
 `smrcore_peripherals` 是公开外设 SDK 源码仓库，包含 SpaceMouse 与六维力/力矩传感器的本地读取、协议解析、采样归一化、C++/Python API、调试工具和 SDK bridge app。
 
-本仓库不依赖 rcore 源码，也不维护机器人 IDL。需要将外设数据送入机器人控制器时，通过 [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) 的 `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()` 高频外部输入接口完成，不走 RPC。
+需要将外设数据送入机器人控制器时，通过 [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) 调用 `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`。
 
 ## 文档
 
 | 文档 | 说明 |
 |---|---|
-| [C++ 示例](examples/cpp/README.md) | 当前源码内 app 与历史 examples 的构建和运行方式 |
-| [Python 示例](examples/python/README.md) | Python wheel 构建、安装和脚本用法 |
+| [C++ 应用](app/README.md) | 探测、读数与 SDK bridge 可执行工具 |
+| [Python 应用](python/app/README.md) | Python wheel 脚本用法 |
 | [平台配置](docs/platform_setup.md) | SpaceMouse 设备节点、串口权限、机器人连接 |
 
 ## 快速开始
@@ -55,16 +55,15 @@ cd smrcore_peripherals
 | F/T Sensor | 支持坤维 `kunwei_serial` 与鑫精诚 XJC `xjc_serial` 串口协议，输出六维力/力矩 |
 | C++ API | `smrcore::peripherals` 命名空间，统一 `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` 生命周期 |
 | Python API | `rcore_peripherals` wheel，API 与 C++ 门面对齐 |
-| SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向 rcore 注入 SpaceMouse / F/T sample |
+| SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向机器人控制器推送 SpaceMouse / F/T 采样 |
 
 ## 仓库结构
 
 | 路径 | 内容 |
 |---|---|
 | `src/` | 外设公开 API、内部工具和协议/设备 IO 实现 |
-| `app/` | 当前推荐的 C++ 可执行工具：probe、read、bridge |
-| `python/` | pybind11 Python wheel、示例脚本和测试 |
-| `examples/` | 对外示例源码；与 `app/` 能力保持同语义，后续逐步收口 |
+| `app/` | C++ 可执行工具：probe、read、bridge |
+| `python/` | pybind11 Python wheel、应用脚本和测试 |
 | `docs/` | 平台配置说明 |
 | `scripts/download.sh` | 只下载 `smrcore_sdk`，不下载本仓库自身制品 |
 | `scripts/build.sh` | 构建 C++ library、app、测试和可选 SDK bridge |
