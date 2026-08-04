@@ -70,5 +70,6 @@
   "scripts/check_python_examples.sh": "scripts/_index.md",
   "scripts/download.sh": "scripts/_index.md",
   "scripts/run_test_py.sh": "scripts/_index.md",
-  "scripts/package.sh": "scripts/_index.md"
+  "scripts/package.sh": "scripts/_index.md",
+  "app/app_peripherals_ft_sensor_calib.cpp": "app/_index.md"
 }

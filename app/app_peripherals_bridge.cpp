@@ -21,14 +21,11 @@
  * 任一选择参数，则仅启动显式选择的外设。设备参数只影响对应外设，例如
  * `--spacemouse-device /dev/input/event7`、`--ft-serial-port /dev/ttyUSB0`。
  *
- * 构建要求：需启用 SDK bridge 支持（`--with-sdk ON`），否则本应用只打印提示后退出。
+ * 构建要求：仅在 `SMR_PERIPHERAL_WITH_SDK=ON`（`--with-sdk ON`）时编译本目标。
  */
 
 #include "peripherals/peripherals.hpp"
-
-#ifdef SMR_PERIPHERAL_WITH_SDK
 #include "sdk/robot.hpp"
-#endif
 
 #include <atomic>
 #include <chrono>
@@ -50,7 +47,6 @@ void HandleSignal(int)
     g_running.store(false, std::memory_order_release);
 }
 
-#ifdef SMR_PERIPHERAL_WITH_SDK
 struct BridgeOptions
 {
     std::string robot_ip;
@@ -227,18 +223,11 @@ void RunFtSensorBridge(smrcore::peripherals::FtSensor &sensor,
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
-#endif
 
 } // namespace
 
 int main(int argc, char **argv)
 {
-#ifndef SMR_PERIPHERAL_WITH_SDK
-    std::cout << "app_peripherals_bridge was built without smrcore_sdk. "
-              << "Reconfigure with -DSMR_PERIPHERAL_WITH_SDK=ON."
-              << std::endl;
-    return 0;
-#else
     BridgeOptions options;
     if (!ParseCli(argc, argv, options))
     {
@@ -253,23 +242,33 @@ int main(int argc, char **argv)
     std::signal(SIGTERM, HandleSignal);
 
     rcore::sdk::Robot robot;
+    std::cout << "正在连接机器人"
+              << (options.robot_ip.empty() ? "" : " " + options.robot_ip)
+              << " ..." << std::endl;
     if (!robot.Initialize(options.robot_ip))
     {
         std::cerr << "failed to initialize robot SDK" << std::endl;
         return 1;
     }
+    std::cout << "机器人 SDK 连接成功" << std::endl;
 
     smrcore::peripherals::SpaceMouse spacemouse;
-    if (options.spacemouse_enabled &&
-        (!spacemouse.Initialize(options.spacemouse) || !spacemouse.Start()))
+    if (options.spacemouse_enabled)
     {
-        std::cerr << "failed to start SpaceMouse reader" << std::endl;
-        return 1;
+        std::cout << "正在启动 SpaceMouse ..." << std::endl;
+        if (!spacemouse.Initialize(options.spacemouse) || !spacemouse.Start())
+        {
+            std::cerr << "failed to start SpaceMouse reader" << std::endl;
+            return 1;
+        }
+        std::cout << "SpaceMouse 已启动" << std::endl;
     }
 
     smrcore::peripherals::FtSensor sensor;
     if (options.ft_sensor_enabled)
     {
+        std::cout << "正在启动力传感器 " << options.ft_sensor.serial_port
+                  << " ..." << std::endl;
         if (!sensor.Initialize(options.ft_sensor) || !sensor.Start())
         {
             std::cerr << "failed to start F/T sensor reader" << std::endl;
@@ -282,6 +281,7 @@ int main(int argc, char **argv)
                       << info.frame_error_count << std::endl;
             return 1;
         }
+        std::cout << "力传感器已启动" << std::endl;
     }
 
     auto peripheral = robot.Peripheral();
@@ -303,6 +303,11 @@ int main(int argc, char **argv)
                                        std::ref(sdk_mutex));
     }
 
+    std::cout << "连接成功，正在发送外设消息"
+              << (options.spacemouse_enabled ? " [SpaceMouse]" : "")
+              << (options.ft_sensor_enabled ? " [F/T]" : "")
+              << "（Ctrl+C 退出）" << std::endl;
+
     if (spacemouse_thread.joinable())
     {
         spacemouse_thread.join();
@@ -311,6 +316,6 @@ int main(int argc, char **argv)
     {
         ft_sensor_thread.join();
     }
+    std::cout << "外设 bridge 已停止" << std::endl;
     return 0;
-#endif
 }

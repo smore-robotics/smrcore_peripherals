@@ -6,7 +6,7 @@
 
 # Contents
 
-- PeripheralHelpers.cmake: `smr_peripheral_resolve_sdk_target(out_var)` 解析 `smrcore_sdk` 包；`smr_target_enable_sdk_bridge(target)` 为 bridge 应用启用 SDK 链接
+- PeripheralHelpers.cmake: `smr_peripheral_resolve_sdk_target(out_var)` 解析 `smrcore_sdk` 包；`smr_target_enable_sdk_bridge(target)` 为需 SDK 的 bridge/标定应用启用 SDK 链接（仅 `SMR_PERIPHERAL_WITH_SDK=ON` 时由 `app/CMakeLists.txt` 添加对应目标）
 - smrcore_peripheralsConfig.cmake.in: `@PACKAGE_INIT@` + `find_dependency(Threads)` + include 已安装的 `smrcore_peripheralsTargets.cmake`（导出目标 `smrcore::peripherals`）
 
 用法：`find_package(smrcore_peripherals CONFIG)` → `target_link_libraries(... smrcore::peripherals)`

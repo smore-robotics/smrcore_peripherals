@@ -55,14 +55,15 @@ cd smrcore_peripherals
 | F/T Sensor | 支持坤维 `kunwei_serial` 与鑫精诚 XJC `xjc_serial` 串口协议，输出六维力/力矩 |
 | C++ API | `smrcore::peripherals` 命名空间，统一 `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` 生命周期 |
 | Python API | `rcore_peripherals` wheel，API 与 C++ 门面对齐 |
-| SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向机器人控制器推送 SpaceMouse / F/T 采样 |
+| SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向机器人控制器推送 SpaceMouse / F/T 采样（仅 `--with-sdk ON` 编译） |
+| F/T calib | `app_peripherals_ft_sensor_calib` MoveJ 静态标定（仅 `--with-sdk ON`；依赖 bridge 注入 raw） |
 
 ## 仓库结构
 
 | 路径 | 内容 |
 |---|---|
 | `src/` | 外设公开 API、内部工具和协议/设备 IO 实现 |
-| `app/` | C++ 可执行工具：probe、read、bridge |
+| `app/` | C++ 可执行工具：probe、read、bridge、F/T calib |
 | `python/` | pybind11 Python wheel、应用脚本和测试 |
 | `docs/` | 平台配置说明 |
 | `scripts/download.sh` | 只下载 `smrcore_sdk`，不下载本仓库自身制品 |

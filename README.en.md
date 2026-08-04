@@ -20,7 +20,7 @@ To send peripheral data into the robot controller, use [`smrcore_sdk`](https://g
 
 | Doc | Description |
 |---|---|
-| [C++ applications](app/README.en.md) | Probe, read, and SDK bridge executables |
+| [C++ applications](app/README.en.md) | Probe, read, SDK bridge, and F/T calibration executables |
 | [Python applications](python/app/README.en.md) | Python wheel script usage |
 | [Platform setup](docs/platform_setup.en.md) | SpaceMouse event nodes, serial permissions, robot connectivity |
 
@@ -55,14 +55,15 @@ To build the SDK bridge app, first download the `smrcore_sdk` version pinned by 
 | F/T Sensor | Supports Kunwei `kunwei_serial` and XJC `xjc_serial` serial protocols |
 | C++ API | `smrcore::peripherals` namespace with `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` lifecycle |
 | Python API | `rcore_peripherals` wheel aligned with the C++ facade |
-| SDK bridge | `app_peripherals_bridge` pushes SpaceMouse / F/T samples into the robot controller through `smrcore_sdk` |
+| SDK bridge | `app_peripherals_bridge` pushes SpaceMouse / F/T samples into the robot controller through `smrcore_sdk` (built only with `--with-sdk ON`) |
+| F/T calib | `app_peripherals_ft_sensor_calib` MoveJ static calibration (built only with `--with-sdk ON`; requires bridge for raw) |
 
 ## Repository Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | Public API, internal helpers, protocol parsers, and device IO |
-| `app/` | C++ tools: probe, read, and bridge |
+| `app/` | C++ tools: probe, read, bridge, and F/T calib |
 | `python/` | pybind11 Python wheel, application scripts, and tests |
 | `docs/` | Platform setup notes |
 | `scripts/download.sh` | Downloads `smrcore_sdk` only; it does not download this repository's own binaries |

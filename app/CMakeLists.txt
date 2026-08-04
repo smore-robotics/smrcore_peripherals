@@ -10,5 +10,10 @@ add_peripheral_app(app_peripherals_read_spacemouse)
 add_peripheral_app(app_peripherals_read_spacemouse_raw)
 add_peripheral_app(app_peripherals_read_ft_sensor)
 
-add_peripheral_app(app_peripherals_bridge)
-smr_target_enable_sdk_bridge(app_peripherals_bridge)
+if(SMR_PERIPHERAL_WITH_SDK)
+    add_peripheral_app(app_peripherals_bridge)
+    smr_target_enable_sdk_bridge(app_peripherals_bridge)
+
+    add_peripheral_app(app_peripherals_ft_sensor_calib)
+    smr_target_enable_sdk_bridge(app_peripherals_ft_sensor_calib)
+endif()

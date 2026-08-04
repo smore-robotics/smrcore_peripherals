@@ -2,7 +2,7 @@
 
 **English** · [简体中文](README.md)
 
-This directory contains peripheral diagnostic tools and SDK bridge executables using the `smrcore::peripherals` C++ API.
+This directory contains peripheral diagnostic tools and SDK bridge/calibration executables using the `smrcore::peripherals` C++ API.
 
 For platform permissions and device setup, see [Platform setup](../docs/platform_setup.en.md).
 
@@ -14,7 +14,7 @@ From the repository root:
 # No robot SDK required: build the peripherals library, read apps, and tests
 ./scripts/build.sh --with-sdk OFF --tests ON
 
-# Required for app_peripherals_bridge
+# Required for bridge / F/T calibration (SDK targets are only built then)
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
@@ -27,7 +27,8 @@ Binaries are built under `build_Release/bin/`:
 | `app_peripherals_read_spacemouse` | Decoded SpaceMouse 6-DOF + gripper target samples |
 | `app_peripherals_read_spacemouse_raw` | Raw Linux input axis/button samples |
 | `app_peripherals_read_ft_sensor` | Serial wrench stream with `WaitForFirstSample` and full serial CLI |
-| `app_peripherals_bridge` | Push SpaceMouse and/or F/T data via `robot.Peripheral().Update*Sample()` |
+| `app_peripherals_bridge` | Push SpaceMouse and/or F/T data via `robot.Peripheral().Update*Sample()` (`--with-sdk ON`) |
+| `app_peripherals_ft_sensor_calib` | MoveJ static F/T calibration (`--with-sdk ON`; run bridge first for raw) |
 
 ## Read Peripherals Only
 
@@ -61,6 +62,17 @@ Binaries are built under `build_Release/bin/`:
 ```
 
 `--robot <robot-ip>` is optional. When omitted, the app passes an empty IP and lets the SDK apply its default connection behavior. Start the bridge before enabling Teleoperation or FDCC so the controller receives fresh peripheral samples.
+
+## F/T Static Calibration
+
+Start the bridge to inject `ft_sensor_state`, then run calibration:
+
+```bash
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip>
+# Persist after a good Preview:
+./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip> --save
+```
 
 ## Safety
 
