@@ -16,8 +16,11 @@ XjcReader::~XjcReader() { Close(); }
 bool XjcReader::Open(const XjcReaderConfig &config)
 {
     Close();
-    parser_.Reset();
     active_reporting_hz_ = config.active_reporting_hz;
+    if (!parser_.SetReportingHz(active_reporting_hz_))
+    {
+        return false;
+    }
     return reader_.Open(config);
 }
 
@@ -65,10 +68,11 @@ bool XjcReader::Close()
 
 bool XjcReader::IsOpen() const { return reader_.IsOpen(); }
 
-std::vector<FtSensorSample>
-XjcReader::ReadAvailable(int timeout_ms, std::size_t max_bytes,
-                         std::size_t max_frames, double timestamp_sec,
-                         bool *disconnected)
+std::vector<FtSensorSample> XjcReader::ReadAvailable(int timeout_ms,
+                                                     std::size_t max_bytes,
+                                                     std::size_t max_frames,
+                                                     double timestamp_sec,
+                                                     bool *disconnected)
 {
     return reader_.ReadAvailable(parser_, timeout_ms, max_bytes, max_frames,
                                  timestamp_sec, disconnected);

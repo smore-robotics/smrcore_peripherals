@@ -2,7 +2,8 @@
  * @file xjc_reader.hpp
  * @brief 鑫精诚力传感器串口读取（品牌协议层）
  *
- * 主动上报模式：发送 Modbus 启流命令后传感器持续推送 16 字节帧。
+ * 主动上报模式：发送 Modbus 启流命令后，传感器按频率持续推送
+ * 16 字节 int16 帧或 28 字节 float 帧。
  *
  * @author Smartmore Corporation
  * @date 2026-06-18
@@ -47,11 +48,9 @@ public:
     bool Close();
     bool IsOpen() const;
 
-    std::vector<FtSensorSample> ReadAvailable(int timeout_ms,
-                                              std::size_t max_bytes,
-                                              std::size_t max_frames,
-                                              double timestamp_sec,
-                                              bool *disconnected = nullptr);
+    std::vector<FtSensorSample>
+    ReadAvailable(int timeout_ms, std::size_t max_bytes, std::size_t max_frames,
+                  double timestamp_sec, bool *disconnected = nullptr);
 
     uint32_t frame_error_count() const { return parser_.frame_error_count(); }
     void ResetParser() { parser_.Reset(); }
