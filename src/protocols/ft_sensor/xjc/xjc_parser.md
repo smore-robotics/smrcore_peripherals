@@ -3,8 +3,11 @@
 
 # XjcParser
 
-鑫精诚 28 字节主动上报帧流式解析：`Feed()` / `DrainLatest()` / `Reset()` / `frame_error_count()`。
+鑫精诚主动上报帧流式解析：`SetReportingHz()` 选择格式，`Feed()` / `DrainLatest()` / `Reset()` / `frame_error_count()` 处理分片与重同步。
+
+- 100/250/500 Hz：16 字节，`0x20 0x4e` + 6×int16 LE + Modbus CRC16；力缩放 1/100，力矩缩放 1/1000
+- 1000 Hz：28 字节，`0x20 0x4e` + 6×float32 BE + Modbus CRC16
 
 启停命令：`BuildStartCommand(hz)`（100/250/500/1000 Hz）、`BuildStopCommand()`。
 
-> FLOW: 末字节 0x3C 对齐 28 字节帧 → 偏移 4 起 6×float32 LE（N / N·m）→ FtSensorSample
+> FLOW: 搜索 `0x20 0x4e` 帧头 → 按上报频率确定 16/28 字节帧 → 验证 CRC → 解码为 FtSensorSample

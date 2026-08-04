@@ -16,7 +16,7 @@ show_help() {
 
 环境变量:
   SDK_VERSION, VERSION            覆盖 .sdk-version（须为 x.y.z）
-  SDK_RELEASE_TAG                 下载使用的 release tag（默认 v<version>；CI 可用 prerelease）
+  SDK_RELEASE_TAG                 下载使用的 release tag（未设置时先 v<version>，不存在再 prerelease）
   SMRCORE_PERIPHERALS_SDK_ROOT    覆盖解包目录
   SMRCORE_SDK_DOWNLOAD_BASE_URL   覆盖下载 base URL
 EOF
@@ -71,26 +71,65 @@ if ! printf '%s\n' "$SDK_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
     exit 1
 fi
 
-SDK_RELEASE_TAG="${SDK_RELEASE_TAG:-v$SDK_VERSION}"
-
 TAR_NAME="smrcore_sdk-cpp-linux-${SDK_ARCH}-v${SDK_VERSION}.tar.gz"
-URL="${BASE_URL}/${SDK_RELEASE_TAG}/${TAR_NAME}"
 TMP_DIR="$(mktemp -d)"
 cleanup() {
     rm -rf "$TMP_DIR"
 }
 trap cleanup EXIT
 
-echo "下载 smrcore_sdk ${SDK_VERSION} (release: ${SDK_RELEASE_TAG})"
-echo "  $URL"
-if command -v curl >/dev/null 2>&1; then
-    curl -fL "$URL" -o "$TMP_DIR/$TAR_NAME"
-elif command -v wget >/dev/null 2>&1; then
-    wget -O "$TMP_DIR/$TAR_NAME" "$URL"
+url_exists() {
+    local url="$1"
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsIL --head "$url" >/dev/null 2>&1
+    elif command -v wget >/dev/null 2>&1; then
+        wget --spider -q "$url" 2>/dev/null
+    else
+        echo "需要 curl 或 wget 下载 SDK。" >&2
+        return 1
+    fi
+}
+
+download_url() {
+    local url="$1"
+    local dest="$2"
+    if command -v curl >/dev/null 2>&1; then
+        curl -fL "$url" -o "$dest"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$dest" "$url"
+    else
+        echo "需要 curl 或 wget 下载 SDK。" >&2
+        return 1
+    fi
+}
+
+if [ -n "${SDK_RELEASE_TAG:-}" ]; then
+    RELEASE_TAGS=("$SDK_RELEASE_TAG")
 else
-    echo "需要 curl 或 wget 下载 SDK。" >&2
+    RELEASE_TAGS=("v$SDK_VERSION" "prerelease")
+fi
+
+SDK_RELEASE_TAG=""
+URL=""
+for tag in "${RELEASE_TAGS[@]}"; do
+    candidate_url="${BASE_URL}/${tag}/${TAR_NAME}"
+    if url_exists "$candidate_url"; then
+        SDK_RELEASE_TAG="$tag"
+        URL="$candidate_url"
+        break
+    fi
+    echo "release ${tag} 未找到 ${TAR_NAME}，尝试下一个来源..." >&2
+done
+
+if [ -z "$SDK_RELEASE_TAG" ]; then
+    echo "未找到 smrcore_sdk ${SDK_VERSION} 安装包。" >&2
+    echo "已尝试 release tag: ${RELEASE_TAGS[*]}" >&2
     exit 1
 fi
+
+echo "下载 smrcore_sdk ${SDK_VERSION} (release: ${SDK_RELEASE_TAG})"
+echo "  $URL"
+download_url "$URL" "$TMP_DIR/$TAR_NAME"
 
 rm -rf "$SDK_ROOT"
 mkdir -p "$SDK_ROOT"

@@ -7,9 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  # PR / manual runs validate candidate smrcore_sdk assets from the `prerelease`
-  # release, using the version pinned in .sdk-version. Official releases are
-  # validated separately by release-smoke.yml.
+  # PR / manual runs build against the smrcore_sdk version pinned in .sdk-version.
+  # download.sh tries the official v<version> release first, then falls back to
+  # `prerelease` when that asset is not published yet. Official peripheral
+  # releases are validated separately by release-smoke.yml.
   linux-peripherals-smoke:
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
@@ -36,18 +37,17 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install "conan>=2.0"
 
-      - name: Resolve SDK version
+      - name: Check .sdk-version format
         run: |
           version="$(tr -d '[:space:]' < .sdk-version)"
           if ! printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo ".sdk-version must contain x.y.z, got: $version" >&2
             exit 1
           fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=prerelease" >> "$GITHUB_ENV"
+          echo "SDK version: $version"
 
       - name: Download smrcore_sdk
-        run: SDK_VERSION="$VERSION" SDK_RELEASE_TAG="$RELEASE_TAG" ./scripts/download.sh
+        run: ./scripts/download.sh
 
       - name: Build C++ library, apps, and tests
         run: ./scripts/build.sh --with-sdk ON --tests ON

@@ -1,13 +1,13 @@
 # AGENTS.md - smrcore_peripherals
 
-Public source repository for SMRCore peripheral integration. It contains the C++/Python peripheral reader implementation, diagnostic apps, and the SDK bridge entry points.
+Public source repository for SMRCore peripheral integration. It contains the C++/Python peripheral reader implementation, diagnostic apps, and the SDK bridge/calibration entry points.
 
 ## Layout
 
 | Path | What |
 |---|---|
 | `src/` | Public C++ API, protocol parsers, and device IO |
-| `app/` | C++ tools: probe, read, and bridge (see `app/README.md`) |
+| `app/` | C++ tools: probe, read, bridge, F/T calib (see `app/README.md`) |
 | `python/` | pybind11 wheel, Python app scripts, and tests |
 | `docs/` | Platform setup notes |
 | `scripts/` | Download, build, test, and package helpers |
@@ -22,6 +22,7 @@ Public source repository for SMRCore peripheral integration. It contains the C++
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 ./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip>
 ```
 
 ## C++ Conventions

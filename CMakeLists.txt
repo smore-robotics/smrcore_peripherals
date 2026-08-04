@@ -31,7 +31,7 @@ if(NOT BUILD_TESTS)
     set(SMR_PERIPHERAL_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 endif()
 option(SMR_PERIPHERAL_BUILD_PYTHON "Build Python bindings" OFF)
-option(SMR_PERIPHERAL_WITH_SDK "Build robot SDK bridge tools" OFF)
+option(SMR_PERIPHERAL_WITH_SDK "Build robot SDK bridge and F/T calibration tools" OFF)
 set(SMR_PERIPHERAL_SDK_ROOT "" CACHE PATH "smrcore_sdk install prefix for standalone bridge builds")
 
 set(SMR_PERIPHERAL_SDK_TARGET "")

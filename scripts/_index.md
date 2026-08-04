@@ -6,7 +6,7 @@
 
 # Contents
 
-- download.sh: 读取 `.sdk-version`（或 `SDK_VERSION`/`VERSION`），按当前 Linux 架构下载 `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` 到 `third_party/smrcore_sdk`；`SDK_RELEASE_TAG` 默认 `v<version>`，CI 可用 `prerelease`；不接受 CLI 参数，Windows 直接报错
+- download.sh: 读取 `.sdk-version`（或 `SDK_VERSION`/`VERSION`），按当前 Linux 架构下载 `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` 到 `third_party/smrcore_sdk`；未设置 `SDK_RELEASE_TAG` 时先查 `v<version>` release，不存在再回退 `prerelease`；不接受 CLI 参数，Windows 直接报错
 - build.sh: C++ SDK 编译/安装（`build_<Type>/install`）；默认 `-a x86`、`--with-sdk ON`、`--tests ON`；`--sdk-root` 指向 standalone `smrcore_sdk` 安装树
 - build_py.sh: 在 C++ 已安装前提下构建 Python wheel（调用 `python/scripts/build_wheel.sh`）
 - run_tests.sh: C++ CTest（`unittests/`）

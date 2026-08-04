@@ -14,7 +14,7 @@
 # 不需要机器人 SDK，只构建外设库、读数 app 和测试
 ./scripts/build.sh --with-sdk OFF --tests ON
 
-# 需要 app_peripherals_bridge 时
+# 需要 bridge / F/T 标定时（仅此时编译 SDK 相关目标）
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
@@ -27,7 +27,8 @@
 | `app_peripherals_read_spacemouse` | 解码后的 SpaceMouse 6-DOF + 夹爪目标采样 |
 | `app_peripherals_read_spacemouse_raw` | 原始 Linux input 轴/按键采样 |
 | `app_peripherals_read_ft_sensor` | 串口六维力矩流，含 `WaitForFirstSample` 与完整串口 CLI |
-| `app_peripherals_bridge` | 通过 `robot.Peripheral().Update*Sample()` 推送 SpaceMouse 和/或 F/T 数据 |
+| `app_peripherals_bridge` | 通过 `robot.Peripheral().Update*Sample()` 推送 SpaceMouse 和/或 F/T 数据（需 `--with-sdk ON`） |
+| `app_peripherals_ft_sensor_calib` | MoveJ 静态六维力标定（需 `--with-sdk ON`；先跑 bridge 注入 raw） |
 
 ## 仅读外设
 
@@ -61,6 +62,17 @@
 ```
 
 `--robot <robot-ip>` 可省略；省略时向 SDK 传入空 IP，由 SDK 使用默认连接行为。bridge 应在启用遥操作或 FDCC 之前启动，确保控制器能持续收到外设采样。
+
+## 六维力静态标定
+
+先启动 bridge 注入 `ft_sensor_state`，再运行标定：
+
+```bash
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip>
+# 确认 Preview 合格后再持久化：
+./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip> --save
+```
 
 ## 安全提示
 

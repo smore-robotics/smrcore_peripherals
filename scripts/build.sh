@@ -52,7 +52,7 @@ show_help() {
   -t, --type TYPE       构建类型: Release (默认), Debug, RelWithDebInfo
   -a, --arch ARCH       目标架构: x86 (默认) 或 armv8；V1 暂不支持 Windows
   -j, --jobs N          并行编译核心数
-      --with-sdk ON/OFF 构建 app_peripherals_bridge 等 SDK bridge 工具 (默认: ON)
+      --with-sdk ON/OFF 构建 app_peripherals_bridge / app_peripherals_ft_sensor_calib 等 SDK 工具 (默认: ON)
       --sdk-root PATH   smrcore_sdk 安装树 (默认: third_party/smrcore_sdk)
       --tests ON/OFF    是否构建测试 (默认: ON)
   -G, --generator NAME  CMake 生成器 (默认: Ninja)
