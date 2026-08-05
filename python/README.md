@@ -44,19 +44,21 @@ python3 python/app/app_peripherals_read_spacemouse.py
 
 `app_peripherals_bridge.py` 除本仓库构建的 `rcore-peripherals-py` 外，还需要**额外**从 [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) GitHub Releases 安装机器人 Python SDK（包名 `rcore-sdk-py`，import 名 `rcore_sdk`）。行为与 C++ `app_peripherals_bridge` 一致。
 
-**版本须与仓库根目录 `.sdk-version` 一致**（当前为 `0.0.7`，与 C++ `./scripts/download.sh` 下载的 `smrcore_sdk-cpp-*` 同源，不要混用不同版本）。
+**版本须与仓库根目录 `.sdk-version` 一致**（当前为 `0.0.24`，与 C++ `./scripts/download.sh` 下载的 `smrcore_sdk-cpp-*` 同源，不要混用不同版本）。
 
-发布页：https://github.com/smore-robotics/smrcore_sdk/releases/tag/v0.0.7
+发布页：https://github.com/smore-robotics/smrcore_sdk/releases/tag/v0.0.24（候选包见 `prerelease` release）
 
-在 release **Assets** 中选择与当前 Python ABI、平台匹配的 `rcore_sdk_py-0.0.7-<python-tags>.whl`，例如 Linux x86_64 + CPython 3.10 为 `cp310-cp310-linux_x86_64`。
+在 release **Assets** 中选择与当前 Python ABI、平台匹配的 `rcore_sdk_py-0.0.24-<python-tags>.whl`，例如 Linux x86_64 + CPython 3.10 为 `cp310-cp310-linux_x86_64`。
 
 ```bash
 PY_TAG=cp310-cp310-linux_x86_64   # 其他平台见 release Assets，如 cp310-cp310-win_amd64
+VERSION=0.0.24
+RELEASE_TAG=prerelease            # 正式版发布后改为 v${VERSION}
 
 curl -L --fail \
-  "https://github.com/smore-robotics/smrcore_sdk/releases/download/v0.0.7/rcore_sdk_py-0.0.7-${PY_TAG}.whl" \
-  -o "rcore_sdk_py-0.0.7-${PY_TAG}.whl"
-python3 -m pip install "./rcore_sdk_py-0.0.7-${PY_TAG}.whl"
+  "https://github.com/smore-robotics/smrcore_sdk/releases/download/${RELEASE_TAG}/rcore_sdk_py-${VERSION}-${PY_TAG}.whl" \
+  -o "rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
+python3 -m pip install "./rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
 ```
 
 安装外设 wheel 与机器人 SDK 后运行 bridge：
