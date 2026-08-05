@@ -111,6 +111,9 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 ## 安全提示
 
 > 机器人是危险设备。运行任何 bridge 或运动相关示例前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据会直接影响控制器行为。
+>
+> **外置六维力用于力控前必须先标定一次**（`app_peripherals_ft_sensor_calib --save`）。未标定外力十分危险。标定保存后，日常由 bridge 向
+> [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / 控制器推送采样；FDCC 等力控示例见 SDK 仓库的 `compliance/fd_cartesian_admittance`。SpaceMouse 遥操同样必须由本仓库 bridge 注入采样。
 
 ## 许可证
 

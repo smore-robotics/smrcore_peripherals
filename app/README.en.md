@@ -65,6 +65,15 @@ Binaries are built under `build_Release/bin/`:
 
 ## F/T Static Calibration
 
+> **Safety:** Before using an external six-axis F/T sensor for force control
+> (for example
+> [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) FDCC with
+> `--wrench-source ft_sensor`), you **must** complete a one-time static
+> calibration and `--save` it. An uncalibrated external wrench does not reflect
+> true contact forces and can cause large unintended motion — this is dangerous.
+> Calibration only needs to succeed once; afterwards, keep the bridge streaming
+> samples into the SDK/controller for daily use.
+
 Start the bridge to inject `ft_sensor_state`, then run calibration:
 
 ```bash
@@ -73,6 +82,24 @@ Start the bridge to inject `ft_sensor_state`, then run calibration:
 # Persist after a good Preview:
 ./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip> --save
 ```
+
+After calibration is saved, daily use with the SDK FDCC example:
+
+```bash
+# 1) Keep streaming external F/T samples (and optionally SpaceMouse)
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+# or default dual peripherals:
+./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+
+# 2) In smrcore_sdk, enable the external wrench source / SpaceMouse
+./compliance_fd_cartesian_admittance <robot-ip> --wrench-source ft_sensor
+./compliance_fd_cartesian_admittance <robot-ip> --mode spacemouse
+```
+
+SpaceMouse teleop is also **not** opened by the SDK example itself. Samples must
+be injected by this repository's `app_peripherals_bridge --spacemouse` (or the
+default dual-peripheral bridge) via
+`Robot::Peripheral().UpdateSpaceMouseSample()`.
 
 ## Safety
 

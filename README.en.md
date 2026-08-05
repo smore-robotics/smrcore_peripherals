@@ -111,6 +111,8 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 ## Safety
 
 > Robots are hazardous machines. Before running any bridge or motion-related example, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
+>
+> **External six-axis F/T for force control requires a one-time calibration** (`app_peripherals_ft_sensor_calib --save`). An uncalibrated external wrench is dangerous. After it is saved, keep the bridge streaming samples into [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / the controller; see the SDK `compliance/fd_cartesian_admittance` example for FDCC. SpaceMouse teleop likewise requires this repository's bridge to inject samples.
 
 ## License
 
