@@ -9,13 +9,13 @@
  *
  * 使用方式：
  * - FDCC 同时需要 SpaceMouse 与力传感器：
- *   `app_peripherals_bridge --robot <robot_ip>`
+ *   `app_peripherals_bridge --robot-ip <robot_ip>`
  * - 只启用 SpaceMouse：
- *   `app_peripherals_bridge --robot <robot_ip> --spacemouse`
+ *   `app_peripherals_bridge --robot-ip <robot_ip> --spacemouse`
  * - 只启用力传感器：
- *   `app_peripherals_bridge --robot <robot_ip> --ft-sensor`
+ *   `app_peripherals_bridge --robot-ip <robot_ip> --ft-sensor`
  * - 同时显式启用两者：
- *   `app_peripherals_bridge --robot <robot_ip> --spacemouse --ft-sensor`
+ *   `app_peripherals_bridge --robot-ip <robot_ip> --spacemouse --ft-sensor`
  *
  * 选择规则：不传 `--spacemouse`/`--ft-sensor` 时默认两路都启动；只要出现
  * 任一选择参数，则仅启动显式选择的外设。设备参数只影响对应外设，例如
@@ -60,7 +60,7 @@ struct BridgeOptions
 void PrintUsage(const char *program)
 {
     std::cerr
-        << "usage: " << program << " [--robot IP] "
+        << "usage: " << program << " [--robot-ip IP] "
         << "[--spacemouse] [--ft-sensor]\n"
         << "       [--spacemouse-device PATH] "
            "[--spacemouse-sample-rate HZ]\n"
@@ -78,7 +78,7 @@ bool ParseCli(int argc, char **argv, BridgeOptions &options)
     for (int i = 1; i < argc; ++i)
     {
         const std::string arg = argv[i];
-        if (arg == "--robot" && i + 1 < argc)
+        if (arg == "--robot-ip" && i + 1 < argc)
         {
             options.robot_ip = argv[++i];
         }

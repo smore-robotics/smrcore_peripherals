@@ -18,7 +18,7 @@
  * 这与 `app_sdk_payload_calib`（动力学末端负载辨识）是不同链路。
  *
  * 使用方式：
- *   app_peripherals_bridge --robot <ip> --ft-sensor
+ *   app_peripherals_bridge --robot-ip <ip> --ft-sensor
  *   app_peripherals_ft_sensor_calib [--robot-ip <ip>]           # Preview
  *   app_peripherals_ft_sensor_calib [--robot-ip <ip>] --save    # 持久化并激活
  *

@@ -44,7 +44,7 @@ sudo usermod -aG dialout "$USER"
 在启用遥操作或 FDCC 之前启动 bridge，确保控制器能持续收到外设采样：
 
 ```bash
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
 ```

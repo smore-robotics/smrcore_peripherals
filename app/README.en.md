@@ -48,31 +48,58 @@ Binaries are built under `build_Release/bin/`:
 
 ```bash
 # Both SpaceMouse and F/T sensor are enabled by default, useful for FDCC
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
 
 # Teleop only or F/T only
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
 
 # Override device options
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> \
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> \
   --spacemouse-device /dev/input/event5 \
   --ft-serial-port /dev/ttyUSB0 \
   --ft-sensor-type xjc_serial
 ```
 
-`--robot <robot-ip>` is optional. When omitted, the app passes an empty IP and lets the SDK apply its default connection behavior. Start the bridge before enabling Teleoperation or FDCC so the controller receives fresh peripheral samples.
+`--robot-ip <robot-ip>` is optional. When omitted, the app passes an empty IP and lets the SDK apply its default connection behavior. Start the bridge before enabling Teleoperation or FDCC so the controller receives fresh peripheral samples.
 
 ## F/T Static Calibration
+
+> **Safety:** Before using an external six-axis F/T sensor for force control
+> (for example
+> [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) FDCC with
+> `--wrench-source ft-sensor`), you **must** complete a one-time static
+> calibration and `--save` it. An uncalibrated external wrench does not reflect
+> true contact forces and can cause large unintended motion — this is dangerous.
+> Calibration only needs to succeed once; afterwards, keep the bridge streaming
+> samples into the SDK/controller for daily use.
 
 Start the bridge to inject `ft_sensor_state`, then run calibration:
 
 ```bash
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
 ./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip>
 # Persist after a good Preview:
 ./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip> --save
 ```
+
+After calibration is saved, daily use with the SDK FDCC example:
+
+```bash
+# 1) Keep streaming external F/T samples (and optionally SpaceMouse)
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
+# or default dual peripherals:
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
+
+# 2) In smrcore_sdk, enable the external wrench source / SpaceMouse
+./compliance_fd_cartesian_admittance --robot-ip <ip> --wrench-source ft-sensor
+./compliance_fd_cartesian_admittance --robot-ip <ip> --mode spacemouse
+```
+
+SpaceMouse teleop is also **not** opened by the SDK example itself. Samples must
+be injected by this repository's `app_peripherals_bridge --spacemouse` (or the
+default dual-peripheral bridge) via
+`Robot::Peripheral().UpdateSpaceMouseSample()`.
 
 ## Safety
 

@@ -48,31 +48,54 @@
 
 ```bash
 # 默认同时启用 SpaceMouse 和 F/T，适合 FDCC 双外设输入
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
 
 # 仅遥操作或仅力传感器
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --spacemouse
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --spacemouse
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
 
 # 覆盖设备参数
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> \
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> \
   --spacemouse-device /dev/input/event5 \
   --ft-serial-port /dev/ttyUSB0 \
   --ft-sensor-type xjc_serial
 ```
 
-`--robot <robot-ip>` 可省略；省略时向 SDK 传入空 IP，由 SDK 使用默认连接行为。bridge 应在启用遥操作或 FDCC 之前启动，确保控制器能持续收到外设采样。
+`--robot-ip <robot-ip>` 可省略；省略时向 SDK 传入空 IP，由 SDK 使用默认连接行为。bridge 应在启用遥操作或 FDCC 之前启动，确保控制器能持续收到外设采样。
 
 ## 六维力静态标定
+
+> **安全：** 将外置六维力用于力控（例如
+> [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) 的 FDCC
+> `--wrench-source ft-sensor`）前，**必须先完成一次静态标定并 `--save`**。
+> 未标定的外力无法准确反映真实接触力，可能导致大幅非预期运动，十分危险。
+> 标定只需成功保存一次；之后日常运行只需 bridge 持续向 SDK/控制器推送采样。
 
 先启动 bridge 注入 `ft_sensor_state`，再运行标定：
 
 ```bash
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip> --ft-sensor
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
 ./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip>
 # 确认 Preview 合格后再持久化：
 ./build_Release/bin/app_peripherals_ft_sensor_calib --robot-ip <robot-ip> --save
 ```
+
+标定保存后，日常与 SDK FDCC 联调：
+
+```bash
+# 1) 持续推送外置力采样（以及可选 SpaceMouse）
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip> --ft-sensor
+# 或默认双外设：
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
+
+# 2) 在 smrcore_sdk 中启用外置力源 / SpaceMouse
+./compliance_fd_cartesian_admittance --robot-ip <ip> --wrench-source ft-sensor
+./compliance_fd_cartesian_admittance --robot-ip <ip> --mode spacemouse
+```
+
+SpaceMouse 遥操同样**不会**由 SDK 示例直接打开 `/dev/input/*`，必须由本仓库
+`app_peripherals_bridge --spacemouse`（或默认双外设）通过
+`Robot::Peripheral().UpdateSpaceMouseSample()` 注入。
 
 ## 安全提示
 
