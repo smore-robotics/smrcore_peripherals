@@ -55,6 +55,7 @@
   "python/app/app_peripherals_read_ft_sensor.py": "python/app/_index.md",
   "python/app/app_peripherals_read_spacemouse.py": "python/app/_index.md",
   "python/app/app_peripherals_bridge.py": "python/app/_index.md",
+  "python/app/app_peripherals_ft_sensor_calib.py": "python/app/_index.md",
   "python/app/README.md": "python/app/_index.md",
   "python/app/README.en.md": "python/app/_index.md",
   "python/src/rcore_peripherals/__init__.py": "python/_index.md",

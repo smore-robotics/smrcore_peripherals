@@ -44,7 +44,7 @@ cd smrcore_peripherals
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
 ```
 
 ## 主要功能
@@ -56,7 +56,7 @@ cd smrcore_peripherals
 | C++ API | `smrcore::peripherals` 命名空间，统一 `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` 生命周期 |
 | Python API | `rcore_peripherals` wheel，API 与 C++ 门面对齐 |
 | SDK bridge | `app_peripherals_bridge` 通过 `smrcore_sdk` 向机器人控制器推送 SpaceMouse / F/T 采样（仅 `--with-sdk ON` 编译） |
-| F/T calib | `app_peripherals_ft_sensor_calib` MoveJ 静态标定（仅 `--with-sdk ON`；依赖 bridge 注入 raw） |
+| F/T calib | `app_peripherals_ft_sensor_calib`（C++ / Python）MoveJ 静态标定；C++ 仅 `--with-sdk ON`；依赖 bridge 注入 raw |
 
 ## 仓库结构
 
@@ -112,7 +112,7 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 
 > 机器人是危险设备。运行任何 bridge 或运动相关示例前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据会直接影响控制器行为。
 >
-> **外置六维力用于力控前必须先标定一次**（`app_peripherals_ft_sensor_calib --save`）。未标定外力十分危险。标定保存后，日常由 bridge 向
+> **外置六维力用于力控前必须先标定一次**（C++ `app_peripherals_ft_sensor_calib --save` 或 Python `python/app/app_peripherals_ft_sensor_calib.py --save`）。未标定外力十分危险。标定保存后，日常由 bridge 向
 > [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / 控制器推送采样；FDCC 等力控示例见 SDK 仓库的 `compliance/fd_cartesian_admittance`。SpaceMouse 遥操同样必须由本仓库 bridge 注入采样。
 
 ## 许可证

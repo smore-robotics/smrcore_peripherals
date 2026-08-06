@@ -65,7 +65,7 @@ python3 -m pip install "./rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
 
 ```bash
 python3 -m pip install --force-reinstall python/dist/*.whl   # 若尚未安装 rcore-peripherals-py
-python3 python/app/app_peripherals_bridge.py --robot <robot-ip>
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip>
 ```
 
 ## API

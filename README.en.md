@@ -44,7 +44,7 @@ To build the SDK bridge app, first download the `smrcore_sdk` version pinned by 
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 
-./build_Release/bin/app_peripherals_bridge --robot <robot-ip>
+./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
 ```
 
 ## Features
@@ -56,7 +56,7 @@ To build the SDK bridge app, first download the `smrcore_sdk` version pinned by 
 | C++ API | `smrcore::peripherals` namespace with `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` lifecycle |
 | Python API | `rcore_peripherals` wheel aligned with the C++ facade |
 | SDK bridge | `app_peripherals_bridge` pushes SpaceMouse / F/T samples into the robot controller through `smrcore_sdk` (built only with `--with-sdk ON`) |
-| F/T calib | `app_peripherals_ft_sensor_calib` MoveJ static calibration (built only with `--with-sdk ON`; requires bridge for raw) |
+| F/T calib | `app_peripherals_ft_sensor_calib` (C++ / Python) MoveJ static calibration; C++ built only with `--with-sdk ON`; requires bridge for raw |
 
 ## Repository Layout
 
@@ -112,7 +112,7 @@ target_link_libraries(my_app PRIVATE smrcore::peripherals)
 
 > Robots are hazardous machines. Before running any bridge or motion-related example, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
 >
-> **External six-axis F/T for force control requires a one-time calibration** (`app_peripherals_ft_sensor_calib --save`). An uncalibrated external wrench is dangerous. After it is saved, keep the bridge streaming samples into [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / the controller; see the SDK `compliance/fd_cartesian_admittance` example for FDCC. SpaceMouse teleop likewise requires this repository's bridge to inject samples.
+> **External six-axis F/T for force control requires a one-time calibration** (C++ `app_peripherals_ft_sensor_calib --save` or Python `python/app/app_peripherals_ft_sensor_calib.py --save`). An uncalibrated external wrench is dangerous. After it is saved, keep the bridge streaming samples into [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / the controller; see the SDK `compliance/fd_cartesian_admittance` example for FDCC. SpaceMouse teleop likewise requires this repository's bridge to inject samples.
 
 ## License
 

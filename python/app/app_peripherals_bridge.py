@@ -138,7 +138,7 @@ def parse_args(argv: list[str] | None = None) -> BridgeOptions:
     parser = argparse.ArgumentParser(
         description="Bridge SpaceMouse and/or F/T sensor samples into robot SDK"
     )
-    parser.add_argument("--robot", default="", help="Robot controller IP (optional)")
+    parser.add_argument("--robot-ip", default="", help="Robot controller IP (optional)")
     parser.add_argument("--spacemouse", action="store_true", help="Enable SpaceMouse")
     parser.add_argument("--ft-sensor", action="store_true", help="Enable F/T sensor")
     parser.add_argument("--spacemouse-device", default="", help="SpaceMouse device path")
@@ -156,7 +156,7 @@ def parse_args(argv: list[str] | None = None) -> BridgeOptions:
     args = parser.parse_args(argv)
 
     options = BridgeOptions(
-        robot_ip=args.robot,
+        robot_ip=args.robot_ip,
         spacemouse=SpaceMouseOptions(
             device_path=args.spacemouse_device,
             sample_rate_hz=args.spacemouse_sample_rate,
@@ -182,20 +182,26 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGTERM, _handle_signal)
 
     robot = Robot()
+    ip_suffix = f" {options.robot_ip}" if options.robot_ip else ""
+    print(f"正在连接机器人{ip_suffix} ...", flush=True)
     if not robot.Initialize(options.robot_ip):
         print("failed to initialize robot SDK", file=sys.stderr, flush=True)
         return 1
+    print("机器人 SDK 连接成功", flush=True)
 
     spacemouse = SpaceMouse()
     if options.spacemouse_enabled:
         assert options.spacemouse is not None
+        print("正在启动 SpaceMouse ...", flush=True)
         if not spacemouse.Initialize(options.spacemouse) or not spacemouse.Start():
             print("failed to start SpaceMouse reader", file=sys.stderr, flush=True)
             return 1
+        print("SpaceMouse 已启动", flush=True)
 
     sensor = FtSensor()
     if options.ft_sensor_enabled:
         assert options.ft_sensor is not None
+        print(f"正在启动力传感器 {options.ft_sensor.serial_port} ...", flush=True)
         if not sensor.Initialize(options.ft_sensor) or not sensor.Start():
             print("failed to start F/T sensor reader", file=sys.stderr, flush=True)
             return 1
@@ -208,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
                 flush=True,
             )
             return 1
+        print("力传感器已启动", flush=True)
 
     peripheral = robot.Peripheral()
     sdk_lock = threading.Lock()
@@ -231,6 +238,13 @@ def main(argv: list[str] | None = None) -> int:
         thread.start()
         threads.append(thread)
 
+    channels = ""
+    if options.spacemouse_enabled:
+        channels += " [SpaceMouse]"
+    if options.ft_sensor_enabled:
+        channels += " [F/T]"
+    print(f"连接成功，正在发送外设消息{channels}（Ctrl+C 退出）", flush=True)
+
     try:
         while _is_running():
             time.sleep(0.1)
@@ -239,6 +253,7 @@ def main(argv: list[str] | None = None) -> int:
         for thread in threads:
             thread.join()
         robot.Shutdown()
+        print("外设 bridge 已停止", flush=True)
 
     return 0
 
