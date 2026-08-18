@@ -3,7 +3,8 @@
  * @brief 外设库公共数据类型
  *
  * 类型语义与机器人 SDK 外设采样接口保持一致，便于通过
- * `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()` 桥接。
+ * `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`
+ * 桥接。
  *
  * @author Smartmore Corporation
  * @date 2026-06-18
@@ -61,7 +62,8 @@ struct FtSensorOptions : public PeripheralOptions
     /** 力传感器协议类型，如 `kunwei_serial`、`xjc_serial`。 */
     std::string sensor_type{"xjc_serial"};
 
-    /** 首帧等待基础超时时间 [ms]，实际超时为 `max(100, 5 * stale_timeout_ms)`。 */
+    /** 首帧等待基础超时时间 [ms]，实际超时为 `max(100, 5 * stale_timeout_ms)`。
+     */
     int stale_timeout_ms{20};
 };
 
@@ -94,11 +96,18 @@ struct SpaceMouseOptions : public PeripheralOptions
     /**
      * 各输出轴归一化满量程对应的原始计数值，绝对值 < 1e-9 时按 1.0 处理。
      */
-    std::array<double, 6> axis_scale{{350.0, 350.0, 350.0,
-                                      350.0, 350.0, 350.0}};
+    std::array<double, 6> axis_scale{
+        {350.0, 350.0, 350.0, 350.0, 350.0, 350.0}};
 
     /** 归一化死区 [0, 1]，绝对值低于此阈值的轴输出为零。 */
     double deadzone{0.01};
+};
+
+/** @brief PICO WebXR 接收器初始化选项 */
+struct PicoOptions : public PeripheralOptions
+{
+    /** localhost HTTP/WebSocket 监听端口；PICO 通过 adb reverse 访问。 */
+    uint16_t port{8765};
 };
 
 /**
@@ -170,6 +179,41 @@ struct SpaceMouseRawSample
     double timestamp_sec{0.0};
 };
 
+/** @brief PICO 单个 6DoF 手柄状态，坐标保持 WebXR 参考空间语义 */
+struct PicoControllerPose
+{
+    bool present{false};
+    bool tracked{false};
+    std::array<double, 3> position{{0.0, 0.0, 0.0}};
+    std::array<double, 4> orientation_xyzw{{0.0, 0.0, 0.0, 1.0}};
+    double trigger{0.0};
+    double grip{0.0};
+    /** WebXR gamepad thumbstick axes [x, y]，范围 [-1, 1]。 */
+    std::array<double, 2> thumbstick{{0.0, 0.0}};
+};
+
+/** @brief PICO 头显 6DoF 状态，坐标保持 WebXR 参考空间语义 */
+struct PicoHeadsetPose
+{
+    bool present{false};
+    bool tracked{false};
+    std::array<double, 3> position{{0.0, 0.0, 0.0}};
+    std::array<double, 4> orientation_xyzw{{0.0, 0.0, 0.0, 1.0}};
+};
+
+/** @brief 一帧 PICO WebXR 头显及双手柄采样 */
+struct PicoSample
+{
+    uint64_t sequence{0};
+    double headset_timestamp_ms{0.0};
+    std::string reference_space;
+    PicoHeadsetPose headset;
+    PicoControllerPose left;
+    PicoControllerPose right;
+    /** 本机接收该帧的单调时钟时间戳 [s]。 */
+    double timestamp_sec{0.0};
+};
+
 /**
  * @brief 力传感器协议坐标系下的原始六维力/力矩
  *
@@ -194,14 +238,17 @@ struct FtSensorSample
     double timestamp_sec{0.0};
 };
 
-inline std::ostream &operator<<(std::ostream &os, const SpaceMouseSample &sample)
+inline std::ostream &operator<<(std::ostream &os,
+                                const SpaceMouseSample &sample)
 {
-    return os << sample.x << ' ' << sample.y << ' ' << sample.z << ' ' << sample.roll << ' '
-              << sample.pitch << ' ' << sample.yaw << ' '
-              << static_cast<uint8_t>(sample.gripper_command) << ' ' << sample.timestamp_sec;
+    return os << sample.x << ' ' << sample.y << ' ' << sample.z << ' '
+              << sample.roll << ' ' << sample.pitch << ' ' << sample.yaw << ' '
+              << static_cast<uint8_t>(sample.gripper_command) << ' '
+              << sample.timestamp_sec;
 }
 
-inline std::ostream &operator<<(std::ostream &os, const SpaceMouseRawSample &sample)
+inline std::ostream &operator<<(std::ostream &os,
+                                const SpaceMouseRawSample &sample)
 {
     os << "buttons=" << sample.buttons << " axes=";
     for (std::size_t i = 0; i < sample.axes.size(); ++i)
@@ -217,8 +264,8 @@ inline std::ostream &operator<<(std::ostream &os, const SpaceMouseRawSample &sam
 
 inline std::ostream &operator<<(std::ostream &os, const FtSensorSample &sample)
 {
-    return os << sample.fx << ' ' << sample.fy << ' ' << sample.fz << ' ' << sample.tx << ' '
-              << sample.ty << ' ' << sample.tz;
+    return os << sample.fx << ' ' << sample.fy << ' ' << sample.fz << ' '
+              << sample.tx << ' ' << sample.ty << ' ' << sample.tz;
 }
 
 } // namespace smrcore::peripherals

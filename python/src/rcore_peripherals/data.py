@@ -24,6 +24,20 @@ def _six_floats(values: Iterable[float], name: str) -> tuple[float, ...]:
     return normalized
 
 
+def _three_floats(values: Iterable[float], name: str) -> tuple[float, ...]:
+    normalized = tuple(float(value) for value in values)
+    if len(normalized) != 3:
+        raise ValueError(f"{name} must contain exactly 3 values")
+    return normalized
+
+
+def _four_floats(values: Iterable[float], name: str) -> tuple[float, ...]:
+    normalized = tuple(float(value) for value in values)
+    if len(normalized) != 4:
+        raise ValueError(f"{name} must contain exactly 4 values")
+    return normalized
+
+
 @dataclass(frozen=True)
 class PeripheralOptions:
     sample_rate_hz: float = 0.0
@@ -138,6 +152,26 @@ class SpaceMouseOptions(PeripheralOptions):
 
 
 @dataclass(frozen=True)
+class PicoOptions(PeripheralOptions):
+    """PICO WebXR localhost receiver options."""
+
+    sample_rate_hz: float = 0.0
+    port: int = 8765
+
+    def __init__(self, sample_rate_hz: float = 0.0, port: int = 8765):
+        super().__init__(sample_rate_hz=sample_rate_hz)
+        port = int(port)
+        if port < 1 or port > 65535:
+            raise ValueError("port must be in range 1..65535")
+        object.__setattr__(self, "port", port)
+
+    def to_dict(self) -> dict:
+        data = super().to_dict()
+        data["port"] = self.port
+        return data
+
+
+@dataclass(frozen=True)
 class PeripheralInfo:
     path: str = ""
     model: str = ""
@@ -235,5 +269,109 @@ class FtSensorSample:
             tx=float(data.get("tx", 0.0)),
             ty=float(data.get("ty", 0.0)),
             tz=float(data.get("tz", 0.0)),
+            timestamp_sec=float(data.get("timestamp_sec", 0.0)),
+        )
+
+
+@dataclass(frozen=True)
+class PicoControllerPose:
+    present: bool = False
+    tracked: bool = False
+    position: tuple[float, ...] = (0.0, 0.0, 0.0)
+    orientation_xyzw: tuple[float, ...] = (0.0, 0.0, 0.0, 1.0)
+    trigger: float = 0.0
+    grip: float = 0.0
+    thumbstick: tuple[float, ...] = (0.0, 0.0)
+
+    def __init__(
+        self,
+        present: bool = False,
+        tracked: bool = False,
+        position: Iterable[float] = (0.0, 0.0, 0.0),
+        orientation_xyzw: Iterable[float] = (0.0, 0.0, 0.0, 1.0),
+        trigger: float = 0.0,
+        grip: float = 0.0,
+        thumbstick: Iterable[float] = (0.0, 0.0),
+    ):
+        object.__setattr__(self, "present", bool(present))
+        object.__setattr__(self, "tracked", bool(tracked))
+        object.__setattr__(self, "position", _three_floats(position, "position"))
+        object.__setattr__(
+            self,
+            "orientation_xyzw",
+            _four_floats(orientation_xyzw, "orientation_xyzw"),
+        )
+        object.__setattr__(self, "trigger", float(trigger))
+        object.__setattr__(self, "grip", float(grip))
+        normalized_thumbstick = tuple(float(value) for value in thumbstick)
+        if len(normalized_thumbstick) != 2:
+            raise ValueError("thumbstick must contain exactly 2 values")
+        object.__setattr__(self, "thumbstick", normalized_thumbstick)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "PicoControllerPose":
+        return cls(
+            present=data.get("present", False),
+            tracked=data.get("tracked", False),
+            position=data.get("position", (0.0, 0.0, 0.0)),
+            orientation_xyzw=data.get("orientation_xyzw", (0.0, 0.0, 0.0, 1.0)),
+            trigger=data.get("trigger", 0.0),
+            grip=data.get("grip", 0.0),
+            thumbstick=data.get("thumbstick", (0.0, 0.0)),
+        )
+
+
+@dataclass(frozen=True)
+class PicoHeadsetPose:
+    present: bool = False
+    tracked: bool = False
+    position: tuple[float, ...] = (0.0, 0.0, 0.0)
+    orientation_xyzw: tuple[float, ...] = (0.0, 0.0, 0.0, 1.0)
+
+    def __init__(
+        self,
+        present: bool = False,
+        tracked: bool = False,
+        position: Iterable[float] = (0.0, 0.0, 0.0),
+        orientation_xyzw: Iterable[float] = (0.0, 0.0, 0.0, 1.0),
+    ):
+        object.__setattr__(self, "present", bool(present))
+        object.__setattr__(self, "tracked", bool(tracked))
+        object.__setattr__(self, "position", _three_floats(position, "position"))
+        object.__setattr__(
+            self,
+            "orientation_xyzw",
+            _four_floats(orientation_xyzw, "orientation_xyzw"),
+        )
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "PicoHeadsetPose":
+        return cls(
+            present=data.get("present", False),
+            tracked=data.get("tracked", False),
+            position=data.get("position", (0.0, 0.0, 0.0)),
+            orientation_xyzw=data.get("orientation_xyzw", (0.0, 0.0, 0.0, 1.0)),
+        )
+
+
+@dataclass(frozen=True)
+class PicoSample:
+    sequence: int = 0
+    headset_timestamp_ms: float = 0.0
+    reference_space: str = ""
+    headset: PicoHeadsetPose = PicoHeadsetPose()
+    left: PicoControllerPose = PicoControllerPose()
+    right: PicoControllerPose = PicoControllerPose()
+    timestamp_sec: float = 0.0
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "PicoSample":
+        return cls(
+            sequence=int(data.get("sequence", 0)),
+            headset_timestamp_ms=float(data.get("headset_timestamp_ms", 0.0)),
+            reference_space=str(data.get("reference_space", "")),
+            headset=PicoHeadsetPose.from_dict(data.get("headset", {})),
+            left=PicoControllerPose.from_dict(data.get("left", {})),
+            right=PicoControllerPose.from_dict(data.get("right", {})),
             timestamp_sec=float(data.get("timestamp_sec", 0.0)),
         )

@@ -54,8 +54,11 @@ target_include_directories(smrcore_peripherals
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
 target_link_libraries(smrcore_peripherals
-    PRIVATE Threads::Threads
+    PRIVATE
+        Threads::Threads
+        nlohmann_json::nlohmann_json
 )
 
 install(TARGETS smrcore_peripherals

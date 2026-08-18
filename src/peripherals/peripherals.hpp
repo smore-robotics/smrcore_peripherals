@@ -10,5 +10,6 @@
 
 #include "peripherals/ft_sensor/ft_sensor.hpp"
 #include "peripherals/peripheral.hpp"
+#include "peripherals/pico/pico.hpp"
 #include "peripherals/spacemouse/spacemouse.hpp"
 #include "peripherals/types.hpp"

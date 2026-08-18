@@ -26,11 +26,16 @@ from .data import (
     GripperCommand,
     PeripheralInfo,
     PeripheralOptions,
+    PicoControllerPose,
+    PicoHeadsetPose,
+    PicoOptions,
+    PicoSample,
     SpaceMouseOptions,
     SpaceMouseRawSample,
     SpaceMouseSample,
 )
 from .ft_sensor import FtSensor
+from .pico import Pico
 from .spacemouse import SpaceMouse
 
 __all__ = [
@@ -41,6 +46,11 @@ __all__ = [
     "GripperCommand",
     "PeripheralInfo",
     "PeripheralOptions",
+    "Pico",
+    "PicoControllerPose",
+    "PicoHeadsetPose",
+    "PicoOptions",
+    "PicoSample",
     "SpaceMouse",
     "SpaceMouseOptions",
     "SpaceMouseRawSample",

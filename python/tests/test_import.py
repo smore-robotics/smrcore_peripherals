@@ -30,5 +30,7 @@ def test_native_types_are_registered():
 
     ft_sensor = _native.FtSensor()
     spacemouse = _native.SpaceMouse()
+    pico = _native.Pico()
     assert hasattr(ft_sensor, "Initialize")
     assert hasattr(spacemouse, "GetRawSample")
+    assert hasattr(pico, "GetLastError")

@@ -14,7 +14,7 @@ From the repository root:
 # No robot SDK required: build the peripherals library, read apps, and tests
 ./scripts/build.sh --with-sdk OFF --tests ON
 
-# Required for bridge / F/T calibration (SDK targets are only built then)
+# Required for robot bridge apps / F/T calibration (SDK targets are only built then)
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
@@ -27,8 +27,10 @@ Binaries are built under `build_Release/bin/`:
 | `app_peripherals_read_spacemouse` | Decoded SpaceMouse 6-DOF + gripper target samples |
 | `app_peripherals_read_spacemouse_raw` | Raw Linux input axis/button samples |
 | `app_peripherals_read_ft_sensor` | Serial wrench stream with `WaitForFirstSample` and full serial CLI |
+| `app_peripherals_read_pico` | PICO WebXR headset/controller samples without a robot connection |
 | `app_peripherals_bridge` | Push SpaceMouse and/or F/T data via `robot.Peripheral().Update*Sample()` (`--with-sdk ON`) |
 | `app_peripherals_ft_sensor_calib` | MoveJ static F/T calibration (`--with-sdk ON`; run bridge first for raw) |
+| `app_peripherals_pico_bridge` | PICO dual controllers to dual-arm SDK ServoP; this app owns the robot connection (`--with-sdk ON`) |
 
 ## Read Peripherals Only
 
@@ -40,6 +42,9 @@ Binaries are built under `build_Release/bin/`:
 ./build_Release/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
 ./build_Release/bin/app_peripherals_read_ft_sensor \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
+
+# No robot IP is needed for PICO input inspection
+./build_Release/bin/app_peripherals_read_pico --port 8765
 ```
 
 ## Robot SDK Bridge
@@ -100,6 +105,16 @@ SpaceMouse teleop is also **not** opened by the SDK example itself. Samples must
 be injected by this repository's `app_peripherals_bridge --spacemouse` (or the
 default dual-peripheral bridge) via
 `Robot::Peripheral().UpdateSpaceMouseSample()`.
+
+Run the PICO ServoP bridge separately:
+
+```bash
+./build_Release/bin/app_peripherals_pico_bridge \
+  --enable-motion --robot-ip <robot-ip> --port 8765
+```
+
+The `Pico` peripheral class and `app_peripherals_read_pico` have no robot IP;
+`--robot-ip` belongs only to this SDK bridge.
 
 ## Safety
 

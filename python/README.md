@@ -72,8 +72,8 @@ python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip>
 
 与 C++ `smrcore::peripherals` 对齐：
 
-- **类型**：`PeripheralOptions`、`FtSensorOptions`、`SpaceMouseOptions`、`PeripheralInfo`、`SpaceMouseSample`、`SpaceMouseRawSample`、`FtSensorSample`、`GripperCommand`
-- **外设**：`FtSensor`、`SpaceMouse`（`Initialize` / `Shutdown` / `Start` / `Stop` / `IsConnected` / `GetInfo` / `GetSample`；SpaceMouse 另有 `GetRawSample`）
+- **类型**：`PeripheralOptions`、`FtSensorOptions`、`SpaceMouseOptions`、`PicoOptions`、`PeripheralInfo`、`SpaceMouseSample`、`SpaceMouseRawSample`、`PicoSample`、`FtSensorSample`、`GripperCommand`
+- **外设**：`FtSensor`、`SpaceMouse`、`Pico`（均支持 `Initialize` / `Shutdown` / `Start` / `Stop` / `IsConnected` / `GetInfo`；分别提供各自的 `GetSample`，SpaceMouse 另有 `GetRawSample`，Pico 另有 `GetLastError`）
 
 示例：
 
@@ -100,3 +100,18 @@ while True:
 ```
 
 SpaceMouse 使用 `SpaceMouseOptions` 初始化；对应 C++ `app_peripherals_read_spacemouse.cpp` 见 `app/app_peripherals_read_spacemouse.py`。
+
+PICO 使用 `PicoOptions` 初始化。它只启动 localhost WebXR 接收服务，不连接机器人，也不做坐标映射：
+
+```python
+from rcore_peripherals import Pico, PicoOptions
+
+pico = Pico()
+if not pico.Initialize(PicoOptions(port=8765)) or not pico.Start():
+    raise RuntimeError(pico.GetLastError())
+
+while True:
+    sample = pico.GetSample()
+    if sample is not None and sample.left.tracked and sample.right.tracked:
+        print(sample.left.position, sample.right.position)
+```

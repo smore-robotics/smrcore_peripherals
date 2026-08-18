@@ -20,6 +20,7 @@ class RCorePeripheralsConan(ConanFile):
     def set_version(self):
         self.version = os.environ.get("SMRCORE_PERIPHERALS_VERSION") or "0.0.0"
     def requirements(self):
+        self.requires("eigen/5.0.1#ceac4c62a715813690dc13d666e29fbc")
         self.requires("nlohmann_json/3.12.0")
 
     exports_sources = (

@@ -102,6 +102,19 @@ smrcore::peripherals::SpaceMouseOptions spacemouse_options_from_dict(const py::d
     return options;
 }
 
+smrcore::peripherals::PicoOptions pico_options_from_dict(const py::dict& d) {
+    smrcore::peripherals::PicoOptions options;
+    apply_common_options(d, &options);
+    if (d.contains("port")) {
+        const int port = py::cast<int>(d["port"]);
+        if (port < 1 || port > 65535) {
+            throw py::value_error("port must be in range 1..65535");
+        }
+        options.port = static_cast<uint16_t>(port);
+    }
+    return options;
+}
+
 py::dict peripheral_info_to_dict(const smrcore::peripherals::PeripheralInfo& info) {
     py::dict out;
     out["path"] = info.path;
@@ -144,6 +157,44 @@ py::dict ft_sensor_sample_to_dict(const smrcore::peripherals::FtSensorSample& sa
     out["tx"] = sample.tx;
     out["ty"] = sample.ty;
     out["tz"] = sample.tz;
+    out["timestamp_sec"] = sample.timestamp_sec;
+    return out;
+}
+
+py::dict pico_controller_pose_to_dict(
+    const smrcore::peripherals::PicoControllerPose& pose) {
+    py::dict out;
+    out["present"] = pose.present;
+    out["tracked"] = pose.tracked;
+    out["position"] = std::vector<double>(pose.position.begin(), pose.position.end());
+    out["orientation_xyzw"] =
+        std::vector<double>(pose.orientation_xyzw.begin(), pose.orientation_xyzw.end());
+    out["trigger"] = pose.trigger;
+    out["grip"] = pose.grip;
+    out["thumbstick"] = std::vector<double>(pose.thumbstick.begin(),
+                                             pose.thumbstick.end());
+    return out;
+}
+
+py::dict pico_headset_pose_to_dict(
+    const smrcore::peripherals::PicoHeadsetPose& pose) {
+    py::dict out;
+    out["present"] = pose.present;
+    out["tracked"] = pose.tracked;
+    out["position"] = std::vector<double>(pose.position.begin(), pose.position.end());
+    out["orientation_xyzw"] =
+        std::vector<double>(pose.orientation_xyzw.begin(), pose.orientation_xyzw.end());
+    return out;
+}
+
+py::dict pico_sample_to_dict(const smrcore::peripherals::PicoSample& sample) {
+    py::dict out;
+    out["sequence"] = sample.sequence;
+    out["headset_timestamp_ms"] = sample.headset_timestamp_ms;
+    out["reference_space"] = sample.reference_space;
+    out["headset"] = pico_headset_pose_to_dict(sample.headset);
+    out["left"] = pico_controller_pose_to_dict(sample.left);
+    out["right"] = pico_controller_pose_to_dict(sample.right);
     out["timestamp_sec"] = sample.timestamp_sec;
     return out;
 }
@@ -221,6 +272,21 @@ public:
     }
 };
 
+class PyPico : public PyPeripheral<smrcore::peripherals::Pico,
+                                   smrcore::peripherals::PicoOptions,
+                                   pico_options_from_dict> {
+public:
+    py::object GetSample() {
+        auto sample = peripheral_.GetSample();
+        if (!sample) {
+            return py::none();
+        }
+        return pico_sample_to_dict(*sample);
+    }
+
+    std::string GetLastError() const { return peripheral_.GetLastError(); }
+};
+
 } // namespace
 
 PYBIND11_MODULE(_native, m) {
@@ -236,6 +302,7 @@ PYBIND11_MODULE(_native, m) {
         info["version"] = SMRCORE_PERIPHERALS_VERSION_STR;
         info["ft_sensor_type"] = "smrcore::peripherals::FtSensor";
         info["spacemouse_type"] = "smrcore::peripherals::SpaceMouse";
+        info["pico_type"] = "smrcore::peripherals::Pico";
         return info;
     });
 
@@ -267,6 +334,11 @@ PYBIND11_MODULE(_native, m) {
         .def_readwrite("axis_scale", &smrcore::peripherals::SpaceMouseOptions::axis_scale)
         .def_readwrite("deadzone", &smrcore::peripherals::SpaceMouseOptions::deadzone);
 
+    py::class_<smrcore::peripherals::PicoOptions,
+               smrcore::peripherals::PeripheralOptions>(m, "PicoOptions")
+        .def(py::init<>())
+        .def_readwrite("port", &smrcore::peripherals::PicoOptions::port);
+
     py::class_<PyFtSensor>(m, "FtSensor")
         .def(py::init<>())
         .def("Initialize", &PyFtSensor::Initialize, py::arg("options"))
@@ -288,4 +360,15 @@ PYBIND11_MODULE(_native, m) {
         .def("GetInfo", &PySpaceMouse::GetInfo)
         .def("GetSample", &PySpaceMouse::GetSample)
         .def("GetRawSample", &PySpaceMouse::GetRawSample);
+
+    py::class_<PyPico>(m, "Pico")
+        .def(py::init<>())
+        .def("Initialize", &PyPico::Initialize, py::arg("options"))
+        .def("Shutdown", &PyPico::Shutdown)
+        .def("Start", &PyPico::Start)
+        .def("Stop", &PyPico::Stop)
+        .def("IsConnected", &PyPico::IsConnected)
+        .def("GetInfo", &PyPico::GetInfo)
+        .def("GetSample", &PyPico::GetSample)
+        .def("GetLastError", &PyPico::GetLastError);
 }

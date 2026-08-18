@@ -11,9 +11,12 @@
 - `PeripheralOptions`: 通用 Initialize 选项（采样率）
 - `FtSensorOptions`: 力传感器 Initialize 选项（串口、协议类型、波特率、首帧等待参数等）
 - `SpaceMouseOptions`: SpaceMouse Initialize 选项（设备路径、轴映射、死区等）
+- `PicoOptions`: PICO WebXR localhost 监听端口
 - `PeripheralInfo`: 低频设备/诊断信息
 - `SpaceMouseSample`: 归一化六轴 + gripper + timestamp_sec
 - `SpaceMouseRawSample`: 原始 axes[6] + buttons + timestamp_sec
+- `PicoControllerPose` / `PicoHeadsetPose`: WebXR 参考空间下的 6DoF 位姿、手柄按键与 `thumbstick[2]` 轴值（范围 `[-1, 1]`）
+- `PicoSample`: sequence、参考空间、头显/双手柄及本机接收时间戳
 - `FtSensorSample`: fx/fy/fz/tx/ty/tz + timestamp_sec
 
 ## 流输出

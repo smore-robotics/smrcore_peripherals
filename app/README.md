@@ -14,7 +14,7 @@
 # 不需要机器人 SDK，只构建外设库、读数 app 和测试
 ./scripts/build.sh --with-sdk OFF --tests ON
 
-# 需要 bridge / F/T 标定时（仅此时编译 SDK 相关目标）
+# 需要机器人 bridge / F/T 标定时（仅此时编译 SDK 相关目标）
 ./scripts/download.sh
 ./scripts/build.sh --with-sdk ON --tests ON
 ```
@@ -27,8 +27,10 @@
 | `app_peripherals_read_spacemouse` | 解码后的 SpaceMouse 6-DOF + 夹爪目标采样 |
 | `app_peripherals_read_spacemouse_raw` | 原始 Linux input 轴/按键采样 |
 | `app_peripherals_read_ft_sensor` | 串口六维力矩流，含 `WaitForFirstSample` 与完整串口 CLI |
+| `app_peripherals_read_pico` | PICO WebXR 头显/双手柄读数，不连接机器人 |
 | `app_peripherals_bridge` | 通过 `robot.Peripheral().Update*Sample()` 推送 SpaceMouse 和/或 F/T 数据（需 `--with-sdk ON`） |
 | `app_peripherals_ft_sensor_calib` | MoveJ 静态六维力标定（需 `--with-sdk ON`；先跑 bridge 注入 raw） |
+| `app_peripherals_pico_bridge` | PICO 双手柄到双臂 SDK ServoP；按住 Grip 后 thumbstick Y 轴直接控制对应手臂 J6（JointPassthrough，默认 `0.8 rad/s`，可用 `--j6-speed` 调整）；Trigger 按 0/1 映射左右夹爪开/关；仅此程序需要机器人连接（需 `--with-sdk ON`） |
 
 ## 仅读外设
 
@@ -40,6 +42,9 @@
 ./build_Release/bin/app_peripherals_read_spacemouse_raw --device /dev/input/event5
 ./build_Release/bin/app_peripherals_read_ft_sensor \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
+
+# PICO 读数不需要机器人 IP
+./build_Release/bin/app_peripherals_read_pico --port 8765
 ```
 
 ## 机器人 SDK 桥接
@@ -96,6 +101,20 @@
 SpaceMouse 遥操同样**不会**由 SDK 示例直接打开 `/dev/input/*`，必须由本仓库
 `app_peripherals_bridge --spacemouse`（或默认双外设）通过
 `Robot::Peripheral().UpdateSpaceMouseSample()` 注入。
+
+PICO ServoP 桥接单独运行：
+
+```bash
+./build_Release/bin/app_peripherals_pico_bridge \
+  --enable-motion --robot-ip <robot-ip> --port 8765
+
+# 可选：调整手柄推杆控制 J6 的最大速度（rad/s）
+./build_Release/bin/app_peripherals_pico_bridge \
+  --enable-motion --robot-ip <robot-ip> --j6-speed 0.8
+```
+
+`Pico` 外设类和 `app_peripherals_read_pico` 均没有机器人 IP；
+`--robot-ip` 只属于上述 SDK bridge。
 
 ## 安全提示
 

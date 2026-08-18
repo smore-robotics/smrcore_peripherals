@@ -2,7 +2,8 @@
 
 # Overview
 
-实现与公开头文件同处 `src/`。公开 API 在 `peripherals/`；协议与设备 IO 在 `protocols/`；线程间工具在 `common/`。
+实现与公开头文件同处 `src/`。公开 API 在 `peripherals/`；协议与设备 IO
+在 `protocols/`；线程间工具在 `common/`。PICO 的公开层不依赖机器人 SDK。
 
 # Contents
 

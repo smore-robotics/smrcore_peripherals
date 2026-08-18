@@ -8,5 +8,6 @@
 
 - ft_sensor/: 力传感器串口传输与品牌协议，见 `ft_sensor/_index.md`
 - spacemouse/: Linux evdev 读取，见 `spacemouse/_index.md`
+- pico/: localhost WebXR HTTP/WebSocket 接收，见 `pico/_index.md`
 
 > FLOW: 字节/事件 → Parser/Reader → `FtSensorSample` 或 `RawInputFrame`；门面层再做线程与槽管理

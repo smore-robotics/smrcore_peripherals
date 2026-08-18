@@ -7,10 +7,10 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 # Contents
 
 - pyproject.toml / CMakeLists.txt: scikit-build wheel 工程定义
-- native/bindings.cpp: pybind11 绑定（`*Options` dict 构造、`FtSensor`/`SpaceMouse` 全生命周期 API）
+- native/bindings.cpp: pybind11 绑定（`*Options` dict 构造、PICO pose/sample DTO、`FtSensor`/`SpaceMouse` 全生命周期 API）
 - src/rcore_peripherals/: Python 包
   - `__init__.py`: 导出公开类型与外设类；`.libs/` 内嵌 native `.so` 并配置 `LD_LIBRARY_PATH`
-  - `data.py`: DTO/`Options` Python dataclass 或等价封装
+  - `data.py`: DTO/`Options` Python dataclass 或等价封装；`PicoControllerPose.thumbstick` 暴露 WebXR 双轴输入
   - `ft_sensor.py` / `spacemouse.py`: 薄封装，对齐 C++ 门面
   - `_version.py`: 包版本
 - app/: 读数示例脚本，见 `app/_index.md`

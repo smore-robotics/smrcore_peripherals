@@ -5,6 +5,10 @@ from rcore_peripherals.data import (
     FtSensorSample,
     PeripheralInfo,
     PeripheralOptions,
+    PicoControllerPose,
+    PicoHeadsetPose,
+    PicoOptions,
+    PicoSample,
     SpaceMouseOptions,
     SpaceMouseRawSample,
     SpaceMouseSample,
@@ -59,3 +63,29 @@ def test_sample_from_dict():
     info = PeripheralInfo.from_dict({"path": "/dev/ttyUSB0", "connected": True})
     assert info.path == "/dev/ttyUSB0"
     assert info.connected is True
+
+    pico_options = PicoOptions(sample_rate_hz=50.0, port=8765)
+    assert pico_options.to_dict() == {"sample_rate_hz": 50.0, "port": 8765}
+    pico = PicoSample.from_dict(
+        {
+            "sequence": 7,
+            "reference_space": "local-floor",
+            "left": {
+                "tracked": True,
+                "position": [1, 2, 3],
+                "orientation_xyzw": [0, 0, 0, 1],
+                "grip": 0.9,
+                "thumbstick": [0.0, -0.5],
+            },
+        }
+    )
+    assert pico.sequence == 7
+    assert pico.left == PicoControllerPose(
+        tracked=True,
+        position=(1.0, 2.0, 3.0),
+        orientation_xyzw=(0.0, 0.0, 0.0, 1.0),
+        grip=0.9,
+        thumbstick=(0.0, -0.5),
+    )
+    assert pico.right == PicoControllerPose()
+    assert pico.headset == PicoHeadsetPose()
