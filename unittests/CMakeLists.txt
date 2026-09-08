@@ -11,3 +11,7 @@ add_peripheral_test(ut_spacemouse_sample_model)
 add_peripheral_test(ut_kunwei_parser)
 add_peripheral_test(ut_ft_sensor_options)
 add_peripheral_test(ut_xjc_parser)
+
+find_package(Eigen3 REQUIRED)
+add_peripheral_test(ut_pico_singularity_scale)
+target_link_libraries(ut_pico_singularity_scale PRIVATE Eigen3::Eigen)

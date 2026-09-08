@@ -13,5 +13,6 @@
 - spacemouse/spacemouse.hpp: `SpaceMouse` 3D 鼠标门面
   - sample_model.hpp/cpp: 内部定频 tick、轴映射/死区/夹爪锁存与 `LatestSlot` 发布（不对外暴露）；双键同时按下视为冲突并保持上一锁存值
 - pico/pico.hpp/cpp: `Pico` WebXR 外设门面，提供含 Trigger、Grip 与双轴 thumbstick 的手柄样本，见 `pico/pico.md`
+- pico/singularity_scale.hpp: PICO ServoP 近奇异缩放纯函数（条件数 + 朝奇异/离开，MoveIt Servo 同构）
 
 > FLOW: `Initialize(*Options)` 拷贝配置 → `Start()` 开设备/本机服务 → `GetSample()`/`GetRawSample()` consume-on-read

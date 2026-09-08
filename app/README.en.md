@@ -113,6 +113,19 @@ Run the PICO ServoP bridge separately:
   --enable-motion --robot-ip <robot-ip> --port 8765
 ```
 
+PICO Cartesian ServoP applies MoveIt-Servo-style approaching/leaving
+condition-number slowdown by default. Each arm samples its current Jacobian
+independently at 20 Hz, takes the last column of U as the weakest Cartesian
+direction, and classifies the unscaled command twist in Base (SVD sign is
+resolved from the previous TCP twist and Δκ because the SDK has no J(q+dq)
+look-ahead). Approaching uses `sqrt(80 / condition)` above condition 80;
+leaving multiplies that threshold by 2 (MoveIt's
+`leaving_singularity_threshold_multiplier`). Slowdown takes effect immediately
+while recovery is filtered with a 0.2 s time constant. If a Jacobian update is
+stale for more than 250 ms, that arm freezes and re-clutches from its current
+TCP. The thumbstick J6 joint passthrough is not scaled by this Cartesian
+limiter.
+
 The `Pico` peripheral class and `app_peripherals_read_pico` have no robot IP;
 `--robot-ip` belongs only to this SDK bridge.
 

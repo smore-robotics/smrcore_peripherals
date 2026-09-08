@@ -113,6 +113,15 @@ PICO ServoP 桥接单独运行：
   --enable-motion --robot-ip <robot-ip> --j6-speed 0.8
 ```
 
+PICO 的笛卡尔 ServoP 默认启用条件数奇异点减速（学习 MoveIt Servo 的朝奇异/
+离开）：每臂独立以 20 Hz 获取当前 Jacobian 做 SVD；用 U 末列与 Base 系指令
+twist 的点积判断方向（符号由上一拍 TCP 速度与 Δκ 定号，因 SDK 无 J(q+dq)
+微扰）。朝奇异走时条件数超过 80 后按 `sqrt(80 / condition)` 缩放本帧平移和
+旋转增量；离开时门槛乘 2（与 MoveIt `leaving_singularity_threshold_multiplier`
+一致）。降速立刻生效，恢复时以 0.2 秒时间常数平滑放开；Jacobian 超过 250 ms
+未刷新时冻结对应手臂并从当前 TCP 重新离合。推杆 J6 关节透传不经过该笛卡尔
+限速比例。
+
 `Pico` 外设类和 `app_peripherals_read_pico` 均没有机器人 IP；
 `--robot-ip` 只属于上述 SDK bridge。
 

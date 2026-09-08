@@ -8,6 +8,7 @@
  */
 
 #include "peripherals/pico/pico.hpp"
+#include "peripherals/pico/singularity_scale.hpp"
 
 #include "sdk/dual_arm_robot.hpp"
 
@@ -25,6 +26,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -35,11 +38,25 @@
 namespace
 {
 
+using smrcore::peripherals::AlignSingularDirection;
+using smrcore::peripherals::AnalyzeJacobian;
+using smrcore::peripherals::ClassifySingularityTravel;
+using smrcore::peripherals::ConditionNumberToSpeedScale;
+using smrcore::peripherals::FilterSingularityRecoveryScale;
+using smrcore::peripherals::IsApproachingSingularity;
+using smrcore::peripherals::kLeavingSingularityThresholdMultiplier;
+using smrcore::peripherals::kSingularityConditionDeltaEpsilon;
+using smrcore::peripherals::kSingularityRecoveryFilterTimeConstantSeconds;
+using smrcore::peripherals::kSingularitySoftConditionNumber;
+using smrcore::peripherals::kSingularityTwistAlignEpsilon;
 using smrcore::peripherals::Pico;
 using smrcore::peripherals::PicoControllerPose;
 using smrcore::peripherals::PicoHeadsetPose;
 using smrcore::peripherals::PicoOptions;
 using smrcore::peripherals::PicoSample;
+using smrcore::peripherals::ResolveTowardFromObservedMotion;
+using smrcore::peripherals::SingularityTravel;
+using smrcore::peripherals::SingularityTravelToString;
 
 constexpr double kDefaultTranslationScale = 0.80;
 constexpr double kDefaultRotationScale = 1.00;
@@ -66,6 +83,8 @@ constexpr auto kServoPeriod = std::chrono::microseconds(1000);
 constexpr size_t kServoPBrakeFrames = 100;
 constexpr double kServoPStartTranslationMeters = 1e-6;
 constexpr double kServoPStartRotationRadians = 1e-5;
+constexpr double kSingularityMonitorPeriodSeconds = 0.05;
+constexpr double kSingularityMonitorStaleSeconds = 0.25;
 
 std::atomic<bool> g_running{true};
 
@@ -753,6 +772,200 @@ struct HandServoState
     double rotation_step = 0.0;
     Eigen::Vector3d last_world_delta = Eigen::Vector3d::Zero();
     std::chrono::steady_clock::time_point last_xr_update{};
+    double singularity_scale = 1.0;
+    int64_t singularity_scale_updated_ns = 0;
+    SingularityTravel singularity_travel = SingularityTravel::Nominal;
+};
+
+struct SingularitySlowdownStatus
+{
+    bool fresh = false;
+    bool toward_valid = false;
+    double condition_number = std::numeric_limits<double>::infinity();
+    Eigen::Matrix<double, 6, 1> toward_singularity =
+        Eigen::Matrix<double, 6, 1>::Zero();
+};
+
+int64_t SteadyNowNanoseconds()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+               std::chrono::steady_clock::now().time_since_epoch())
+        .count();
+}
+
+class SingularitySlowdownMonitor
+{
+public:
+    explicit SingularitySlowdownMonitor(rcore::sdk::Robot &robot)
+        : robot_(robot)
+    {
+    }
+
+    ~SingularitySlowdownMonitor() { Stop(); }
+
+    SingularitySlowdownMonitor(const SingularitySlowdownMonitor &) = delete;
+    SingularitySlowdownMonitor &
+    operator=(const SingularitySlowdownMonitor &) = delete;
+
+    void Start()
+    {
+        if (running_.exchange(true, std::memory_order_acq_rel))
+        {
+            return;
+        }
+        thread_ = std::thread(&SingularitySlowdownMonitor::Run, this);
+    }
+
+    void Stop()
+    {
+        if (!running_.exchange(false, std::memory_order_acq_rel))
+        {
+            return;
+        }
+        if (thread_.joinable())
+        {
+            thread_.join();
+        }
+    }
+
+    bool WaitForInitialSample(std::chrono::milliseconds timeout) const
+    {
+        const auto deadline = std::chrono::steady_clock::now() + timeout;
+        while (g_running.load(std::memory_order_acquire) &&
+               std::chrono::steady_clock::now() < deadline)
+        {
+            if (Snapshot().fresh)
+            {
+                return true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        return Snapshot().fresh;
+    }
+
+    SingularitySlowdownStatus Snapshot() const
+    {
+        SingularitySlowdownStatus result;
+        int64_t updated_at_ns = 0;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            updated_at_ns = updated_at_ns_;
+            result.condition_number = condition_number_;
+            result.toward_singularity = toward_singularity_;
+            result.toward_valid = toward_valid_;
+        }
+        const double age =
+            static_cast<double>(SteadyNowNanoseconds() - updated_at_ns) / 1e9;
+        result.fresh = updated_at_ns > 0 && std::isfinite(age) && age >= 0.0 &&
+                       age <= kSingularityMonitorStaleSeconds;
+        return result;
+    }
+
+private:
+    static Eigen::Matrix<double, 6, 1>
+    BaseTwistFromState(const rcore::RobotState &state)
+    {
+        Eigen::Matrix<double, 6, 1> twist;
+        for (Eigen::Index axis = 0; axis < 6; ++axis)
+        {
+            twist[axis] = state.cartesian_velocity[static_cast<size_t>(axis)];
+        }
+        return twist;
+    }
+
+    void Run()
+    {
+        auto next_sample = std::chrono::steady_clock::now();
+        bool have_previous = false;
+        bool previous_toward_valid = false;
+        double previous_condition = std::numeric_limits<double>::infinity();
+        Eigen::Matrix<double, 6, 1> previous_toward =
+            Eigen::Matrix<double, 6, 1>::Zero();
+        while (running_.load(std::memory_order_acquire))
+        {
+            rcore::sdk::Jacobian sdk_jacobian;
+            auto result = robot_.Motion().GetJacobian(sdk_jacobian);
+            if (result.IsSuccess())
+            {
+                Eigen::Matrix<double, 6, 6> jacobian;
+                for (Eigen::Index row = 0; row < 6; ++row)
+                {
+                    for (Eigen::Index column = 0; column < 6; ++column)
+                    {
+                        jacobian(row, column) =
+                            sdk_jacobian(static_cast<size_t>(row),
+                                         static_cast<size_t>(column));
+                    }
+                }
+
+                const auto analysis = AnalyzeJacobian(jacobian);
+                if (analysis.valid)
+                {
+                    Eigen::Matrix<double, 6, 1> toward =
+                        analysis.least_singular_direction;
+                    bool toward_valid = false;
+                    const auto robot_state = robot_.GetState();
+                    const Eigen::Matrix<double, 6, 1> base_twist =
+                        BaseTwistFromState(robot_state);
+                    const bool twist_usable =
+                        base_twist.allFinite() &&
+                        base_twist.norm() > kSingularityTwistAlignEpsilon;
+                    if (have_previous && twist_usable &&
+                        std::isfinite(previous_condition) &&
+                        std::abs(analysis.condition_number -
+                                 previous_condition) >
+                            kSingularityConditionDeltaEpsilon)
+                    {
+                        toward = ResolveTowardFromObservedMotion(
+                            toward, base_twist, analysis.condition_number,
+                            previous_condition);
+                        toward_valid = true;
+                    }
+                    else if (have_previous && previous_toward_valid)
+                    {
+                        toward =
+                            AlignSingularDirection(toward, previous_toward);
+                        toward_valid = true;
+                    }
+
+                    previous_condition = analysis.condition_number;
+                    previous_toward = toward;
+                    previous_toward_valid = toward_valid;
+                    have_previous = true;
+
+                    const int64_t now_ns = SteadyNowNanoseconds();
+                    {
+                        std::lock_guard<std::mutex> lock(mutex_);
+                        condition_number_ = analysis.condition_number;
+                        toward_singularity_ = toward;
+                        toward_valid_ = toward_valid;
+                        updated_at_ns_ = now_ns;
+                    }
+                }
+            }
+
+            next_sample +=
+                std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                    std::chrono::duration<double>(
+                        kSingularityMonitorPeriodSeconds));
+            const auto now = std::chrono::steady_clock::now();
+            if (next_sample < now)
+            {
+                next_sample = now;
+            }
+            std::this_thread::sleep_until(next_sample);
+        }
+    }
+
+    rcore::sdk::Robot &robot_;
+    std::atomic<bool> running_{false};
+    mutable std::mutex mutex_;
+    double condition_number_{std::numeric_limits<double>::infinity()};
+    Eigen::Matrix<double, 6, 1> toward_singularity_{
+        Eigen::Matrix<double, 6, 1>::Zero()};
+    bool toward_valid_{false};
+    int64_t updated_at_ns_{0};
+    std::thread thread_;
 };
 
 double FilterAlpha(double dt, double time_constant)
@@ -832,6 +1045,9 @@ void FreezeHand(const rcore::RobotState &robot_state, HandServoState &state,
     state.last_joint6_update = {};
     state.translation_step = 0.0;
     state.rotation_step = 0.0;
+    state.singularity_scale = 1.0;
+    state.singularity_scale_updated_ns = 0;
+    state.singularity_travel = SingularityTravel::Nominal;
     state.servop_brake_frames_remaining =
         should_servop_brake ? kServoPBrakeFrames : 0;
     state.joint6_brake_frames_remaining =
@@ -1111,7 +1327,8 @@ bool SendSdkServoPTick(rcore::sdk::Robot &robot, HandServoState &state)
 void PrintArmDiagnostics(const char *name, const PicoControllerPose &pose,
                          const rcore::RobotState &robot_state,
                          const HandServoState &hand,
-                         const ArmReference &reference)
+                         const ArmReference &reference,
+                         const SingularitySlowdownStatus &singularity)
 {
     const Eigen::Isometry3d actual_reference = [&]()
     {
@@ -1143,8 +1360,8 @@ void PrintArmDiagnostics(const char *name, const PicoControllerPose &pose,
     std::cout << name << " grip=" << std::fixed << std::setprecision(2)
               << pose.grip << " clutch=" << (hand.active ? "ON" : "OFF")
               << " stick_y=" << pose.thumbstick[1]
-              << " j6=" << (hand.joint6_active ? "JOINT" : "OFF")
-              << grip_hint << " stream=";
+              << " j6=" << (hand.joint6_active ? "JOINT" : "OFF") << grip_hint
+              << " stream=";
     if (hand.joint6_active)
     {
         std::cout << "J6";
@@ -1162,10 +1379,25 @@ void PrintArmDiagnostics(const char *name, const PicoControllerPose &pose,
     {
         std::cout << "OFF";
     }
-    std::cout
-              << " frames=" << hand.command_frames
+    std::cout << " frames=" << hand.command_frames
               << " dxyz=" << hand.translation_step * 1000.0 << "mm"
               << " drot=" << hand.rotation_step * 180.0 / kPi << "deg"
+              << " cond=";
+    if (singularity.fresh && std::isfinite(singularity.condition_number))
+    {
+        std::cout << singularity.condition_number;
+    }
+    else if (singularity.fresh)
+    {
+        std::cout << "inf";
+    }
+    else
+    {
+        std::cout << "stale";
+    }
+    std::cout << " sing="
+              << SingularityTravelToString(hand.singularity_travel)
+              << " sing_scale=" << hand.singularity_scale
               << " map_yaw=" << hand.clutch_head_yaw * 180.0 / kPi << "deg"
               << " pos_err=" << PositionErrorMillimeters(robot_state, hand)
               << "mm ori_err=" << OrientationErrorDegrees(robot_state, hand)
@@ -1196,7 +1428,9 @@ void UpdateHandTarget(const PicoControllerPose &pose,
                       const ArmReference &reference, bool enable_rotation,
                       bool head_yaw_clutched, double translation_scale,
                       double rotation_scale, double j6_thumbstick_speed,
-                      bool operator_facing_robot, HandServoState &state)
+                      bool operator_facing_robot,
+                      const SingularitySlowdownStatus &singularity,
+                      HandServoState &state)
 {
     if (!pose.present || !pose.tracked)
     {
@@ -1316,6 +1550,9 @@ void UpdateHandTarget(const PicoControllerPose &pose,
         (void)SetTargetFromRobotState(robot_state, state);
         state.command_frames = 0;
         state.last_xr_update = now;
+        state.singularity_scale = 1.0;
+        state.singularity_scale_updated_ns = 0;
+        state.singularity_travel = SingularityTravel::Nominal;
         return;
     }
 
@@ -1339,6 +1576,7 @@ void UpdateHandTarget(const PicoControllerPose &pose,
         state.filtered_hand_orientation;
     const double position_alpha =
         FilterAlpha(dt, kHandPositionFilterTimeConstant);
+    const Eigen::Vector3d previous_hand_position = state.filtered_hand_position;
     state.filtered_hand_position +=
         position_alpha * (hand_position - state.filtered_hand_position);
     const double orientation_alpha =
@@ -1348,16 +1586,10 @@ void UpdateHandTarget(const PicoControllerPose &pose,
             .slerp(orientation_alpha, hand_quaternion)
             .normalized();
 
-    Eigen::Vector3d translation_delta =
-        translation_scale *
-        (state.robot_world_from_webxr_clutch *
-         (state.filtered_hand_position - state.hand_start_position));
-    const double translation_norm = translation_delta.norm();
-    if (translation_norm > kMaxTranslationDeltaMeters)
-    {
-        translation_delta *= kMaxTranslationDeltaMeters / translation_norm;
-    }
-    state.last_world_delta = translation_delta;
+    const Eigen::Vector3d unscaled_translation_increment =
+        translation_scale * (state.robot_world_from_webxr_clutch *
+                             (state.filtered_hand_position -
+                              previous_hand_position));
 
     const Eigen::Matrix3d raw_rotation_delta_webxr =
         state.filtered_hand_orientation.toRotationMatrix() *
@@ -1369,16 +1601,62 @@ void UpdateHandTarget(const PicoControllerPose &pose,
         FreezeHand(robot_state, state, true);
         return;
     }
-    const double rotation_angle =
+    const double unscaled_rotation_angle =
         enable_rotation
             ? std::min(rotation_scale * rotation_delta_axis.angle(),
                        kMaxOrientationTargetRateRadiansPerSecond * dt)
             : 0.0;
+    const Eigen::Matrix3d &world_from_webxr =
+        state.robot_world_from_webxr_clutch;
+    const Eigen::Vector3d unscaled_rotation_increment_world =
+        unscaled_rotation_angle *
+        (world_from_webxr * rotation_delta_axis.axis());
+
+    const Eigen::Matrix3d base_from_world =
+        reference.world_from_reference.linear().transpose();
+    Eigen::Matrix<double, 6, 1> commanded_twist_base;
+    commanded_twist_base.head<3>() =
+        base_from_world * unscaled_translation_increment;
+    commanded_twist_base.tail<3>() =
+        base_from_world * unscaled_rotation_increment_world;
+    const bool approaching =
+        !singularity.toward_valid ||
+        IsApproachingSingularity(singularity.toward_singularity,
+                                 commanded_twist_base);
+    double singularity_speed_scale = ConditionNumberToSpeedScale(
+        singularity.condition_number, approaching);
+    if (state.singularity_scale_updated_ns > 0)
+    {
+        singularity_speed_scale = FilterSingularityRecoveryScale(
+            singularity_speed_scale, state.singularity_scale, dt,
+            kSingularityRecoveryFilterTimeConstantSeconds);
+    }
+    singularity_speed_scale = std::clamp(singularity_speed_scale, 0.0, 1.0);
+    state.singularity_scale = singularity_speed_scale;
+    state.singularity_scale_updated_ns = SteadyNowNanoseconds();
+    state.singularity_travel = ClassifySingularityTravel(
+        singularity.condition_number, singularity.toward_valid, approaching);
+
+    const Eigen::Vector3d translation_increment =
+        singularity_speed_scale * unscaled_translation_increment;
+    const Eigen::Vector3d previous_target_world =
+        (reference.world_from_reference * state.target_tcp_reference)
+            .translation();
+    Eigen::Vector3d translation_delta = previous_target_world +
+                                        translation_increment -
+                                        state.tcp_start_world.translation();
+    const double translation_norm = translation_delta.norm();
+    if (translation_norm > kMaxTranslationDeltaMeters)
+    {
+        translation_delta *= kMaxTranslationDeltaMeters / translation_norm;
+    }
+    state.last_world_delta = translation_delta;
+
+    const double rotation_angle =
+        singularity_speed_scale * unscaled_rotation_angle;
     const Eigen::Matrix3d rotation_delta_webxr_limited =
         Eigen::AngleAxisd(rotation_angle, rotation_delta_axis.axis())
             .toRotationMatrix();
-    const Eigen::Matrix3d &world_from_webxr =
-        state.robot_world_from_webxr_clutch;
     const Eigen::Matrix3d rotation_delta_world = world_from_webxr *
                                                  rotation_delta_webxr_limited *
                                                  world_from_webxr.transpose();
@@ -1681,10 +1959,34 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    SingularitySlowdownMonitor left_singularity_monitor(arms.left_robot());
+    SingularitySlowdownMonitor right_singularity_monitor(arms.right_robot());
+    left_singularity_monitor.Start();
+    right_singularity_monitor.Start();
+    if (!left_singularity_monitor.WaitForInitialSample(
+            std::chrono::seconds(1)) ||
+        !right_singularity_monitor.WaitForInitialSample(
+            std::chrono::seconds(1)))
+    {
+        std::cerr << "1s 内未取得双臂 Jacobian，拒绝启动 PICO ServoP。"
+                  << std::endl;
+        left_singularity_monitor.Stop();
+        right_singularity_monitor.Stop();
+        (void)arms.Disable();
+        arms.Shutdown();
+        pico.Stop();
+        return 1;
+    }
+
     std::cout << "PICO 遥操作已启用：Grip 按住控制，松开冻结；"
                  "Trigger 二值映射夹爪（0=开，1=关）；"
-                 "推杆上下进入本臂 J6 关节透传。"
-              << std::endl;
+                 "推杆上下进入本臂 J6 关节透传；"
+                 "ServoP 按 Jacobian 条件数减速：朝奇异走时超过 "
+              << kSingularitySoftConditionNumber
+              << " 按 sqrt(" << kSingularitySoftConditionNumber
+              << "/condition) 缩放，离开时门槛×"
+              << kLeavingSingularityThresholdMultiplier
+              << "。" << std::endl;
 
     RobotStateFreshnessWatchdog left_state_watchdog;
     RobotStateFreshnessWatchdog right_state_watchdog;
@@ -1698,6 +2000,8 @@ int main(int argc, char **argv)
     uint64_t last_sequence = first_packet.sequence;
     bool input_was_fresh = true;
     bool robot_state_was_fresh = true;
+    bool left_singularity_was_fresh = true;
+    bool right_singularity_was_fresh = true;
     bool safety_fault_detected = false;
     PicoSample packet = first_packet;
     rcore::GripperCommand last_left_gripper = rcore::GripperCommand::Open;
@@ -1713,6 +2017,10 @@ int main(int argc, char **argv)
             SecondsSince(packet.timestamp_sec) <= kInputStaleSeconds;
         const auto left_state = arms.left_robot().GetState();
         const auto right_state = arms.right_robot().GetState();
+        const SingularitySlowdownStatus left_singularity =
+            left_singularity_monitor.Snapshot();
+        const SingularitySlowdownStatus right_singularity =
+            right_singularity_monitor.Snapshot();
 
         if (left_state.errors.GetLatchedErrorCount() > 0 ||
             right_state.errors.GetLatchedErrorCount() > 0)
@@ -1756,6 +2064,38 @@ int main(int argc, char **argv)
         }
         robot_state_was_fresh = true;
 
+        const auto update_singularity_freshness =
+            [&](const char *arm, const SingularitySlowdownStatus &status,
+                bool &was_fresh, const rcore::RobotState &robot_state,
+                HandServoState &hand)
+        {
+            if (!status.fresh && was_fresh)
+            {
+                FreezeHand(robot_state, hand, false);
+                std::cerr << "\n"
+                          << arm << " Jacobian 条件数超过 "
+                          << static_cast<int>(kSingularityMonitorStaleSeconds *
+                                              1000.0)
+                          << "ms 未刷新，已冻结该臂 ServoP。" << std::endl;
+            }
+            else if (status.fresh && !was_fresh)
+            {
+                FreezeHand(robot_state, hand, false);
+                std::cout << "\n"
+                          << arm
+                          << " Jacobian 条件数监测已恢复，Grip 将从当前 TCP "
+                             "重新离合。"
+                          << std::endl;
+            }
+            was_fresh = status.fresh;
+        };
+        update_singularity_freshness("L", left_singularity,
+                                     left_singularity_was_fresh, left_state,
+                                     left_hand);
+        update_singularity_freshness("R", right_singularity,
+                                     right_singularity_was_fresh, right_state,
+                                     right_hand);
+
         if (!fresh && input_was_fresh)
         {
             FreezeHand(left_state, left_hand, false);
@@ -1771,18 +2111,25 @@ int main(int argc, char **argv)
                 options.operator_facing_robot ? packet.right : packet.left;
             const PicoControllerPose &right_controller =
                 options.operator_facing_robot ? packet.left : packet.right;
-            UpdateHandTarget(left_controller, packet.headset, left_state,
-                             left_reference, options.enable_rotation,
-                             options.head_yaw_clutched,
-                             options.translation_scale, options.rotation_scale,
-                             options.j6_thumbstick_speed,
-                             options.operator_facing_robot, left_hand);
-            UpdateHandTarget(right_controller, packet.headset, right_state,
-                             right_reference, options.enable_rotation,
-                             options.head_yaw_clutched,
-                             options.translation_scale, options.rotation_scale,
-                             options.j6_thumbstick_speed,
-                             options.operator_facing_robot, right_hand);
+            if (left_singularity.fresh)
+            {
+                UpdateHandTarget(
+                    left_controller, packet.headset, left_state, left_reference,
+                    options.enable_rotation, options.head_yaw_clutched,
+                    options.translation_scale, options.rotation_scale,
+                    options.j6_thumbstick_speed, options.operator_facing_robot,
+                    left_singularity, left_hand);
+            }
+            if (right_singularity.fresh)
+            {
+                UpdateHandTarget(
+                    right_controller, packet.headset, right_state,
+                    right_reference, options.enable_rotation,
+                    options.head_yaw_clutched, options.translation_scale,
+                    options.rotation_scale, options.j6_thumbstick_speed,
+                    options.operator_facing_robot, right_singularity,
+                    right_hand);
+            }
             const auto left_gripper =
                 TriggerToGripperCommand(left_controller.trigger);
             const auto right_gripper =
@@ -1870,9 +2217,9 @@ int main(int argc, char **argv)
                                 : -1.0)
                       << "ms ref=" << packet.reference_space << std::endl;
             PrintArmDiagnostics("L", left_controller, left_state, left_hand,
-                                left_reference);
+                                left_reference, left_singularity);
             PrintArmDiagnostics("R", right_controller, right_state, right_hand,
-                                right_reference);
+                                right_reference, right_singularity);
             last_print = std::chrono::steady_clock::now();
         }
 
@@ -1885,6 +2232,8 @@ int main(int argc, char **argv)
         std::this_thread::sleep_until(next_servo_tick);
     }
 
+    left_singularity_monitor.Stop();
+    right_singularity_monitor.Stop();
     std::cout << "\n正在锁定当前关节并分别下使能..." << std::endl;
     try
     {
