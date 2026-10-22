@@ -1,125 +1,79 @@
-<div align="center">
-
 # smrcore_peripherals
 
-**Build the SMRCore peripherals library from source, probe/read SpaceMouse and F/T sensors, and bridge samples into the robot controller through smrcore_sdk.**
-
-[![License](https://img.shields.io/badge/License-Apache%202.0-1f6feb.svg)](LICENSE)
+**Read SpaceMouse, force/torque sensors and Pico, and integrate robot applications with the Smartmore Robot SDK.**
 
 **English** · [简体中文](README.md)
 
-</div>
-
 ---
 
-`smrcore_peripherals` is the public source repository for SMRCore peripheral support. It contains local SpaceMouse and force/torque sensor readers, protocol parsers, sample normalization, C++/Python APIs, diagnostic tools, and SDK bridge applications.
-
-To send peripheral data into the robot controller, use [`smrcore_sdk`](https://github.com/smore-robotics/smrcore_sdk) and call `Robot::Peripheral().UpdateSpaceMouseSample()` / `UpdateFtSensorSample()`.
+The public source repository for the Smartmore peripheral SDK. It provides a C++ library, Python wheels, reader examples, and optional robot SDK bridges. Readers do not connect to robots; separate bridges compose them with [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk).
 
 ## Documentation
 
-| Doc | Description |
-|---|---|
-| [C++ applications](app/README.en.md) | Probe, read, SDK bridge, and F/T calibration executables |
-| [Python applications](python/app/README.en.md) | Python wheel script usage |
-| [Platform setup](docs/platform_setup.en.md) | SpaceMouse event nodes, serial permissions, robot connectivity |
+- [C++ applications](app/README.en.md)
+- [Python applications](python/app/README.en.md)
+- [Platform setup](docs/platform_setup.en.md)
+- [Release assets, SDK compatibility and publishing](docs/releases.en.md)
+- [Releases](https://github.com/smore-robotics/smrcore_peripherals/releases): tagged builds include English and Chinese PDF / HTML manuals.
 
 ## Quick Start
 
-Build only the peripherals library, basic apps, and tests. This path does not require the robot SDK:
+### C++
+
+Linux x86_64; Ubuntu 22.04 is recommended. Install GCC/CMake, Conan 2 and Python 3.10+.
 
 ```bash
 git clone https://github.com/smore-robotics/smrcore_peripherals.git
 cd smrcore_peripherals
-
+python3 -m pip install 'conan>=2,<3'
 ./scripts/build.sh --with-sdk OFF --tests ON
 ./scripts/run_tests.sh -t Release
-
 ./build_Release/bin/app_peripherals_probe
+./build_Release/bin/app_peripherals_read_pico --port 8765
 ```
 
-To build the SDK bridge app, first download the `smrcore_sdk` version pinned by `.sdk-version`:
+### Python
+
+The wheel reads peripherals only; it does not bundle the robot SDK or teleoperation core.
+
+```bash
+./scripts/build_py.sh --no-install
+python3 -m pip install --force-reinstall python/dist/*.whl
+python3 python/app/app_peripherals_read_pico.py --port 8765
+```
+
+Release wheels target CPython 3.10, 3.11 and 3.12 on Linux x86_64. Untagged development wheels use version 0.0.0; identify them by their Actions commit.
+
+### Robot SDK bridge
 
 ```bash
 ./scripts/download.sh
-./scripts/build.sh --with-sdk ON --tests ON
-
-./build_Release/bin/app_peripherals_bridge --robot-ip <robot-ip>
+./scripts/build.sh --with-sdk ON --with-pico OFF
 ```
 
-## Features
+[.sdk-version](.sdk-version) pins **0.2.0** for the original SpaceMouse/F/T bridges. See application documentation before running them.
 
-| Module | Description |
+The optional Pico dual-arm bridge requires `--with-pico ON --sdk-root /path/to/compatible-sdk`. The original official v0.2.0 package omits `sdk/dual_arm_robot.hpp`; use a corrected package with matching headers and libraries. This example **embeds B3 mounting-bracket transforms for the corresponding B3 dual-arm configuration**, not a generic dual-arm setup. Hardware acceptance is pending; default release binaries exclude this bridge.
+
+## Release Assets
+
+| Asset | Description |
 |---|---|
-| SpaceMouse | Reads Linux input events and outputs normalized 6-DOF + gripper target samples |
-| F/T Sensor | Supports Kunwei `kunwei_serial` and XJC `xjc_serial` serial protocols |
-| C++ API | `smrcore::peripherals` namespace with `Initialize` → `Start` → `GetSample` → `Stop` → `Shutdown` lifecycle |
-| Python API | `rcore_peripherals` wheel aligned with the C++ facade |
-| SDK bridge | `app_peripherals_bridge` pushes SpaceMouse / F/T samples into the robot controller through `smrcore_sdk` (built only with `--with-sdk ON`) |
-| F/T calib | `app_peripherals_ft_sensor_calib` (C++ / Python) MoveJ static calibration; C++ built only with `--with-sdk ON`; requires bridge for raw |
+| `smrcore_peripherals-cpp-linux-x86_64-v<version>.tar.gz` | C++ readers, headers, library, CMake config and Python examples |
+| `smrcore_peripherals-sdk-bridge-linux-x86_64-v<version>.tar.gz` | Original SpaceMouse/F/T bridges, calibration tools and SDK runtime |
+| `rcore_peripherals_py-<version>-cp3xx-cp3xx-linux_x86_64.whl` | CPython 3.10–3.12 reader wheels |
+| `smrcore_peripherals-manual-zh-v<version>.pdf/html` | Chinese manual |
+| `smrcore_peripherals-manual-en-v<version>.pdf/html` | English manual |
+| `SHA256SUMS` | Tagged release checksums |
 
-## Repository Layout
+Every push/PR builds [Actions artifacts](https://github.com/smore-robotics/smrcore_peripherals/actions). Successful `vX.Y.Z` tag builds publish a GitHub Release. This table describes the configured outputs, not assets already published before the first successful CI run. Windows, ARM64 and simulator artifacts are not currently promised.
 
-| Path | Contents |
-|---|---|
-| `src/` | Public API, internal helpers, protocol parsers, and device IO |
-| `app/` | C++ tools: probe, read, bridge, and F/T calib |
-| `python/` | pybind11 Python wheel, application scripts, and tests |
-| `docs/` | Platform setup notes |
-| `scripts/download.sh` | Downloads `smrcore_sdk` only; it does not download this repository's own binaries |
-| `scripts/build.sh` | Builds the C++ library, apps, tests, and optional SDK bridge |
-
-Installed public headers are available under `<peripherals/...>`:
-
-```cpp
-#include "peripherals/peripherals.hpp"
-```
-
-External consumers can use:
-
-```cmake
-find_package(smrcore_peripherals CONFIG REQUIRED)
-target_link_libraries(my_app PRIVATE smrcore::peripherals)
-```
-
-## Version Files
-
-| File | Meaning |
-|---|---|
-| `.sdk-version` | Default `smrcore_sdk` version for standalone bridge builds |
-
-`scripts/download.sh` reads `.sdk-version` and downloads `smrcore_sdk-cpp-linux-<arch>-v<version>.tar.gz` into `third_party/smrcore_sdk/`. V1 does not support standalone Windows download/build.
-
-## Common Commands
-
-```bash
-# Lightweight build without SDK bridge
-./scripts/build.sh --with-sdk OFF --tests ON
-
-# Download SDK and build the bridge
-./scripts/download.sh
-./scripts/build.sh --with-sdk ON --tests ON
-
-# Run C++ tests
-./scripts/run_tests.sh -t Release
-
-# Build and verify the Python wheel
-./scripts/build_py.sh
-./scripts/run_test_py.sh -t Release
-```
+After extracting a C++ archive, use `./run.sh app_peripherals_read_pico --port 8765`; the wrapper resolves bundled runtime libraries. Device permissions are still required.
 
 ## Safety
 
-> Robots are hazardous machines. Before running any bridge or motion-related example, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
->
-> **External six-axis F/T for force control requires a one-time calibration** (C++ `app_peripherals_ft_sensor_calib --save` or Python `python/app/app_peripherals_ft_sensor_calib.py --save`). An uncalibrated external wrench is dangerous. After it is saved, keep the bridge streaming samples into [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) / the controller; see the SDK `compliance/fd_cartesian_admittance` example for FDCC. SpaceMouse teleop likewise requires this repository's bridge to inject samples.
+Robot bridges affect physical hardware. Verify the robot, tool, payload, workspace and example configuration, and keep the emergency stop reachable. Build and simulation checks do not establish hardware acceptance.
 
 ## License
 
-This repository is released under the [Apache License 2.0](LICENSE). Third-party dependencies remain under their respective licenses.
-
-<div align="center">
-
-Copyright © Smartmore Corporation
-
-</div>
+[Apache License 2.0](LICENSE). SDK bridge archives preserve the SDK's bundled third-party licenses and attribution.
