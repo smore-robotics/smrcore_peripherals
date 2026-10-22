@@ -1,5 +1,8 @@
 > DIR: unittests/
 
+- test_pico_legacy_release.py: offline comparison-stop tests; 100 fixed-target
+  frames, separate TCP/J6 paths, stale/fault/invalid feedback rejection.
+
 # Overview
 
 无硬件语义单测，由 `CMakeLists.txt` 中 `add_peripheral_test()` 注册 CTest。
@@ -10,3 +13,7 @@
 - ut_kunwei_parser.cpp: 坤维 `KunweiParser` 帧解析与 `DrainLatest`
 - ut_ft_sensor_options.cpp: `FtSensor::Initialize(FtSensorOptions)` 后 `GetInfo()` 字段（路径/型号/采样率）
 - ut_xjc_parser.cpp: 实测 XJC 16 字节 int16 / 28 字节 float 帧解析，分片/重同步/CRC 拒绝，以及启停命令
+
+- ut_pico_singularity_scale.cpp: 硬边界不受离开方向放宽；覆盖 30/45/60、非有限输入、整圈跳解、关节跨度和实测肘部危险姿态。
+
+- `test_pico_stop_worker.py`: 编译生产停止目标/worker，验证有方向的目标估计、越限/无效参数拒绝、J6 比例限速、ServoJ 固定目标、延迟发送与停稳门禁；fake 不提供透传/StopMotion，并禁止遥操源码重新引入透传。

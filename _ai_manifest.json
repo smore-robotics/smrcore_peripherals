@@ -1,4 +1,7 @@
 {
+  "unittests/test_pico_legacy_release.py": "unittests/_index.md",
+  "teleop/legacy_release_stop.hpp": "teleop/_index.md",
+  "unittests/test_pico_stop_worker.py": "unittests/_index.md",
   ".sdk-version": "_index.md",
   "README.en.md": "_index.md",
   "README.md": "_index.md",
@@ -79,5 +82,15 @@
   "scripts/download.sh": "scripts/_index.md",
   "scripts/run_test_py.sh": "scripts/_index.md",
   "scripts/package.sh": "scripts/_index.md",
-  "app/app_peripherals_ft_sensor_calib.cpp": "app/_index.md"
+  "app/app_peripherals_ft_sensor_calib.cpp": "app/_index.md",
+  "teleop/pico_teleop.cpp": "teleop/_index.md",
+  "src/peripherals/pico/teleop.hpp": "src/peripherals/pico/teleop.md",
+  "python/TELEOP.md": "python/_index.md",
+  "teleop/latency_trace.hpp": "teleop/_index.md",
+  "docs/pico-integration-status.md": "_index.md",
+  "scripts/build.sh": "scripts/_index.md",
+  "python/app/app_peripherals_read_pico.py": "python/app/_index.md",
+  ".github/workflows/ci.yml": ".github/workflows/_index.md",
+  "scripts/package_release.py": "scripts/_index.md",
+  "scripts/build_manual.sh": "scripts/_index.md"
 }

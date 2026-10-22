@@ -6,7 +6,7 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 
 # Contents
 
-- pyproject.toml / CMakeLists.txt: scikit-build wheel 工程定义
+- pyproject.toml / CMakeLists.txt: 基础外设 wheel 工程定义，不包含机器人 SDK 或遥操核心
 - native/bindings.cpp: pybind11 绑定（`*Options` dict 构造、PICO pose/sample DTO、`FtSensor`/`SpaceMouse` 全生命周期 API）
 - src/rcore_peripherals/: Python 包
   - `__init__.py`: 导出公开类型与外设类；`.libs/` 内嵌 native `.so` 并配置 `LD_LIBRARY_PATH`
@@ -19,3 +19,5 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 - scripts/verify_wheel.sh: 安装 wheel 冒烟导入（由 `../scripts/run_test_py.sh` 调用）
 
 > FLOW: C++ install → wheel 打包 native + Python → `import rcore_peripherals` → `FtSensor(options)` 同 C++ 语义
+
+- TELEOP.md: 外设读取与独立 C++ Pico bridge 的构建、使用边界。

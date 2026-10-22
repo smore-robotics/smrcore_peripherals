@@ -65,3 +65,14 @@ CLI 与 C++ 对齐：`--robot-ip`、`--nominal`、`--settle-ms`、`--sample-ms`�
 ## 安全提示
 
 > 机器人是危险设备。运行 bridge 或标定脚本前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。力控前须先完成一次 `--save` 标定。
+
+## Pico 只读位置
+
+需安装包含 Pico 接口的 `rcore-peripherals-py` wheel，无需机器人 SDK。
+
+```bash
+python3 python/app/app_peripherals_read_pico.py --port 8765
+adb reverse tcp:8765 tcp:8765
+```
+
+在另一终端执行 adb，在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。

@@ -18,8 +18,10 @@ if(SMR_PERIPHERAL_WITH_SDK)
     add_peripheral_app(app_peripherals_ft_sensor_calib)
     smr_target_enable_sdk_bridge(app_peripherals_ft_sensor_calib)
 
-    find_package(Eigen3 REQUIRED)
+endif()
+
+if(SMR_PERIPHERAL_WITH_PICO_TELEOP)
     add_peripheral_app(app_peripherals_pico_bridge)
-    target_link_libraries(app_peripherals_pico_bridge PRIVATE Eigen3::Eigen)
+    target_link_libraries(app_peripherals_pico_bridge PRIVATE smrcore_pico_teleop)
     smr_target_enable_sdk_bridge(app_peripherals_pico_bridge)
 endif()

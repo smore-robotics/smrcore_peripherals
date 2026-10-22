@@ -26,3 +26,5 @@ python3 python/app/app_peripherals_bridge.py --robot-ip 192.168.1.100
 python3 python/app/app_peripherals_bridge.py --spacemouse --spacemouse-device /dev/input/event5
 python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip 192.168.1.100
 ```
+
+- app_peripherals_read_pico.py: Pico 只读 WebXR 接收，--port 默认 8765；输出头显/左右手柄 XYZ（米）与按键，未追踪显示 N/A，Ctrl+C Stop/Shutdown；不依赖机器人 SDK。

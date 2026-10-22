@@ -5,6 +5,7 @@
 
 #include "peripherals/pico/pico.hpp"
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <csignal>
@@ -24,6 +25,17 @@ void HandleSignal(int) { g_running.store(false, std::memory_order_release); }
 void PrintUsage(const char *program)
 {
     std::cout << "用法: " << program << " [--port 8765]\n";
+}
+
+void PrintPosition(const std::array<double, 3> &position, bool tracked)
+{
+    if (!tracked)
+    {
+        std::cout << " xyz[m]=N/A";
+        return;
+    }
+    std::cout << " xyz[m]=(" << std::fixed << std::setprecision(4)
+              << position[0] << "," << position[1] << "," << position[2] << ")";
 }
 
 bool ParsePort(const std::string &text, uint16_t &port)
@@ -94,14 +106,17 @@ int main(int argc, char **argv)
         {
             std::cout << "seq=" << sample->sequence
                       << " ref=" << sample->reference_space << " headset="
-                      << (sample->headset.tracked ? "tracked" : "missing")
-                      << " L=" << (sample->left.tracked ? "tracked" : "missing")
-                      << " grip=" << std::fixed << std::setprecision(2)
-                      << sample->left.grip
-                      << " trigger=" << sample->left.trigger << " R="
-                      << (sample->right.tracked ? "tracked" : "missing")
-                      << " grip=" << sample->right.grip
-                      << " trigger=" << sample->right.trigger << '\n';
+                      << (sample->headset.tracked ? "tracked" : "missing");
+            PrintPosition(sample->headset.position, sample->headset.tracked);
+            std::cout << " L=" << (sample->left.tracked ? "tracked" : "missing");
+            PrintPosition(sample->left.position, sample->left.tracked);
+            std::cout << " grip=" << std::fixed << std::setprecision(2)
+                      << sample->left.grip << " trigger=" << sample->left.trigger
+                      << " R=" << (sample->right.tracked ? "tracked" : "missing");
+            PrintPosition(sample->right.position, sample->right.tracked);
+            std::cout << " grip=" << std::fixed << std::setprecision(2)
+                      << sample->right.grip << " trigger=" << sample->right.trigger
+                      << '\n';
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }

@@ -137,7 +137,10 @@ function frame(time, f) {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
   }
-  if (time - lastSend < 20) return;
+  // Request up to 200 Hz. WebXR requestAnimationFrame is ultimately capped by
+  // the headset display/runtime rate, so PICO normally delivers 72-90 unique
+  // pose samples per second rather than duplicated 200 Hz packets.
+  if (time - lastSend < 5) return;
   lastSend = time;
   const controllers = {};
   for (const source of f.session.inputSources) {
@@ -500,7 +503,7 @@ PicoControllerPose ParseController(const nlohmann::json &controllers,
     {
         if (buttons->size() > 0 && (*buttons)[0].is_object())
         {
-    result.trigger = std::clamp(
+            result.trigger = std::clamp(
                 (*buttons)[0].value("value", result.trigger), 0.0, 1.0);
         }
         if (buttons->size() > 1 && (*buttons)[1].is_object())

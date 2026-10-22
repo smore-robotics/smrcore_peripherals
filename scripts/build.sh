@@ -4,6 +4,7 @@ set -e
 TYPE="Release"
 BUILD_TESTS="ON"
 WITH_SDK="ON"
+WITH_PICO="OFF"
 SDK_ROOT=""
 ARCH="x86"
 JOBS=""
@@ -53,6 +54,7 @@ show_help() {
   -a, --arch ARCH       目标架构: x86 (默认) 或 armv8；V1 暂不支持 Windows
   -j, --jobs N          并行编译核心数
       --with-sdk ON/OFF 构建 app_peripherals_bridge / app_peripherals_ft_sensor_calib 等 SDK 工具 (默认: ON)
+      --with-pico ON/OFF  构建双臂 Pico 遥操 (默认: OFF，需要 --with-sdk ON)
       --sdk-root PATH   smrcore_sdk 安装树 (默认: third_party/smrcore_sdk)
       --tests ON/OFF    是否构建测试 (默认: ON)
   -G, --generator NAME  CMake 生成器 (默认: Ninja)
@@ -75,6 +77,7 @@ while [[ $# -gt 0 ]]; do
         -a|--arch) ARCH="$2"; shift 2 ;;
         -j|--jobs) JOBS="$2"; shift 2 ;;
         --with-sdk) WITH_SDK="$2"; shift 2 ;;
+        --with-pico) WITH_PICO="$2"; shift 2 ;;
         --sdk-root) SDK_ROOT="$2"; shift 2 ;;
         --tests) BUILD_TESTS="$2"; shift 2 ;;
         -G|--generator) CMAKE_GENERATOR="$2"; shift 2 ;;
@@ -93,6 +96,14 @@ if [[ "$BUILD_TESTS" != "ON" && "$BUILD_TESTS" != "OFF" ]]; then
 fi
 if [[ "$WITH_SDK" != "ON" && "$WITH_SDK" != "OFF" ]]; then
     echo "--with-sdk 只能是 ON 或 OFF" >&2
+    exit 1
+fi
+if [[ "$WITH_PICO" != "ON" && "$WITH_PICO" != "OFF" ]]; then
+    echo "--with-pico 只能是 ON 或 OFF" >&2
+    exit 1
+fi
+if [[ "$WITH_PICO" == "ON" && "$WITH_SDK" != "ON" ]]; then
+    echo "--with-pico ON 需要 --with-sdk ON" >&2
     exit 1
 fi
 if [ -z "$SDK_ROOT" ]; then
@@ -187,6 +198,7 @@ CMAKE_ARGS=(
     -DCMAKE_INSTALL_PREFIX="$BUILD_DIR/install" \
     -DBUILD_TESTS="$BUILD_TESTS" \
     -DSMR_PERIPHERAL_WITH_SDK="$WITH_SDK" \
+    -DSMR_PERIPHERAL_WITH_PICO_TELEOP="$WITH_PICO" \
     -DSMR_PERIPHERAL_SDK_ROOT="$SDK_ROOT" \
     -DSMRCORE_PERIPHERALS_VERSION="$SMRCORE_PERIPHERALS_CPP_VERSION"
 )

@@ -30,7 +30,7 @@
 | `app_peripherals_read_pico` | PICO WebXR 头显/双手柄读数，不连接机器人 |
 | `app_peripherals_bridge` | 通过 `robot.Peripheral().Update*Sample()` 推送 SpaceMouse 和/或 F/T 数据（需 `--with-sdk ON`） |
 | `app_peripherals_ft_sensor_calib` | MoveJ 静态六维力标定（需 `--with-sdk ON`；先跑 bridge 注入 raw） |
-| `app_peripherals_pico_bridge` | PICO 双手柄到双臂 SDK ServoP；按住 Grip 后 thumbstick Y 轴直接控制对应手臂 J6（JointPassthrough，默认 `0.8 rad/s`，可用 `--j6-speed` 调整）；Trigger 按 0/1 映射左右夹爪开/关；仅此程序需要机器人连接（需 `--with-sdk ON`） |
+| `app_peripherals_pico_bridge` | PICO 双手柄到双臂 SDK ServoP；按住 Grip 后 thumbstick Y 轴直接控制对应手臂 J6（ServoJ，默认 `0.8 rad/s`，可用 `--j6-speed` 调整）；Trigger 按 0/1 映射左右夹爪开/关；仅此程序需要机器人连接（需 `--with-sdk ON`） |
 
 ## 仅读外设
 
@@ -116,11 +116,10 @@ PICO ServoP 桥接单独运行：
 PICO 的笛卡尔 ServoP 默认启用条件数奇异点减速（学习 MoveIt Servo 的朝奇异/
 离开）：每臂独立以 20 Hz 获取当前 Jacobian 做 SVD；用 U 末列与 Base 系指令
 twist 的点积判断方向（符号由上一拍 TCP 速度与 Δκ 定号，因 SDK 无 J(q+dq)
-微扰）。朝奇异走时条件数超过 80 后按 `sqrt(80 / condition)` 缩放本帧平移和
-旋转增量；离开时门槛乘 2（与 MoveIt `leaving_singularity_threshold_multiplier`
-一致）。降速立刻生效，恢复时以 0.2 秒时间常数平滑放开；Jacobian 超过 250 ms
-未刷新时冻结对应手臂并从当前 TCP 重新离合。推杆 J6 关节透传不经过该笛卡尔
-限速比例。
+微扰）。朝奇异走时条件数 30..60 二次缩放到零，并收回目标积压；离开时门槛
+乘 2，恢复时以 0.2 秒时间常数平滑放开。Jacobian 超过 250 ms 未刷新时停止
+会话。按住 Grip 时推杆 Y 轴通过 ServoJ 控制对应机械臂 J6，回中后
+从当前 TCP 重新离合 ServoP；J6 不经过笛卡尔奇异点比例。
 
 `Pico` 外设类和 `app_peripherals_read_pico` 均没有机器人 IP；
 `--robot-ip` 只属于上述 SDK bridge。
@@ -128,3 +127,13 @@ twist 的点积判断方向（符号由上一拍 TCP 速度与 Δκ 定号，因
 ## 安全提示
 
 > 机器人是危险设备。运行 bridge 前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据将直接影响控制器行为。
+
+### Guarded PICO ServoP (2026-09-18)
+
+The guarded ServoP path quadratically slows from condition 30 to zero at 60 while approaching and uses doubled thresholds while leaving. A background SDK IK/FK preflight checks each approved Cartesian target. Stale telemetry/input, reference changes, and controller faults stop and exit. While Grip is held, thumbstick Y controls J6 through ServoJ; returning to neutral re-clutches ServoP from the measured TCP. Backend joint limits, speed protection, and E-stop remain active.
+
+Pico bridge build: `./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk`. Pico reading remains available with `--with-sdk OFF`.
+
+只读程序 `app_peripherals_read_pico --port 8765` 输出头显和左右手柄 `xyz[m]`，保留 4 位小数；坐标属于 `ref` 指定的 WebXR 参考空间，非机器人坐标。未追踪时位置显示 `N/A`。
+
+本示例内置 B3 支架变换，适用于对应 B3 双臂安装构型，不是通用双臂配置。其他支架或安装方式需重新配置并验证坐标变换。

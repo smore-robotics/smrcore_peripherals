@@ -14,3 +14,8 @@
 - check_python_examples.sh: 递归 `py_compile` `python/app/`（CI main-checks / PR smoke 共用）
 - package.sh: 打包 C++ install 目录为 `rcore_peripherals.tar.gz`
 - ci/resolve_version: 从环境变量/Git 解析 `SMRCORE_PERIPHERALS_VERSION`（C++ 与 Python 共用）
+
+- build.sh: --with-pico ON 显式构建独立 C++ 双臂 bridge，要求匹配双臂 SDK；默认 OFF。build_py.sh 保持原基础 wheel 流程。
+
+- package_release.py: 打包 Linux x86_64 安装树、SDK 运行库/归属、元信息及校验和，不运行设备。
+- build_manual.sh: 使用 Pandoc/XeLaTeX 合成中英文 HTML/PDF。

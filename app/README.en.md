@@ -132,3 +132,11 @@ The `Pico` peripheral class and `app_peripherals_read_pico` have no robot IP;
 ## Safety
 
 > Robots are hazardous machines. Before running bridge apps, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
+
+### Guarded PICO ServoP (2026-09-18)
+
+The current source uses a conservative test guard: condition 30 starts linear slowdown, 60 stops both arms; leaving direction does not relax this boundary. A background SDK IK/FK preflight checks each approved target (numerical target Jacobian, B3 elbow/wrist clearance >=10 degrees). Only approved targets younger than 200 ms stream. Stale telemetry/input, reference changes or validation failure stops and exits; restart is required. The client no longer applies a fixed 3-degree joint-step rejection or a 20 mm / 5 degree tracking-error stop: IK branch continuity belongs to the backend ServoP IK chain, which also keeps joint limits, speed protection and E-stop. J6 passthrough is disabled in this guarded version. Release uses StopMotion. Existing executables are unchanged until rebuilt.
+
+Pico bridge build: `./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk`. Pico reading remains available with `--with-sdk OFF`.
+
+This example embeds the B3 mounting-bracket transforms and targets the corresponding B3 dual-arm mounting configuration. It is not a generic dual-arm configuration; other mounts require adjusted and validated transforms.

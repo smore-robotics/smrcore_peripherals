@@ -9,10 +9,11 @@
  * - 指令 twist 与该方向点积 > 0 视为朝奇异走，否则视为离开；
  * - 离开时门槛乘 `leaving_singularity_threshold_multiplier`（默认 2）。
  *
- * 本模块是无状态纯函数。PICO 桥阈值仍与笛卡尔规划 legacy 软限对齐（80），
- * 缩放律保持 `sqrt(threshold / κ)`（不是 MoveIt 的 17–30 线性插值，也不在
- * κ=30 硬停——离开奇异时遥操作必须还能动）。SDK 没有 J(q+dq)，桥接侧用
- * 上一拍 Base 系 TCP 速度与 Δκ 代替 MoveIt 的虚拟微扰定号。
+ * 本模块是无状态纯函数。PICO 桥靠近奇异点时在条件数 30..60 二次减速到零；
+ * 离开时门槛乘 2，在相同姿态获得恢复速度，避免停在边界后无法退出。
+ * 到达边界只冻结继续靠近的运动，不终止遥操会话。
+ * SDK 没有 J(q)，候选目标检查通过 FK 数值雅可比完成。
+
  */
 
 #pragma once
@@ -21,6 +22,7 @@
 #include <Eigen/SVD>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -30,7 +32,8 @@ namespace smrcore
 namespace peripherals
 {
 
-constexpr double kSingularitySoftConditionNumber = 80.0;
+constexpr double kSingularitySoftConditionNumber = 30.0;
+constexpr double kSingularityHardConditionNumber = 60.0;
 constexpr double kLeavingSingularityThresholdMultiplier = 2.0;
 constexpr double kSingularityRecoveryFilterTimeConstantSeconds = 0.20;
 constexpr double kSingularityTwistAlignEpsilon = 1e-4;
@@ -112,10 +115,11 @@ inline Eigen::Matrix<double, 6, 1> ResolveTowardSingularityDirection(
 }
 
 /// SDK 无 J(q+dq) 时：用已发生的 Base 系 twist 与 Δκ 给 U 末列定号。
-inline Eigen::Matrix<double, 6, 1> ResolveTowardFromObservedMotion(
-    Eigen::Matrix<double, 6, 1> singular_direction,
-    const Eigen::Matrix<double, 6, 1> &base_twist, double current_condition,
-    double previous_condition)
+inline Eigen::Matrix<double, 6, 1>
+ResolveTowardFromObservedMotion(Eigen::Matrix<double, 6, 1> singular_direction,
+                                const Eigen::Matrix<double, 6, 1> &base_twist,
+                                double current_condition,
+                                double previous_condition)
 {
     if (!std::isfinite(current_condition) || !std::isfinite(previous_condition))
     {
@@ -165,22 +169,21 @@ inline double ConditionNumberToSpeedScale(double condition_number,
     {
         return 0.0;
     }
-    const double threshold =
-        approaching ? kSingularitySoftConditionNumber
-                    : kSingularitySoftConditionNumber *
-                          kLeavingSingularityThresholdMultiplier;
-    if (condition_number <= threshold)
-    {
-        return 1.0;
-    }
-    return std::clamp(std::sqrt(threshold / condition_number), 0.0, 1.0);
+    const double threshold_multiplier =
+        approaching ? 1.0 : kLeavingSingularityThresholdMultiplier;
+    const double soft = kSingularitySoftConditionNumber * threshold_multiplier;
+    const double hard = kSingularityHardConditionNumber * threshold_multiplier;
+    const double linear =
+        std::clamp((hard - condition_number) / (hard - soft), 0.0, 1.0);
+    return approaching ? linear * linear : linear;
 }
 
 inline SingularityTravel ClassifySingularityTravel(double condition_number,
                                                    bool toward_valid,
                                                    bool approaching)
 {
-    if (!std::isfinite(condition_number))
+    if (!std::isfinite(condition_number) ||
+        condition_number >= kSingularityHardConditionNumber)
     {
         return SingularityTravel::Halt;
     }
@@ -193,6 +196,27 @@ inline SingularityTravel ClassifySingularityTravel(double condition_number,
         return SingularityTravel::Approaching;
     }
     return SingularityTravel::Leaving;
+}
+
+// B3 i3 elbow/wrist axes: reject a neighbourhood of q3/q5 = n*pi.
+// IK branch continuity is handled by the backend ServoP IK, not here.
+inline bool GuardJointCandidate(const std::array<double, 6> &actual,
+                                const std::array<double, 6> &candidate)
+{
+    constexpr double clearance_sine = 0.173648177667; // sin(10 degrees)
+    for (size_t i = 0; i < 6; ++i)
+    {
+        if (!std::isfinite(actual[i]) || !std::isfinite(candidate[i]))
+            return false;
+    }
+    for (size_t i : {size_t{2}, size_t{4}})
+    {
+        const double a = std::sin(actual[i]), b = std::sin(candidate[i]);
+        if (std::abs(a) < clearance_sine || std::abs(b) < clearance_sine ||
+            a * b <= 0.0)
+            return false;
+    }
+    return true;
 }
 
 /// 降速立刻生效；只有 scale 回升才按时间常数滤波，避免突然放开。

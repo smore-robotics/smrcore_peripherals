@@ -39,34 +39,45 @@ int main()
                                 std::numeric_limits<double>::quiet_NaN()))
                 .valid);
 
-    assert(ConditionNumberToSpeedScale(kSingularitySoftConditionNumber, true) ==
-           1.0);
-    assert(ConditionNumberToSpeedScale(kSingularitySoftConditionNumber * 4.0,
-                                       true) == 0.5);
-    assert(ConditionNumberToSpeedScale(
-               kSingularitySoftConditionNumber *
-                   kLeavingSingularityThresholdMultiplier,
-               false) == 1.0);
-    assert(ConditionNumberToSpeedScale(
-               kSingularitySoftConditionNumber *
-                   kLeavingSingularityThresholdMultiplier * 4.0,
-               false) == 0.5);
-    assert(ConditionNumberToSpeedScale(
-               std::numeric_limits<double>::infinity(), true) == 0.0);
-    assert(ConditionNumberToSpeedScale(
-               std::numeric_limits<double>::quiet_NaN(), false) == 0.0);
-
-    const double approaching_160 =
-        ConditionNumberToSpeedScale(160.0, true);
-    const double leaving_160 = ConditionNumberToSpeedScale(160.0, false);
-    assert(leaving_160 > approaching_160);
-    assert(std::abs(approaching_160 - std::sqrt(80.0 / 160.0)) < 1e-12);
-    assert(leaving_160 == 1.0);
+    assert(ConditionNumberToSpeedScale(20.0, true) == 1.0);
+    assert(ConditionNumberToSpeedScale(30.0, true) == 1.0);
+    assert(ConditionNumberToSpeedScale(45.0, true) == 0.25);
+    assert(ConditionNumberToSpeedScale(60.0, true) == 0.0);
+    assert(ConditionNumberToSpeedScale(60.0, false) == 1.0);
+    assert(ConditionNumberToSpeedScale(90.0, false) == 0.5);
+    assert(ConditionNumberToSpeedScale(120.0, false) == 0.0);
+    for (bool approaching : {false, true})
+    {
+        assert(ConditionNumberToSpeedScale(310.73, approaching) == 0.0);
+        assert(
+            ConditionNumberToSpeedScale(std::numeric_limits<double>::infinity(),
+                                        approaching) == 0.0);
+        assert(ConditionNumberToSpeedScale(
+                   std::numeric_limits<double>::quiet_NaN(), approaching) ==
+               0.0);
+    }
+    std::array<double, 6> actual{0, -1, 0.5, -1, 0.5, 0};
+    auto candidate = actual;
+    candidate[0] += 0.01;
+    assert(smrcore::peripherals::GuardJointCandidate(actual, candidate));
+    candidate = actual;
+    candidate[3] += 0.06; // no fixed per-frame joint step limit
+    assert(smrcore::peripherals::GuardJointCandidate(actual, candidate));
+    candidate = actual;
+    candidate[2] = -0.5; // elbow crosses q3 = 0
+    assert(!smrcore::peripherals::GuardJointCandidate(actual, candidate));
+    candidate = actual;
+    actual[2] = candidate[2] = 0.065745; // captured hazardous B3 posture
+    assert(!smrcore::peripherals::GuardJointCandidate(actual, candidate));
+    actual[2] = candidate[2] = 0.5;
+    actual[4] = candidate[4] = 3.141592653589793;
+    assert(!smrcore::peripherals::GuardJointCandidate(actual, candidate));
+    candidate[0] = std::numeric_limits<double>::quiet_NaN();
+    assert(!smrcore::peripherals::GuardJointCandidate(actual, candidate));
 
     Eigen::Matrix<double, 6, 1> toward = Eigen::Matrix<double, 6, 1>::Zero();
     toward[2] = 1.0;
-    const auto flipped =
-        ResolveTowardSingularityDirection(toward, 100.0, 90.0);
+    const auto flipped = ResolveTowardSingularityDirection(toward, 100.0, 90.0);
     assert(flipped[2] == -1.0);
     const auto kept = ResolveTowardSingularityDirection(toward, 100.0, 110.0);
     assert(kept[2] == 1.0);
@@ -85,16 +96,16 @@ int main()
 
     assert(IsApproachingSingularity(toward, twist));
     assert(!IsApproachingSingularity(toward, -twist));
-    assert(!IsApproachingSingularity(toward,
-                                     Eigen::Matrix<double, 6, 1>::Zero()));
+    assert(
+        !IsApproachingSingularity(toward, Eigen::Matrix<double, 6, 1>::Zero()));
 
-    assert(ClassifySingularityTravel(40.0, true, true) ==
+    assert(ClassifySingularityTravel(20.0, true, true) ==
            SingularityTravel::Nominal);
-    assert(ClassifySingularityTravel(120.0, true, true) ==
+    assert(ClassifySingularityTravel(45.0, true, true) ==
            SingularityTravel::Approaching);
-    assert(ClassifySingularityTravel(120.0, true, false) ==
+    assert(ClassifySingularityTravel(45.0, true, false) ==
            SingularityTravel::Leaving);
-    assert(ClassifySingularityTravel(120.0, false, false) ==
+    assert(ClassifySingularityTravel(45.0, false, false) ==
            SingularityTravel::Approaching);
     assert(ClassifySingularityTravel(std::numeric_limits<double>::infinity(),
                                      true, false) == SingularityTravel::Halt);
@@ -102,11 +113,10 @@ int main()
 
     const double recovered = FilterSingularityRecoveryScale(
         1.0, 0.2, 0.20, kSingularityRecoveryFilterTimeConstantSeconds);
-    const double expected =
-        0.2 + (1.0 - std::exp(-1.0)) * (1.0 - 0.2);
+    const double expected = 0.2 + (1.0 - std::exp(-1.0)) * (1.0 - 0.2);
     assert(std::abs(recovered - expected) < 1e-12);
-    assert(FilterSingularityRecoveryScale(0.2, 1.0, 0.20,
-                                          kSingularityRecoveryFilterTimeConstantSeconds) ==
+    assert(FilterSingularityRecoveryScale(
+               0.2, 1.0, 0.20, kSingularityRecoveryFilterTimeConstantSeconds) ==
            0.2);
 
     return 0;

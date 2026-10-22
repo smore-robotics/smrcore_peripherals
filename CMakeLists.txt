@@ -32,6 +32,11 @@ if(NOT BUILD_TESTS)
 endif()
 option(SMR_PERIPHERAL_BUILD_PYTHON "Build Python bindings" OFF)
 option(SMR_PERIPHERAL_WITH_SDK "Build robot SDK bridge and F/T calibration tools" OFF)
+option(SMR_PERIPHERAL_WITH_PICO_TELEOP "Build optional SDK-backed dual-arm Pico teleoperation" OFF)
+if(SMR_PERIPHERAL_WITH_PICO_TELEOP AND NOT SMR_PERIPHERAL_WITH_SDK)
+    message(FATAL_ERROR "Pico teleoperation requires SMR_PERIPHERAL_WITH_SDK=ON")
+endif()
+
 set(SMR_PERIPHERAL_SDK_ROOT "" CACHE PATH "smrcore_sdk install prefix for standalone bridge builds")
 
 set(SMR_PERIPHERAL_SDK_TARGET "")
@@ -95,6 +100,31 @@ install(
         "${CMAKE_CURRENT_BINARY_DIR}/smrcore_peripheralsConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/smrcore_peripherals
 )
+
+if(SMR_PERIPHERAL_WITH_PICO_TELEOP)
+    get_target_property(_pico_sdk_imported ${SMR_PERIPHERAL_SDK_TARGET} IMPORTED)
+    if(_pico_sdk_imported)
+        include(CheckCXXSourceCompiles)
+        set(CMAKE_REQUIRED_LIBRARIES ${SMR_PERIPHERAL_SDK_TARGET})
+        unset(SMR_PERIPHERAL_HAS_DUAL_ARM_SDK CACHE)
+        check_cxx_source_compiles("#include <sdk/dual_arm_robot.hpp>
+int main() { return 0; }"
+            SMR_PERIPHERAL_HAS_DUAL_ARM_SDK)
+        unset(CMAKE_REQUIRED_LIBRARIES)
+        if(NOT SMR_PERIPHERAL_HAS_DUAL_ARM_SDK)
+            message(FATAL_ERROR "Pico teleoperation needs a matching dual-arm SDK (sdk/dual_arm_robot.hpp). Set SMR_PERIPHERAL_SDK_ROOT to a compatible installation, or disable SMR_PERIPHERAL_WITH_PICO_TELEOP to build the original readers/bridges.")
+        endif()
+    endif()
+    find_package(Eigen3 REQUIRED)
+    add_library(smrcore_pico_teleop SHARED teleop/pico_teleop.cpp)
+    target_compile_features(smrcore_pico_teleop PUBLIC cxx_std_17)
+    target_link_libraries(smrcore_pico_teleop PRIVATE smrcore_peripherals Eigen3::Eigen nlohmann_json::nlohmann_json ${SMR_PERIPHERAL_SDK_TARGET})
+    target_include_directories(smrcore_pico_teleop PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    set_target_properties(smrcore_pico_teleop PROPERTIES INSTALL_RPATH "$ORIGIN" EXPORT_NAME pico_teleop)
+    install(TARGETS smrcore_pico_teleop EXPORT smrcore_peripheralsTargets LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
 
 if(SMR_PERIPHERAL_BUILD_APPS)
     add_subdirectory(app)

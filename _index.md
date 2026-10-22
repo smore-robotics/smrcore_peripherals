@@ -11,7 +11,7 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 # Contents
 
 - README.md / README.en.md: 中英文仓库入口；按源码仓库语义说明构建、SDK 下载、app、Python 和安全要求
-- CMakeLists.txt: 顶层构建/安装/package config；`file(GLOB_RECURSE .../src/*.cpp CONFIGURE_DEPENDS)` 自动收集库源；`smrcore_peripherals` 设置 `EXPORT_NAME peripherals`，安装导出目标为 `smrcore::peripherals`；`install(DIRECTORY src/peripherals/ ... *.hpp)` 安装公开头（排除内部 `sample_model.hpp`）；PICO 协议实现私有依赖 nlohmann_json；`--with-sdk ON` 时构建 SDK bridge、PICO bridge 与 F/T 标定应用；产物 `build_<Type>/bin|lib|install`
+- CMakeLists.txt: 顶层构建/安装/package config；`file(GLOB_RECURSE .../src/*.cpp CONFIGURE_DEPENDS)` 自动收集库源；`smrcore_peripherals` 设置 `EXPORT_NAME peripherals`，安装导出目标为 `smrcore::peripherals`；`install(DIRECTORY src/peripherals/ ... *.hpp)` 安装公开头（排除内部 `sample_model.hpp`）；PICO 协议私有依赖 nlohmann_json；`--with-sdk ON` 时构建原 SDK bridge 与 F/T 标定应用；Pico bridge 另需 `--with-pico ON`；产物 `build_<Type>/bin|lib|install`
 - conanfile.py: Conan 2 包 `rcore-peripherals`；options `shared`/`build_tests`；版本来自 `SMRCORE_PERIPHERALS_VERSION`；nlohmann_json 供 PICO 协议层使用，Eigen 供可选 ServoP bridge app 使用
 - .sdk-version: standalone `scripts/download.sh` 使用的 smrcore_sdk 默认版本
 - docs/: 中英文平台配置，覆盖 SpaceMouse `/dev/input/event*`、F/T 串口权限和 robot bridge 连接
@@ -25,3 +25,12 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - unittests/: 无硬件语义单测，见 `unittests/_index.md`
 
 > FLOW: `*Options` 经 `Initialize()` 配置 → `Start()` 启后台线程 → `GetSample()` consume-on-read → 可选 SDK bridge 推送
+
+- teleop/: optional SDK-backed PICO core used by the independent C++ CLI; see `teleop/_index.md`.
+
+- docs/pico-integration-status.md: Pico 接入方式、SDK 兼容性与验证范围。
+
+- Pico 读取保留在基础库；SMR_PERIPHERAL_WITH_PICO_TELEOP 默认 OFF，显式启用并依赖 SDK，配置阶段检查 standalone 双臂头文件。
+
+- .github/workflows/: 每次提交构建 Linux 制品，版本标签发布 Release；见 .github/workflows/_index.md。
+- scripts/package_release.py / build_manual.sh: 安装树打包、双语说明书；发布范围见 docs/releases.md。
