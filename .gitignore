@@ -82,3 +82,6 @@ python/.deps/
 *.vcxproj
 *.vcxproj.filters
 /pdb/
+
+# MkDocs output
+/site/

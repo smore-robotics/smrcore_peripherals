@@ -92,5 +92,16 @@
   "python/app/app_peripherals_read_pico.py": "python/app/_index.md",
   ".github/workflows/ci.yml": ".github/workflows/_index.md",
   "scripts/package_release.py": "scripts/_index.md",
-  "scripts/build_manual.sh": "scripts/_index.md"
+  "scripts/build_manual.sh": "scripts/_index.md",
+  "mkdocs.yml": "_index.md",
+  "docs/requirements.txt": "docs/_index.md",
+  "docs/site/stylesheets/extra.css": "docs/site/stylesheets/_index.md",
+  "docs/site/index.md": "docs/site/_index.md",
+  "docs/site/zh/getting-started.md": "docs/site/zh/_index.md",
+  "docs/site/zh/readers.md": "docs/site/zh/_index.md",
+  "docs/site/zh/robot-integration.md": "docs/site/zh/_index.md",
+  "docs/site/zh/downloads.md": "docs/site/zh/_index.md",
+  "docs/site/zh/troubleshooting.md": "docs/site/zh/_index.md",
+  ".github/workflows/docs.yml": ".github/workflows/_index.md",
+  ".gitignore": "_index.md"
 }

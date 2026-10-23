@@ -10,6 +10,8 @@
 
 ## 文档
 
+- [在线文档 / Documentation site](https://smore-robotics.github.io/smrcore_peripherals/zh/getting-started/)（组织站点部署后可用 / available after upstream deployment）
+
 - [C++ 应用](app/README.md)
 - [Python 应用](python/app/README.md)
 - [设备权限与平台配置](docs/platform_setup.md)

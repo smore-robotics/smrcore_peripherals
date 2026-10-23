@@ -10,6 +10,8 @@ The public source repository for the Smartmore peripheral SDK. It provides a C++
 
 ## Documentation
 
+- [在线文档 / Documentation site](https://smore-robotics.github.io/smrcore_peripherals/zh/getting-started/)（组织站点部署后可用 / available after upstream deployment）
+
 - [C++ applications](app/README.en.md)
 - [Python applications](python/app/README.en.md)
 - [Platform setup](docs/platform_setup.en.md)

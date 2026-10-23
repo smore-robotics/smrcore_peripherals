@@ -1,0 +1,38 @@
+site_name: Smartmore Peripherals
+site_description: Smartmore 外设 SDK 使用文档
+site_url: !ENV [PERIPHERALS_SITE_URL, 'https://smore-robotics.github.io/smrcore_peripherals/']
+repo_url: https://github.com/smore-robotics/smrcore_peripherals
+repo_name: smore-robotics/smrcore_peripherals
+docs_dir: docs/site
+theme:
+  name: material
+  language: zh
+  palette:
+    primary: teal
+    accent: teal
+  features:
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - navigation.footer
+plugins:
+  - search:
+      lang: [en, zh]
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - tables
+extra_css:
+  - stylesheets/extra.css
+nav:
+  - 首页: index.md
+  - 使用指南:
+      - 快速开始: zh/getting-started.md
+      - 外设读取: zh/readers.md
+      - 机器人与 Pico 接入: zh/robot-integration.md
+      - 下载与版本: zh/downloads.md
+      - 常见问题: zh/troubleshooting.md
+exclude_docs: |
+  **/_index.md
+  _index.md
