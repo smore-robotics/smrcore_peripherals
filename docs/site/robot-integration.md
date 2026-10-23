@@ -27,3 +27,14 @@ Default CI and release packages exclude this optional executable. A passing read
 Before running motion, verify the robot, tool, payload and workspace, and keep the emergency stop accessible.
 
 See the [complete Pico guide](pico.md) and [platform permissions](platform.md).
+
+## Peripheral integration
+
+| Peripheral | Input | Robot integration |
+|---|---|---|
+| [SpaceMouse](spacemouse.md) | Six-axis input and buttons | SDK Peripheral sample API |
+| [Force/torque sensor](ft-sensor.md) | Force and torque | SDK Peripheral sample API |
+| [Pico](pico.md) | Headset/controller poses and buttons | Dual-arm SDK ServoP and grippers |
+| [Master–follower arms](zhonglin.md) | Master joint positions | SDK ServoJ follower control |
+
+Each chain covers input reading, robot integration and configuration. Protocols and robot interfaces reflect the actual implementation.

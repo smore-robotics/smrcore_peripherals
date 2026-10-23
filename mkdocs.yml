@@ -36,6 +36,9 @@ plugins:
             API Summary: API 摘要
             Peripheral Readers: 外设读取
             Robot Integration: 机器人接入
+            Peripheral Integration: 外设接入
+            Force/Torque Sensor: 六维力传感器
+            Master–Follower Arms: 主从臂
             Troubleshooting: 常见问题
             Platform Setup: 平台配置
             Pico: Pico 读取与遥操
@@ -74,14 +77,15 @@ nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - Release Notes: downloads.md
-  - C++ Examples:
-      - Overview: cpp.md
+  - Peripheral Integration:
+      - SpaceMouse: spacemouse.md
+      - Force/Torque Sensor: ft-sensor.md
+      - Pico: pico.md
+      - Master–Follower Arms: zhonglin.md
       - Peripheral Readers: readers.md
       - Robot Integration: robot-integration.md
-      - Pico: pico.md
-  - Python Examples:
-      - Overview: python.md
-      - Zhonglin: zhonglin.md
+  - C++ Examples: cpp.md
+  - Python Examples: python.md
   - Platform Setup: platform.md
   - API Reference: api.md
   - Troubleshooting: troubleshooting.md

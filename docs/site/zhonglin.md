@@ -1,6 +1,6 @@
-# Zhonglin master arm to i3
+# Master–follower arms
 
-The original single-arm chain is preserved: serial PWM → six-joint mapping → robot SDK `ServoJ`. No ROS or dual-arm API is used.
+Master input → joint mapping → robot SDK `ServoJ` → follower arm.
 
 ## Read the master
 

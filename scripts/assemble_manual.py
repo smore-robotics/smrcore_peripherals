@@ -15,13 +15,25 @@ def assemble(language):
         ('C++ 示例' if zh else 'C++ examples', 'app/README.md' if zh else 'app/README.en.md'),
         ('Python 示例' if zh else 'Python examples', 'python/app/README.md' if zh else 'python/app/README.en.md'),
         ('平台配置' if zh else 'Platform setup', 'docs/platform_setup.md' if zh else 'docs/platform_setup.en.md'),
-        ('Pico 双臂遥操' if zh else 'Pico dual-arm teleoperation', 'docs/site/pico.zh.md' if zh else 'docs/site/pico.md'),
-        ('中凌主从臂' if zh else 'Zhonglin master arm', 'docs/site/zhonglin.zh.md' if zh else 'docs/site/zhonglin.md'),
         ('制品与版本' if zh else 'Artifacts and releases', 'docs/releases.md' if zh else 'docs/releases.en.md'),
     ]
+    devices = [(name, f'docs/site/{stem}' + ('.zh.md' if zh else '.md')) for name, stem in [
+        ('SpaceMouse', 'spacemouse'), ('六维力传感器' if zh else 'Force/torque sensor', 'ft-sensor'),
+        ('Pico', 'pico'), ('主从臂' if zh else 'Master–follower arms', 'zhonglin')]]
+    sources.insert(1, ('外设接入' if zh else 'Peripheral integration', devices))
     chapters = []
     for i, (title, source) in enumerate(sources, 1):
-        text = (ROOT / source).read_text()
+        if isinstance(source, list):
+            parts = []
+            for name, path in source:
+                body = (ROOT / path).read_text()
+                body = re.sub(r'^# .+\n', '', body, count=1)
+                body = re.sub(r'^(#{2,5}) (?:\d+\.\s+)?', r'#\1 ', body, flags=re.MULTILINE)
+                parts.append(f'## {name}\n\n{body.strip()}')
+            text = '\n\n'.join(parts)
+            source = 'docs/site/index.md'
+        else:
+            text = (ROOT / source).read_text()
         text = re.sub(r'^# .+\n', '', text, count=1)
         text = re.sub(r'^(#{2,6}) \d+\.\s+', r'\1 ', text, flags=re.MULTILINE)
         if source.startswith('README'):

@@ -26,6 +26,11 @@ Distribution name: `rcore-peripherals-py`; import name: `rcore_peripherals`.
 | `app_peripherals_read_ft_sensor.py` | Stream wrench samples after the first valid frame |
 | `app_peripherals_bridge.py` | Push SpaceMouse / F/T samples into the robot SDK |
 | `app_peripherals_ft_sensor_calib.py` | MoveJ static F/T calibration (Preview / `--save`) |
+| `app_peripherals_read_pico.py` | Pico poses and buttons |
+| `app_peripherals_pico_bridge.py` | Pico dual-arm launcher |
+| `app_peripherals_read_zhonglin.py` | Master arm input |
+| `app_peripherals_zhonglin_i3_bridge.py` | Master–follower ServoJ control |
+
 
 ```bash
 python3 python/app/app_peripherals_read_spacemouse.py --device /dev/input/event5 --sample-rate 125
@@ -66,7 +71,7 @@ CLI matches C++: `--robot-ip`, `--nominal`, `--settle-ms`, `--sample-ms`, `--vel
 
 > Robots are hazardous machines. Before running bridge or calibration scripts, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. Force control requires a one-time `--save` calibration first.
 
-- [Zhonglin master reader and single-arm i3 ServoJ teleoperation](../../docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
+- [Master–follower arms](../../docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
 
 ## Start Pico dual-arm teleoperation from Python
 

@@ -42,3 +42,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - docs/releases.md / docs/releases.en.md: weekly patch release cadence and manual retry instructions.
 
 - docs/manual/: pinned Eisvogel template, bilingual PDF/HTML branding and attribution; see docs/manual/_index.md.
+
+- mkdocs.yml and docs/site: unified peripheral integration navigation for SpaceMouse, F/T, Pico and master–follower arms.

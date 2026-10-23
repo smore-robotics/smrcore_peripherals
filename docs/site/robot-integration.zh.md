@@ -1,6 +1,6 @@
-# 机器人与 Pico 接入
+# 机器人接入
 
-## 原有 SpaceMouse / F/T bridge
+## SpaceMouse / 六维力传感器
 
 该 bridge 将外设样本通过 SDK 的 Peripheral 接口交给机器人；实际运动行为取决于柜端控制模式及配置。
 
@@ -18,7 +18,7 @@
 
 默认 SDK 版本由仓库 `.sdk-version` 固定。预编译 `sdk-bridge` 包带有配套 SDK 运行库，不需要另外安装读取器包。
 
-## Pico 双臂示例
+## Pico
 
 Pico 读取器属于基础库；Pico 双臂遥操属于独立的可选 C++ 程序。
 
@@ -38,3 +38,14 @@ Pico 读取器属于基础库；Pico 双臂遥操属于独立的可选 C++ 程�
 执行运动示例前确认目标、工具、负载与工作空间匹配，急停可触达。
 
 详见 [Pico 完整用法](pico.md)和[平台权限配置](platform.md)。
+
+## 外设接入
+
+| 外设 | 输入 | 机器人接入 |
+|---|---|---|
+| [SpaceMouse](spacemouse.md) | 六自由度输入与按键 | SDK Peripheral 样本接口 |
+| [六维力传感器](ft-sensor.md) | 力与力矩采样 | SDK Peripheral 样本接口 |
+| [Pico](pico.md) | 头显、手柄位姿与按键 | 双臂 SDK ServoP 与末端夹爪 |
+| [主从臂](zhonglin.md) | 主臂关节位置 | SDK ServoJ 从臂跟随 |
+
+统一按“读取输入 → 机器人接入 → 配置与适用范围”使用；各链路的协议和控制接口按实际实现说明。

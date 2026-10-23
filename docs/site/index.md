@@ -37,3 +37,14 @@ Build C++ and Python applications with the peripheral library, and connect robot
 </div>
 
 Readers do not require a robot SDK. Default release packages do not include the optional Pico dual-arm teleoperation executable.
+
+## Peripheral integration
+
+| Peripheral | Input | Robot integration |
+|---|---|---|
+| [SpaceMouse](spacemouse.md) | Six-axis input and buttons | SDK Peripheral sample API |
+| [Force/torque sensor](ft-sensor.md) | Force and torque | SDK Peripheral sample API |
+| [Pico](pico.md) | Headset/controller poses and buttons | Dual-arm SDK ServoP and grippers |
+| [Master–follower arms](zhonglin.md) | Master joint positions | SDK ServoJ follower control |
+
+Each chain covers input reading, robot integration and configuration. Protocols and robot interfaces reflect the actual implementation.

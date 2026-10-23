@@ -34,3 +34,5 @@ python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip 192.168.1.100
 - app_peripherals_read_zhonglin.py / app_peripherals_zhonglin_i3_bridge.py: read-only serial diagnostics and explicit single-i3 ServoJ control; complete-input timeout and StopMotion cleanup.
 
 - app_peripherals_pico_bridge.py: Python launcher replaces itself with the C++ SDK bridge; explicit binary path or local build/PATH lookup, unchanged arguments and signal handling.
+
+- README.md / README.en.md: shared application table covers all four peripheral chains; master–follower arms is the public label.

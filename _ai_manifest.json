@@ -140,5 +140,9 @@
   "docs/manual/eisvogel.latex": "docs/manual/_index.md",
   "docs/manual/EISVOGEL-LICENSE": "docs/manual/_index.md",
   "docs/manual/layout.tex": "docs/manual/_index.md",
-  "scripts/build_manual.py": "scripts/_index.md"
+  "scripts/build_manual.py": "scripts/_index.md",
+  "docs/site/spacemouse.md": "docs/site/_index.md",
+  "docs/site/spacemouse.zh.md": "docs/site/_index.md",
+  "docs/site/ft-sensor.md": "docs/site/_index.md",
+  "docs/site/ft-sensor.zh.md": "docs/site/_index.md"
 }

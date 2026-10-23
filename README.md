@@ -8,6 +8,10 @@
 
 这是 Smartmore 外设 SDK 的公开源码仓库，提供 C++ 外设库、Python wheel、读数示例及可选机器人 SDK bridge。外设读取不连接机器人；控制由独立 bridge 组合 [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk)。
 
+## 外设接入
+
+[SpaceMouse](docs/site/spacemouse.md) · [六维力传感器](docs/site/ft-sensor.md) · [Pico](docs/site/pico.md) · [主从臂](docs/site/zhonglin.md)
+
 ## 文档
 
 - [在线文档 / Documentation site](https://smore-robotics.github.io/smrcore_peripherals/zh/getting-started/)（组织站点部署后可用 / available after upstream deployment）
@@ -80,5 +84,3 @@ Pico 双臂 bridge 另行通过 `--with-pico ON --sdk-root /path/to/compatible-s
 ## 许可证
 
 仓库采用 [Apache License 2.0](LICENSE)。SDK bridge 包随 SDK 运行库保留其第三方许可证和归属说明。
-
-- [中凌主臂读取与单臂 i3 ServoJ 遥操](docs/site/zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

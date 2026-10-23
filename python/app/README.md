@@ -18,7 +18,7 @@ python3 -m pip install --force-reinstall python/dist/*.whl
 
 包名：`rcore-peripherals-py`；import 名：`rcore_peripherals`。
 
-## 仅读外设
+## 应用入口
 
 | 脚本 | 说明 |
 |---|---|
@@ -26,6 +26,11 @@ python3 -m pip install --force-reinstall python/dist/*.whl
 | `app_peripherals_read_ft_sensor.py` | 在首帧有效数据后流式输出六维力矩 |
 | `app_peripherals_bridge.py` | 向机器人 SDK 推送 SpaceMouse / F/T 采样 |
 | `app_peripherals_ft_sensor_calib.py` | MoveJ 静态六维力标定（Preview / `--save`） |
+| `app_peripherals_read_pico.py` | Pico 位姿与按键读取 |
+| `app_peripherals_pico_bridge.py` | Pico 双臂遥操启动入口 |
+| `app_peripherals_read_zhonglin.py` | 主从臂输入读取 |
+| `app_peripherals_zhonglin_i3_bridge.py` | 主从臂 ServoJ 跟随 |
+
 
 ```bash
 python3 python/app/app_peripherals_read_spacemouse.py --device /dev/input/event5 --sample-rate 125
@@ -82,7 +87,7 @@ adb reverse tcp:8765 tcp:8765
 
 在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。
 
-- [中凌主臂读取与单臂 i3 ServoJ 遥操](../../docs/site/zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
+- [主从臂](../../docs/site/zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
 
 ## Python 启动 Pico 双臂遥操
 

@@ -27,3 +27,5 @@
 - assemble_manual.py / build_manual.sh: named chapters, resolved links and template license; branded Eisvogel PDF plus self-contained HTML.
 
 - build_manual.py: validates version and builds bilingual HTML/PDF; shell entry delegates unchanged arguments.
+
+- assemble_manual.py: one Peripheral Integration chapter with four peer subsections; C++ and Python remain language entry points.

@@ -12,3 +12,5 @@
 - zhonglin.md / zhonglin.zh.md: original master/i3 pairing, reader setup and ServoJ example.
 
 - pico/python pages: bilingual Python launcher setup and unchanged C++ control semantics.
+
+- spacemouse/ft-sensor/pico/zhonglin: four peer device guides under Peripheral Integration; public name 主从臂 / Master–follower arms, hardware details only in scope.

@@ -8,6 +8,10 @@
 
 The public source repository for the Smartmore peripheral SDK. It provides a C++ library, Python wheels, reader examples, and optional robot SDK bridges. Readers do not connect to robots; separate bridges compose them with [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk).
 
+## Peripheral integration
+
+[SpaceMouse](docs/site/spacemouse.md) · [Force/torque sensor](docs/site/ft-sensor.md) · [Pico](docs/site/pico.md) · [Master–follower arms](docs/site/zhonglin.md)
+
 ## Documentation
 
 - [在线文档 / Documentation site](https://smore-robotics.github.io/smrcore_peripherals/zh/getting-started/)（组织站点部署后可用 / available after upstream deployment）
@@ -79,5 +83,3 @@ Robot bridges affect physical hardware. Verify the robot, tool, payload, workspa
 ## License
 
 [Apache License 2.0](LICENSE). SDK bridge archives preserve the SDK's bundled third-party licenses and attribution.
-
-- [Zhonglin master reader and single-arm i3 ServoJ teleoperation](docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

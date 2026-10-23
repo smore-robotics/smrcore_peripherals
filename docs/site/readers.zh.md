@@ -40,6 +40,6 @@ adb reverse tcp:8765 tcp:8765
 !!! note "Wi-Fi 与 localhost"
     上面的 localhost 用法依赖 adb 端口反向转发。普通 Wi-Fi 连接中的 localhost 指头显自己；直接访问电脑 HTTP 地址也可能不满足 WebXR 安全上下文要求。Wi-Fi 方案需要头显可访问的 HTTPS 服务与受信任证书，不能只把 localhost 换成电脑 IP。
 
-读取成功不等于已连接机器人。双臂接入见[机器人与 Pico 接入](robot-integration.md)。
+读取成功不等于已连接机器人。双臂接入见[机器人接入](robot-integration.md)。
 
 详见 [Pico 完整用法](pico.md)和[平台权限配置](platform.md)。
