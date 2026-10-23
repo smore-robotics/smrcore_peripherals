@@ -151,5 +151,3 @@ def max_joint_error_deg(actual_rad: Sequence[float], target_rad: Sequence[float]
     actual = np.asarray(actual_rad, dtype=float)
     target = np.asarray(target_rad, dtype=float)
     return float(np.max(np.abs(np.degrees(actual - target))))
-
-
