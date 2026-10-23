@@ -69,3 +69,5 @@ CLI matches C++: `--robot-ip`, `--nominal`, `--settle-ms`, `--sample-ms`, `--vel
 ## Pico
 
 [Pico reader, coordinates and connection guide](pico.md). The peripheral wheel does not include a Python dual-arm teleoperation core.
+
+- [Zhonglin master reader and single-arm i3 ServoJ teleoperation](zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

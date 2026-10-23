@@ -17,3 +17,5 @@
 - ut_pico_singularity_scale.cpp: 硬边界不受离开方向放宽；覆盖 30/45/60、非有限输入、整圈跳解、关节跨度和实测肘部危险姿态。
 
 - `test_pico_stop_worker.py`: 编译生产停止目标/worker，验证有方向的目标估计、越限/无效参数拒绝、J6 比例限速、ServoJ 固定目标、延迟发送与停稳门禁；fake 不提供透传/StopMotion，并禁止遥操源码重新引入透传。
+
+- test_zhonglin.py: mapping, invalid/stale samples, bridge rejection and cleanup without hardware.

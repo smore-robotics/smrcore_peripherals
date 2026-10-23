@@ -122,5 +122,11 @@
   "docs/site/pico.md": "docs/site/_index.md",
   "docs/site/pico.zh.md": "docs/site/_index.md",
   "docs/site/platform.md": "docs/site/_index.md",
-  "docs/site/platform.zh.md": "docs/site/_index.md"
+  "docs/site/platform.zh.md": "docs/site/_index.md",
+  "python/src/rcore_peripherals/zhonglin.py": "python/_index.md",
+  "python/app/app_peripherals_read_zhonglin.py": "python/app/_index.md",
+  "python/app/app_peripherals_zhonglin_i3_bridge.py": "python/app/_index.md",
+  "unittests/test_zhonglin.py": "unittests/_index.md",
+  "docs/site/zhonglin.md": "docs/site/_index.md",
+  "docs/site/zhonglin.zh.md": "docs/site/_index.md"
 }

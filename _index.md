@@ -36,3 +36,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - scripts/package_release.py / build_manual.sh: 安装树打包、双语说明书；发布范围见 docs/releases.md。
 
 - mkdocs.yml / docs/site/: SDK 同款双语 Material 文档站，严格构建，Pages 发布入口。
+
+- Python Zhonglin reader and single-i3 ServoJ bridge preserve the original master-arm pairing; see docs/site/zhonglin.md.

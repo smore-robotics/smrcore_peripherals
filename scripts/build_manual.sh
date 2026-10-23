@@ -9,9 +9,9 @@ output="$(cd "$output" && pwd)"
 cd "$root"
 for language in zh en; do
     if [[ "$language" == zh ]]; then
-        inputs=(README.md app/README.md python/app/README.md docs/platform_setup.md python/TELEOP.md docs/releases.md)
+        inputs=(README.md app/README.md python/app/README.md docs/platform_setup.md python/TELEOP.md docs/releases.md docs/site/zhonglin.zh.md)
     else
-        inputs=(README.en.md app/README.en.md python/app/README.en.md docs/platform_setup.en.md docs/releases.en.md)
+        inputs=(README.en.md app/README.en.md python/app/README.en.md docs/platform_setup.en.md docs/releases.en.md docs/site/zhonglin.md)
     fi
     stem="$output/smrcore_peripherals-manual-$language-v$version"
     pandoc "${inputs[@]}" --standalone --toc --metadata title="Smartmore Peripherals $version" -o "$stem.html"

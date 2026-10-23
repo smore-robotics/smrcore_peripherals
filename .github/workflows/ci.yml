@@ -54,12 +54,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build g++ patchelf
-          python -m pip install 'conan>=2,<3' pytest
+          python -m pip install 'conan>=2,<3' pytest numpy
       - name: Build readers and tests without robot SDK
         run: |
           ./scripts/build.sh --with-sdk OFF --tests ON
           ./scripts/run_tests.sh -t Release
-          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py -q
+          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py unittests/test_zhonglin.py -q
           ./scripts/check_python_examples.sh
       - name: Build and test wheel
         run: |

@@ -30,3 +30,5 @@ python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip 192.168.1.100
 - app_peripherals_read_pico.py: Pico 只读 WebXR 接收，--port 默认 8765；输出头显/左右手柄 XYZ（米）与按键，未追踪显示 N/A，Ctrl+C Stop/Shutdown；不依赖机器人 SDK。
 
 - README.md: Pico 与其他读取器共用外设 wheel；接收程序和 USB adb 转发分步说明。
+
+- app_peripherals_read_zhonglin.py / app_peripherals_zhonglin_i3_bridge.py: read-only serial diagnostics and explicit single-i3 ServoJ control; complete-input timeout and StopMotion cleanup.

@@ -19,3 +19,5 @@
 
 - package_release.py: 打包 Linux x86_64 安装树、SDK 运行库/归属、元信息及校验和，不运行设备。
 - build_manual.sh: 使用 Pandoc/XeLaTeX 合成中英文 HTML/PDF。
+
+- build_manual.sh: include Zhonglin reader/ServoJ instructions in both language manuals.

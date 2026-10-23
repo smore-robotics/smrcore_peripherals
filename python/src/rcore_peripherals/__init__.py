@@ -56,3 +56,10 @@ __all__ = [
     "SpaceMouseRawSample",
     "SpaceMouseSample",
 ]
+
+# Zhonglin is optional: importing other readers does not require numpy/pyserial.
+def __getattr__(name):
+    if name == "ZhonglinReader":
+        from .zhonglin import ZhonglinReader
+        return ZhonglinReader
+    raise AttributeError(name)

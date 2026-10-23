@@ -11,6 +11,9 @@ requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "rcore" }]
 
+[project.optional-dependencies]
+zhonglin = ["numpy>=1.23", "pyserial>=3.5"]
+
 [tool.scikit-build]
 wheel.packages = ["src/rcore_peripherals"]
 cmake.version = ">=3.20"

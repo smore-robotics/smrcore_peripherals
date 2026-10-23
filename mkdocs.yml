@@ -79,7 +79,9 @@ nav:
       - Peripheral Readers: readers.md
       - Robot Integration: robot-integration.md
       - Pico: pico.md
-  - Python Examples: python.md
+  - Python Examples:
+      - Overview: python.md
+      - Zhonglin: zhonglin.md
   - Platform Setup: platform.md
   - API Reference: api.md
   - Troubleshooting: troubleshooting.md

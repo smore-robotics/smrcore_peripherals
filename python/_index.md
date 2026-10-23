@@ -21,3 +21,5 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 > FLOW: C++ install → wheel 打包 native + Python → `import rcore_peripherals` → `FtSensor(options)` 同 C++ 语义
 
 - TELEOP.md: 外设读取与独立 C++ Pico bridge 的构建、使用边界。
+
+- zhonglin.py: lazy-exported ZhonglinReader, optional numpy/pyserial extra; six-axis serial samples and original i3 mapping.

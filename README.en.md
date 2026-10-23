@@ -79,3 +79,5 @@ Robot bridges affect physical hardware. Verify the robot, tool, payload, workspa
 ## License
 
 [Apache License 2.0](LICENSE). SDK bridge archives preserve the SDK's bundled third-party licenses and attribution.
+
+- [Zhonglin master reader and single-arm i3 ServoJ teleoperation](docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

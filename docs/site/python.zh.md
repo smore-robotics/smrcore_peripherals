@@ -85,3 +85,5 @@ adb reverse tcp:8765 tcp:8765
 ## Pico
 
 [Pico 只读、坐标与连接说明](pico.md)。外设 wheel 不包含 Python 双臂遥操核心。
+
+- [中凌主臂读取与单臂 i3 ServoJ 遥操](zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

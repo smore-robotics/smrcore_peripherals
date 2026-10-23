@@ -81,3 +81,5 @@ adb reverse tcp:8765 tcp:8765
 ```
 
 在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。
+
+- [中凌主臂读取与单臂 i3 ServoJ 遥操](../../docs/site/zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

@@ -8,3 +8,5 @@
 - cpp / python / platform: 整理原应用、桥接、标定及权限文档；pico: 只读到双臂的完整流程、参数与恢复语义。
 
 - Python 中文说明统一按当前 wheel 用法描述，USB 转发独立列为连接步骤。
+
+- zhonglin.md / zhonglin.zh.md: original master/i3 pairing, reader setup and ServoJ example.

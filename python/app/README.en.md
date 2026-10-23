@@ -65,3 +65,5 @@ CLI matches C++: `--robot-ip`, `--nominal`, `--settle-ms`, `--sample-ms`, `--vel
 ## Safety
 
 > Robots are hazardous machines. Before running bridge or calibration scripts, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. Force control requires a one-time `--save` calibration first.
+
+- [Zhonglin master reader and single-arm i3 ServoJ teleoperation](../../docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.

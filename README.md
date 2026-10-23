@@ -80,3 +80,5 @@ Pico 双臂 bridge 另行通过 `--with-pico ON --sdk-root /path/to/compatible-s
 ## 许可证
 
 仓库采用 [Apache License 2.0](LICENSE)。SDK bridge 包随 SDK 运行库保留其第三方许可证和归属说明。
+
+- [中凌主臂读取与单臂 i3 ServoJ 遥操](docs/site/zhonglin.md)：`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
