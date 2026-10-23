@@ -35,4 +35,4 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - .github/workflows/: 每次提交构建 Linux 制品，版本标签发布 Release；见 .github/workflows/_index.md。
 - scripts/package_release.py / build_manual.sh: 安装树打包、双语说明书；发布范围见 docs/releases.md。
 
-- mkdocs.yml / docs/site/: Material 文档站，严格构建，Pages 发布入口。
+- mkdocs.yml / docs/site/: SDK 同款双语 Material 文档站，严格构建，Pages 发布入口。

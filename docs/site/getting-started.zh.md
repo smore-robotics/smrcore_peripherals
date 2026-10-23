@@ -1,5 +1,27 @@
 # 快速开始
 
+本页介绍安装、构建和运行最小外设程序。请选择你的路径：
+
+<div class="grid cards" markdown>
+
+- :material-language-cpp:{ .lg .middle } **C++ SDK**
+
+    ---
+
+    构建外设库和诊断程序。
+
+    [前往 C++ SDK →](#c-sdk)
+
+- :material-language-python:{ .lg .middle } **Python SDK**
+
+    ---
+
+    安装 wheel 并运行读取示例。
+
+    [前往 Python SDK →](#python-sdk)
+
+</div>
+
 ## 环境
 
 当前自动构建制品面向 Linux x86_64，建议 Ubuntu 22.04。Python wheel 覆盖 CPython 3.10、3.11、3.12。
@@ -16,7 +38,7 @@ git clone https://github.com/smore-robotics/smrcore_peripherals.git
 cd smrcore_peripherals
 ```
 
-## 编译 C++ 读取器
+## C++ SDK {#c-sdk}
 
 ```bash
 ./scripts/build.sh --with-sdk OFF --tests ON
@@ -26,7 +48,7 @@ cd smrcore_peripherals
 
 `--with-sdk OFF` 不连接机器人，也无需安装机器人 SDK。连接设备及权限处理见[外设读取](readers.md)。
 
-## 构建 Python wheel
+## Python SDK {#python-sdk}
 
 继续在仓库根目录、同一个 Python 环境中执行：
 

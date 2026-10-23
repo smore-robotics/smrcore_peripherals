@@ -1,0 +1,3 @@
+Theme CSS and logo reused from smore-robotics/smrcore_sdk, Apache-2.0.
+Source: https://github.com/smore-robotics/smrcore_sdk/tree/main/docs/assets
+License: SDK-LICENSE.txt

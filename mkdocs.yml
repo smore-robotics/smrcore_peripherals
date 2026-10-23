@@ -1,38 +1,105 @@
-site_name: Smartmore Peripherals
-site_description: Smartmore 外设 SDK 使用文档
+site_name: smrcore_peripherals
+site_description: Smartmore Peripherals SDK documentation
 site_url: !ENV [PERIPHERALS_SITE_URL, 'https://smore-robotics.github.io/smrcore_peripherals/']
+docs_dir: docs/site
 repo_url: https://github.com/smore-robotics/smrcore_peripherals
 repo_name: smore-robotics/smrcore_peripherals
-docs_dir: docs/site
+
+plugins:
+  - search
+  - i18n:
+      reconfigure_material: true
+      docs_structure: suffix
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: zh
+          name: 中文
+          build: true
+          site_name: smrcore_peripherals 文档
+          site_description: Smartmore Peripherals SDK 文档
+          nav_translations:
+            Home: 首页
+            Getting Started: 快速开始
+            Release Notes: 版本说明
+            C++ Examples: C++ 示例
+            Python Examples: Python 示例
+            Overview: 总览
+            Basics: 基础
+            Motion: 运动
+            Configuration: 配置
+            End Board: 末端功能板
+            Compliance: 柔顺控制
+            API Reference: API 参考
+            API Summary: API 摘要
+            Peripheral Readers: 外设读取
+            Robot Integration: 机器人接入
+            Troubleshooting: 常见问题
+
 theme:
   name: material
-  language: zh
+  language: en
+  logo: assets/logo.png
+  favicon: assets/logo.png
   palette:
-    primary: teal
-    accent: teal
+    - scheme: default
+      primary: blue grey
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
   features:
     - navigation.tabs
+    - navigation.sections
     - navigation.top
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
     - content.code.copy
-    - navigation.footer
-plugins:
-  - search:
-      lang: [en, zh]
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Release Notes: downloads.md
+  - C++ Examples:
+      - Overview: cpp.md
+      - Peripheral Readers: readers.md
+      - Robot Integration: robot-integration.md
+  - Python Examples: python.md
+  - Troubleshooting: troubleshooting.md
+
+extra_css:
+  - assets/stylesheets/extra.css
+
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
   - pymdownx.highlight
   - pymdownx.superfences
-  - tables
-extra_css:
-  - stylesheets/extra.css
-nav:
-  - 首页: index.md
-  - 使用指南:
-      - 快速开始: zh/getting-started.md
-      - 外设读取: zh/readers.md
-      - 机器人与 Pico 接入: zh/robot-integration.md
-      - 下载与版本: zh/downloads.md
-      - 常见问题: zh/troubleshooting.md
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.snippets:
+      base_path: .
+      check_paths: true
+
 exclude_docs: |
   **/_index.md
   _index.md
