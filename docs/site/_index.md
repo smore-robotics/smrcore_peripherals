@@ -10,3 +10,5 @@
 - Python 中文说明统一按当前 wheel 用法描述，USB 转发独立列为连接步骤。
 
 - zhonglin.md / zhonglin.zh.md: original master/i3 pairing, reader setup and ServoJ example.
+
+- pico/python pages: bilingual Python launcher setup and unchanged C++ control semantics.

@@ -6,3 +6,5 @@
 - docs.yml: 构建 MkDocs 文档，PR 仅构建，main 或指定 Fork 开发分支部署 Pages。
 
 - ci.yml: numpy dependency and Zhonglin Python regression tests.
+
+- ci.yml: includes Python Pico launcher regression tests.

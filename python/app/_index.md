@@ -32,3 +32,5 @@ python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip 192.168.1.100
 - README.md: Pico 与其他读取器共用外设 wheel；接收程序和 USB adb 转发分步说明。
 
 - app_peripherals_read_zhonglin.py / app_peripherals_zhonglin_i3_bridge.py: read-only serial diagnostics and explicit single-i3 ServoJ control; complete-input timeout and StopMotion cleanup.
+
+- app_peripherals_pico_bridge.py: Python launcher replaces itself with the C++ SDK bridge; explicit binary path or local build/PATH lookup, unchanged arguments and signal handling.

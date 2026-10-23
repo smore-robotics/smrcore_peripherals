@@ -19,3 +19,5 @@
 - `test_pico_stop_worker.py`: 编译生产停止目标/worker，验证有方向的目标估计、越限/无效参数拒绝、J6 比例限速、ServoJ 固定目标、延迟发送与停稳门禁；fake 不提供透传/StopMotion，并禁止遥操源码重新引入透传。
 
 - test_zhonglin.py: mapping, invalid/stale samples, bridge rejection and cleanup without hardware.
+
+- test_pico_python_launcher.py: no-hardware argument forwarding, exit status, missing binary and help tests.

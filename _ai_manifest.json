@@ -128,5 +128,7 @@
   "python/app/app_peripherals_zhonglin_i3_bridge.py": "python/app/_index.md",
   "unittests/test_zhonglin.py": "unittests/_index.md",
   "docs/site/zhonglin.md": "docs/site/_index.md",
-  "docs/site/zhonglin.zh.md": "docs/site/_index.md"
+  "docs/site/zhonglin.zh.md": "docs/site/_index.md",
+  "python/app/app_peripherals_pico_bridge.py": "python/app/_index.md",
+  "unittests/test_pico_python_launcher.py": "unittests/_index.md"
 }

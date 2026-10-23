@@ -17,7 +17,32 @@ python3 python/app/app_peripherals_read_pico.py --help
 
 SpaceMouse bridge 上传采样供柜端遥操消费；Pico 当前 bridge 在应用层转换手柄位姿并调用双臂 SDK，
 不能把它描述为相同的柜端采样接口。读取层/控制层分离的原则相同。
-独立 Python 双臂控制示例尚未提供，基础 wheel 不包含 PicoTeleop 类。
+Python 启动入口直接复用 C++ bridge，基础 wheel 保持只读职责。
 SDK 当前仅支持 Initialize(IP)，需核对 domain 与目标柜的兼容性。
 
 本示例内置 B3 支架变换，适用于对应 B3 双臂安装构型，不是通用双臂配置。其他支架或安装方式需重新配置并验证坐标变换。
+
+## Python 启动 Pico 双臂遥操
+
+Python 入口复用 C++ SDK bridge；B3 支架变换、Grip 离合、J6 摇杆、Trigger 夹爪、奇异位形减速和断流停止与 C++ 程序一致。无需安装外设 wheel 或机器人 Python SDK。
+
+先用配套的双臂 C++ SDK 构建：
+
+```bash
+./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk
+python3 python/app/app_peripherals_pico_bridge.py --help
+```
+
+确认机械臂工作空间和急停可用后启动：
+
+```bash
+python3 python/app/app_peripherals_pico_bridge.py \
+  --robot-ip 192.168.3.232 --port 8765 --enable-motion \
+  --gripper-force 80 --gripper-speed 100
+```
+
+使用已安装的程序时增加 `--bridge-executable /path/to/app_peripherals_pico_bridge`。
+默认查找仓库 `build_Release/bin`、`build_Release/install/bin`，然后查找 PATH。
+其他参数原样交给 C++ bridge 校验；不会自动添加 `--enable-motion`。
+Python 进程直接替换为 C++ bridge，Ctrl+C 和退出码沿用原程序，不额外留下后台遥操进程。
+不要同时运行 Pico 只读程序占用同一端口。Pico 网络连接步骤见 Pico 指南。

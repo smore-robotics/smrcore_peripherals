@@ -79,3 +79,25 @@ Arguments are processed in order; later options override earlier scale settings.
 Approaching singularities uses quadratic slowdown between condition numbers 30 and 60; leaving uses doubled thresholds. A transient stale Jacobian freezes/brakes the affected arm. Pico input older than 250 ms freezes/brakes both arms and cancels unsent gripper commands; recovered input re-clutches from measured TCP. Stale robot state, controller faults and guard infrastructure failures terminate the session.
 
 Pending/rejected candidate checks hold the last approved target. J6 bypasses Cartesian singularity scaling but retains joint constraints. These describe source behavior, not completed hardware acceptance. No independent Python dual-arm control example is provided.
+
+## Start Pico dual-arm teleoperation from Python
+
+The Python entry point reuses the C++ SDK bridge, including the B3 mounting transform, Grip clutch, J6 thumbstick, Trigger grippers, singularity slowdown and stale-input stop. Neither the peripheral wheel nor the robot Python SDK is required.
+
+Build with the compatible dual-arm C++ SDK:
+
+```bash
+./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk
+python3 python/app/app_peripherals_pico_bridge.py --help
+```
+
+After checking the workspace and emergency stop:
+
+```bash
+python3 python/app/app_peripherals_pico_bridge.py \
+  --robot-ip 192.168.3.232 --port 8765 --enable-motion \
+  --gripper-force 80 --gripper-speed 100
+```
+
+Use `--bridge-executable /path/to/app_peripherals_pico_bridge` for an installed binary. Otherwise the launcher checks repository `build_Release/bin`, `build_Release/install/bin`, then PATH. Other arguments pass unchanged to the C++ parser; motion opt-in is never added automatically.
+The Python process is replaced by the bridge, preserving Ctrl+C handling and exit status without leaving an extra background motion process. Do not run the Pico reader on the same port simultaneously; use the Pico guide for headset connection steps.

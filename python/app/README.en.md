@@ -67,3 +67,25 @@ CLI matches C++: `--robot-ip`, `--nominal`, `--settle-ms`, `--sample-ms`, `--vel
 > Robots are hazardous machines. Before running bridge or calibration scripts, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. Force control requires a one-time `--save` calibration first.
 
 - [Zhonglin master reader and single-arm i3 ServoJ teleoperation](../../docs/site/zhonglin.md):`app_peripherals_read_zhonglin.py` / `app_peripherals_zhonglin_i3_bridge.py`.
+
+## Start Pico dual-arm teleoperation from Python
+
+The Python entry point reuses the C++ SDK bridge, including the B3 mounting transform, Grip clutch, J6 thumbstick, Trigger grippers, singularity slowdown and stale-input stop. Neither the peripheral wheel nor the robot Python SDK is required.
+
+Build with the compatible dual-arm C++ SDK:
+
+```bash
+./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk
+python3 python/app/app_peripherals_pico_bridge.py --help
+```
+
+After checking the workspace and emergency stop:
+
+```bash
+python3 python/app/app_peripherals_pico_bridge.py \
+  --robot-ip 192.168.3.232 --port 8765 --enable-motion \
+  --gripper-force 80 --gripper-speed 100
+```
+
+Use `--bridge-executable /path/to/app_peripherals_pico_bridge` for an installed binary. Otherwise the launcher checks repository `build_Release/bin`, `build_Release/install/bin`, then PATH. Other arguments pass unchanged to the C++ parser; motion opt-in is never added automatically.
+The Python process is replaced by the bridge, preserving Ctrl+C handling and exit status without leaving an extra background motion process. Do not run the Pico reader on the same port simultaneously; use the Pico guide for headset connection steps.

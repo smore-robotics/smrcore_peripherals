@@ -23,3 +23,5 @@ pybind11 + scikit-build-core Python wheel，distribution 名 `rcore-peripherals-
 - TELEOP.md: 外设读取与独立 C++ Pico bridge 的构建、使用边界。
 
 - zhonglin.py: lazy-exported ZhonglinReader, optional numpy/pyserial extra; six-axis serial samples and original i3 mapping.
+
+- TELEOP.md: Python launcher reuses C++ Pico bridge without Python SDK or wheel dependency.
