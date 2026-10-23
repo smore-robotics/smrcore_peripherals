@@ -68,14 +68,19 @@ CLI 与 C++ 对齐：`--robot-ip`、`--nominal`、`--settle-ms`、`--sample-ms`�
 
 ## Pico 只读位置
 
-需安装包含 Pico 接口的 `rcore-peripherals-py` wheel，无需机器人 SDK。
+安装 `rcore-peripherals-py` 后，即可读取 Pico 的位置和按键，与 SpaceMouse、六维力传感器使用同一个 wheel。
 
 ```bash
 python3 python/app/app_peripherals_read_pico.py --port 8765
+```
+
+USB 连接头显后，在另一个终端配置端口转发：
+
+```bash
 adb reverse tcp:8765 tcp:8765
 ```
 
-在另一终端执行 adb，在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。
+在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。
 
 ## Pico
 
