@@ -14,3 +14,5 @@
 - pico/python pages: bilingual Python launcher setup and unchanged C++ control semantics.
 
 - spacemouse/ft-sensor/pico/zhonglin: four peer device guides under Peripheral Integration; public name 主从臂 / Master–follower arms, hardware details only in scope.
+
+- downloads.md / downloads.zh.md: include canonical bilingual release guides instead of duplicating support claims.

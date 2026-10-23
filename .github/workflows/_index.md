@@ -14,3 +14,5 @@
 - ci.yml: stage wheels and archives under dist before upload so merged release artifacts have a flat layout.
 
 - ci.yml: manual job installs texlive-latex-extra for the vendored Eisvogel template.
+
+- ci.yml: release notes generated from shared bilingual guides; commit summaries appended by GitHub.

@@ -1,50 +1,62 @@
-# 制品与配套 SDK
+# 版本与下载
 
-## 下载和运行
+[下载正式版本](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases) · [查看开发构建](https://github.com/zhanhui-li-smore/smrcore_peripherals/actions)
 
-正式制品在 [GitHub Releases](https://github.com/smore-robotics/smrcore_peripherals/releases)；普通提交和 PR 制品在对应 Actions 运行的 Artifacts 中保留 14 天。开发包名带提交短哈希，wheel 的开发版本为 0.0.0，不能与正式版本混淆。
+本仓库提供四类外设接入，统一采用“外设输入 → 应用 → 机器人 SDK”的分层。只读采样不连接机器人；需要运动或夹爪控制时运行对应应用。
 
-当前流水线目标为 Ubuntu 22.04 / Linux x86_64，生成 C++ 读取包、原 SpaceMouse/F/T SDK bridge 包、CPython 3.10/3.11/3.12 wheel，以及中英文 PDF/HTML 说明书。无 Windows、ARM64 或模拟器发布任务。基础 wheel 不包含机器人 SDK。
+## 支持的链路
 
-下载正式制品后执行 `sha256sum -c SHA256SUMS` 校验完整下载集。C++ 包内 `build-info.json` 记录源码提交、版本及配套 SDK；使用 `./run.sh <程序名> [参数]` 加载包内动态库。主机仍需提供 glibc/libstdc++ 等系统库和设备访问权限。
+| 外设 | 输入读取 | 机器人接入 | 交付形式 |
+|---|---|---|---|
+| SpaceMouse | C++ / Python | SDK Peripheral 样本接口 | C++ 预编译 bridge / Python 示例 |
+| 六维力传感器 | C++ / Python | SDK Peripheral 样本接口与静态标定 | C++ 预编译 bridge / Python 示例 |
+| Pico | C++ / Python | 双臂 ServoP、末端夹爪 | C++ 源码示例 / Python 启动入口 |
+| 主从臂 | Python | ServoJ 从臂跟随 | Python 源码示例 |
 
-## SDK 兼容性
+Pico 的 Python 入口启动同一 C++ 程序；主从臂的 Python 示例直接调用机器人 Python SDK。两者都沿用外设读取与机器人控制分离的结构。
 
-- `.sdk-version` 固定原 SpaceMouse/F/T bridge 的 SDK 版本，当前 0.2.0。
-- 发布流水线只下载精确的官方 `v<version>` 资源，不回退 prerelease。
-- Pico 双臂示例内置 B3 支架变换，只适用于对应 B3 双臂安装构型。
-- 原官方 v0.2.0 库中已有双臂符号，但缺少公开头文件。SDK 修复提交 `0852bae` 补上安装清单；该修复正式发布并验证前，Pico 双臂不进入默认预编译制品。
-- SDK 当前的双臂 Initialize 接口没有 domain/interface 参数；连接柜子的兼容性需单独验证。
-- 更新 SDK：修改 `.sdk-version` → 验证原 bridge 与标定工具 → 验证官方包双臂头文件及链接 → 更新兼容性说明。不要把尚未发布的版本写入默认下载配置。
-- 启用 Pico 发布任务时，还需验证实机停止、断流恢复、夹爪及安装变换，不能只凭头文件存在就宣称支持。
+## 选择下载包
 
-## 自动构建与发布
+发布平台：**Ubuntu 22.04 / Linux x86_64**；Python wheel 支持 **CPython 3.10、3.11、3.12**。
 
-每次 push/PR 和手动触发都会运行读数包、wheel、SDK bridge 和说明书任务。PR 不发布 Release；`vX.Y.Z` 标签 push 或每周发版检查且全部任务通过后，发布 Release、自动提交摘要及 SHA256SUMS。
+| 文件 | 用途与包含内容 |
+|---|---|
+| `smrcore_peripherals-cpp-linux-x86_64-v<version>.tar.gz` | C++ 外设库、头文件、读取程序和 Python 示例；不带机器人 SDK |
+| `smrcore_peripherals-sdk-bridge-linux-x86_64-v<version>.tar.gz` | 上述外设组件，加 SpaceMouse / 六维力 bridge、标定程序和配套 C++ SDK 运行库 |
+| `rcore_peripherals_py-<version>-cp3xx-cp3xx-linux_x86_64.whl` | Python 外设读取库；按解释器选择一个 wheel，不含机器人 SDK |
+| `smrcore_peripherals-manual-zh-v<version>.pdf/html` | 中文说明书 |
+| `smrcore_peripherals-manual-en-v<version>.pdf/html` | 英文说明书 |
+| `SHA256SUMS`、`*.tar.gz.sha256` | 完整下载集校验和、单个压缩包校验和 |
 
-正式发布前确保该提交已审阅，并设置合适的 tag 保护规则。标签版本同时传入 C++ 和 wheel；SDK 版本独立记录。Release 失败时先检查 Actions 日志；同名 Release 已存在时不会覆盖已有资产。
+两个 C++ 包按用途选一个，不需要叠加安装。Python wheel 是另一种语言的使用入口；示例脚本位于压缩包或同版本源码的 `python/app/`。GitHub 自动附带的 Source code 文件是源码，不是编译包。当前流水线不生成 Windows、ARM64 或模拟器制品。
 
-## 本地生成
+## 安装与运行
+
+解压所选 C++ 包并进入解压目录，通过 `run.sh` 加载包内动态库：
 
 ```bash
-./scripts/build.sh --with-sdk OFF --tests ON
-python3 scripts/package_release.py --install build_Release/install --version 0.1.0 --output dist
-./scripts/build_py.sh --no-install
-
-# 需要 pandoc、XeLaTeX 和 Noto Sans CJK SC 字体
-./scripts/build_manual.sh dist 0.1.0
+./run.sh app_peripherals_probe
 ```
 
-SDK bridge 包需先用 `--with-sdk ON --with-pico OFF` 构建，然后为打包脚本增加 `--sdk-root third_party/smrcore_sdk`。使用独立干净构建目录/安装树，避免旧的可选程序混入。
+Python 以 CPython 3.10 为例，安装对应版本的单个 wheel：
 
-打包脚本不执行机器人程序。SDK runtime 包保留 SDK 的 share/归属文件；发布 wheel 和二进制不代表实机验收完成。
+```bash
+python3 -m pip install ./rcore_peripherals_py-<version>-cp310-cp310-linux_x86_64.whl
+```
 
-## 每周自动发版
+主从臂读取还需 `numpy`、`pyserial`（可通过 wheel 的 `zhonglin` extra 安装）。直接调用机器人 SDK 的 Python 示例另装配套机器人 Python SDK。Pico Python 启动入口只需要构建好的 C++ bridge。
 
-每周一北京时间 09:17（UTC 01:17）检查默认分支。默认分支有新提交时，按最新正式格式 tag 的补丁号递增，例如 `v0.0.1 → v0.0.2`；没有 tag 时从 `v0.0.1` 开始。没有新提交且 Release 已发布则跳过，同一提交只有 tag、尚未成功发布时复用该 tag 重试。
+下载全部制品后运行 `sha256sum -c SHA256SUMS`；只下载一个压缩包时，下载其 `.sha256` 并使用 `sha256sum -c <包名>.sha256`。设备权限和串口参数见同版本说明书。
 
-打 tag 后在同一次工作流内构建，全部制品和说明书任务成功后才创建 Release；不依赖自动 token 的 tag push 再次触发 CI，也不需要额外 PAT。版本号与 SDK 版本相互独立。回退或偏离最新版本历史时会失败，需要人工处理，不强推标签。
+## SDK 与构型
 
-需要提前检查时，在 Actions → Build and Release → Run workflow 勾选 `weekly_release`，必须选择默认分支；不勾选只构建开发制品。定时任务也仅运行默认分支，当前个人 fork 使用 `feat/pico-readers-and-release`，官方仓库保持不变。
+- 预编译 SpaceMouse / 六维力 bridge 配套 SDK **0.2.0**，由 `.sdk-version` 固定。压缩包内 `build-info.json` 记录源码提交和 SDK 版本。
+- Pico 需要带 `sdk/dual_arm_robot.hpp` 的配套 C++ SDK。当前固定的官方 SDK 包缺少此头文件，因此 **Pico 遥操程序不在预编译包中**，需用修复的配套 SDK 从源码构建。示例内置 B3 支架变换。
+- 主从臂示例保留当前主臂与单臂 i3 的标定映射；具体硬件与标定见主从臂说明。
+- 库、头文件与运行库须配套更新。构建检查不代表实机验收；使用运动应用前确认构型、工具、工作区和急停。
 
-GitHub 的定时任务可能延迟；公共仓库长期无活动时可能自动暂停，需在 Actions 重新启用。规则参考 [GitHub Actions scheduled events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。
+## 版本识别
+
+正式 Release 对应 `vX.Y.Z` tag，版本号同时写入 C++ 包和 wheel。开发制品在 Actions 保留 14 天：压缩包名带提交哈希，wheel 版本为 `0.0.0`，通过运行记录确认提交。
+
+网站随开发分支更新；使用某个版本时，以该 tag 的源码和随附说明书为准。每周检查和手动发布规则见[维护者发布流程](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/HEAD/docs/releasing.md)。

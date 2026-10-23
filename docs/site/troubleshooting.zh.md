@@ -2,7 +2,7 @@
 
 ## 编译通过，为什么不能直接用 Pico 遥操？
 
-默认构建的是读取器和原有 bridge。Pico 双臂示例需显式开启 `--with-pico ON` 并提供兼容双臂 SDK，见[接入说明](robot-integration.md)。
+默认构建的是读取器和SpaceMouse / 六维力 bridge。Pico 双臂示例需显式开启 `--with-pico ON` 并提供兼容双臂 SDK，见[接入说明](robot-integration.md)。
 
 ## Python 提示找不到 rcore_peripherals
 

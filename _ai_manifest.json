@@ -144,5 +144,8 @@
   "docs/site/spacemouse.md": "docs/site/_index.md",
   "docs/site/spacemouse.zh.md": "docs/site/_index.md",
   "docs/site/ft-sensor.md": "docs/site/_index.md",
-  "docs/site/ft-sensor.zh.md": "docs/site/_index.md"
+  "docs/site/ft-sensor.zh.md": "docs/site/_index.md",
+  "scripts/release_notes.py": "scripts/_index.md",
+  "unittests/test_release_notes.py": "unittests/_index.md",
+  "docs/releasing.md": "docs/_index.md"
 }

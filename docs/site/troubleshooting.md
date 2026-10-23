@@ -2,7 +2,7 @@
 
 ## Pico teleoperation is missing
 
-Default packages contain readers and the original bridge. Build the optional executable with a compatible dual-arm SDK as described in [robot integration](robot-integration.md).
+Default packages contain readers and the SpaceMouse / F/T bridge. Build the optional executable with a compatible dual-arm SDK as described in [robot integration](robot-integration.md).
 
 ## Python import fails
 

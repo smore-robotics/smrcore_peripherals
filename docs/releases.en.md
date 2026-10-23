@@ -1,46 +1,62 @@
-# Assets and Robot SDK Compatibility
+# Versions and downloads
 
-## Download and run
+[Release downloads](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases) · [Development builds](https://github.com/zhanhui-li-smore/smrcore_peripherals/actions)
 
-Tagged builds are published on [GitHub Releases](https://github.com/smore-robotics/smrcore_peripherals/releases). Push/PR artifacts are retained in Actions for 14 days. Development archive names include a commit hash; development wheels use version 0.0.0.
+Four peripheral chains share the structure “input → application → robot SDK”. Readers do not connect to robots; run the corresponding application for motion or gripper control.
 
-The pipeline targets Ubuntu 22.04 / Linux x86_64: C++ readers, original SpaceMouse/F/T SDK bridges, CPython 3.10/3.11/3.12 wheels, and Chinese/English PDF and HTML manuals. There are no Windows, ARM64 or simulator release jobs. Reader wheels do not contain the robot SDK.
+## Supported chains
 
-Verify a complete release download with `sha256sum -c SHA256SUMS`. C++ archives contain `build-info.json` with source commit, version and SDK version. Run applications using `./run.sh <binary> [arguments]` to resolve bundled libraries. System glibc/libstdc++ and device permissions remain host requirements.
+| Peripheral | Reader | Robot integration | Delivery |
+|---|---|---|---|
+| SpaceMouse | C++ / Python | SDK Peripheral sample API | Prebuilt C++ bridge / Python example |
+| Force/torque sensor | C++ / Python | SDK Peripheral sample API and static calibration | Prebuilt C++ bridge / Python example |
+| Pico | C++ / Python | Dual-arm ServoP and grippers | C++ source example / Python launcher |
+| Master–follower arms | Python | ServoJ follower control | Python source example |
 
-## SDK compatibility
+The Pico Python launcher runs the C++ bridge. The master–follower Python example calls the robot Python SDK directly. Both keep peripheral input separate from robot control.
 
-`.sdk-version` pins 0.2.0 for the original bridges. Release CI downloads that exact official tag, without prerelease fallback.
+## Choose an asset
 
-Pico dual-arm teleoperation embeds B3 mounting-bracket transforms for the corresponding B3 configuration. The original official v0.2.0 binary exports dual-arm symbols but omits its public header. SDK fix `0852bae` repairs the install list. Until a corrected official package is published and validated, default binary releases exclude Pico dual-arm teleoperation. Its current Initialize API has no domain/interface arguments.
+Platform: **Ubuntu 22.04 / Linux x86_64**. Wheels support **CPython 3.10, 3.11 and 3.12**.
 
-To update the SDK, change `.sdk-version`, validate bridges and calibration tools, check dual-arm header/link compatibility, and update documentation. Do not pin an unpublished release. Hardware stopping, stream recovery, grippers and mounting transforms require separate acceptance before enabling Pico release binaries.
+| File | Contents and purpose |
+|---|---|
+| `smrcore_peripherals-cpp-linux-x86_64-v<version>.tar.gz` | C++ library, headers, readers and Python examples; no robot SDK |
+| `smrcore_peripherals-sdk-bridge-linux-x86_64-v<version>.tar.gz` | Peripheral components plus SpaceMouse / F/T bridges, calibration and the matching C++ SDK runtime |
+| `rcore_peripherals_py-<version>-cp3xx-cp3xx-linux_x86_64.whl` | Python peripheral readers; choose one matching interpreter; no robot SDK |
+| `smrcore_peripherals-manual-zh-v<version>.pdf/html` | Chinese manual |
+| `smrcore_peripherals-manual-en-v<version>.pdf/html` | English manual |
+| `SHA256SUMS`, `*.tar.gz.sha256` | Checksums for all assets and individual archives |
 
-## Build and publish
+Choose one C++ archive; they need not be installed together. Wheels provide the Python interface. Example scripts are in the archive or same-tag source under `python/app/`. GitHub's automatic Source code assets are source archives, not compiled packages. No Windows, ARM64 or simulator assets are built by this pipeline.
 
-Every push, PR and manual run builds artifacts. PRs cannot publish releases. Only a repository `vX.Y.Z` tag push with all jobs passing creates a Release with generated commit notes and SHA256SUMS. Protect release tags and review the tagged commit first.
+## Install and run
 
-The tag supplies the C++/wheel version; the SDK version is independent. Existing releases/assets are not overwritten. Inspect Actions logs if publishing fails.
-
-## Local packaging
+Extract a C++ archive, enter its directory and use the runtime wrapper:
 
 ```bash
-./scripts/build.sh --with-sdk OFF --tests ON
-python3 scripts/package_release.py --install build_Release/install --version 0.1.0 --output dist
-./scripts/build_py.sh --no-install
-
-# Requires pandoc, XeLaTeX, and Noto Sans CJK SC
-./scripts/build_manual.sh dist 0.1.0
+./run.sh app_peripherals_probe
 ```
 
-For SDK bridge archives, first build with `--with-sdk ON --with-pico OFF`, then add `--sdk-root third_party/smrcore_sdk` to the packager. Use clean build/install trees to avoid stale optional programs. Packaging does not run robot applications and retains SDK attribution files.
+For Python, install one matching wheel; CPython 3.10 example:
 
-## Weekly releases
+```bash
+python3 -m pip install ./rcore_peripherals_py-<version>-cp310-cp310-linux_x86_64.whl
+```
 
-Every Monday at 01:17 UTC (09:17 Asia/Shanghai), check the default branch. New commits increment the highest stable-format tag's patch version (for example `v0.0.1` to `v0.0.2`); an untagged repository starts at `v0.0.1`. An unchanged published release is skipped. An existing tag on the same commit without a successful release is retried without moving the tag.
+Master input needs `numpy` and `pyserial`, also available through the wheel's `zhonglin` extra. Python examples that call robot APIs need the matching robot Python SDK. The Pico launcher requires the built C++ bridge instead.
 
-The same workflow builds and publishes after all artifact and manual jobs succeed; it does not rely on a GITHUB_TOKEN tag push triggering another run and needs no additional PAT. SDK versions remain independent. A rollback or divergent release history fails instead of force-updating tags.
+For a complete download use `sha256sum -c SHA256SUMS`. For one archive download its `.sha256` and run `sha256sum -c <archive>.sha256`. Device permissions and serial settings are described in the versioned manual.
 
-To check manually, select the default branch in Actions → Build and Release → Run workflow and enable `weekly_release`. Without it, a manual run only builds development artifacts. The personal fork currently uses `feat/pico-readers-and-release` as its default branch; the upstream repository is unchanged.
+## SDK and robot configuration
 
-Scheduled runs can be delayed, and GitHub may disable schedules in inactive public repositories. Re-enable in Actions when necessary. See [GitHub scheduled events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+- Prebuilt SpaceMouse / F/T bridges use SDK **0.2.0**, pinned in `.sdk-version`. Each C++ archive records the commit and SDK in `build-info.json`.
+- Pico needs a matching C++ SDK including `sdk/dual_arm_robot.hpp`. The currently pinned official package omits this header, so **prebuilt archives do not include the Pico teleoperation binary**. Build it from source with a corrected SDK. The example embeds B3 mounting transforms.
+- The master–follower example retains its calibrated master/single-i3 mapping. See that guide for hardware and calibration details.
+- Update headers and runtime together. Build validation is not hardware acceptance; verify the robot configuration, tool, workspace and emergency stop before motion.
+
+## Version identity
+
+Releases correspond to `vX.Y.Z` tags; the version is applied to both C++ packages and wheels. Development artifacts remain in Actions for 14 days: archive names include a commit hash, while wheels use `0.0.0`; identify the commit through the run record.
+
+The website follows development. For an installed version use its tag and bundled manual. Weekly checks and manual release procedures are in the [maintainer guide](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/HEAD/docs/releasing.md).

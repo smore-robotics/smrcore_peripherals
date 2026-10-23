@@ -7,3 +7,5 @@
 - site/: 中英文在线使用指南与 SDK 同款 Material 样式；requirements.txt 固定站点依赖。
 
 - manual/: branded Eisvogel PDF and standalone HTML templates; see manual/_index.md.
+
+- releases.md / releases.en.md: four-chain delivery and asset selection; releasing.md: maintainer automation/recovery.

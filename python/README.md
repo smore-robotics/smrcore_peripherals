@@ -38,25 +38,22 @@ wheel 会打包 `libsmrcore_peripherals.so` 到 `rcore_peripherals/.libs/`，干
 ```bash
 python3 python/app/app_peripherals_read_ft_sensor.py
 python3 python/app/app_peripherals_read_spacemouse.py
+python3 python/app/app_peripherals_read_pico.py --port 8765
 ```
 
 ## 机器人 SDK（bridge 依赖）
 
 `app_peripherals_bridge.py` 除本仓库构建的 `rcore-peripherals-py` 外，还需要**额外**从 [smrcore_sdk](https://github.com/smore-robotics/smrcore_sdk) GitHub Releases 安装机器人 Python SDK（包名 `rcore-sdk-py`，import 名 `rcore_sdk`）。行为与 C++ `app_peripherals_bridge` 一致。
 
-**版本须与仓库根目录 `.sdk-version` 一致**（当前为 `0.0.25`，与 C++ `./scripts/download.sh` 下载的 `smrcore_sdk-cpp-*` 同源，不要混用不同版本）。
+配套版本由仓库根目录 `.sdk-version` 固定。请从 [机器人 SDK Releases](https://github.com/smore-robotics/smrcore_sdk/releases) 选择该版本及当前 Python ABI、平台对应的 wheel。
 
-发布页：https://github.com/smore-robotics/smrcore_sdk/releases/tag/v0.0.25（候选包见 `prerelease` release）
-
-在 release **Assets** 中选择与当前 Python ABI、平台匹配的 `rcore_sdk_py-0.0.25-<python-tags>.whl`，例如 Linux x86_64 + CPython 3.10 为 `cp310-cp310-linux_x86_64`。
+以下命令在仓库根目录执行（Linux x86_64 / CPython 3.10）：
 
 ```bash
-PY_TAG=cp310-cp310-linux_x86_64   # 其他平台见 release Assets，如 cp310-cp310-win_amd64
-VERSION=0.0.25
-RELEASE_TAG=prerelease            # 正式版发布后改为 v${VERSION}
-
+VERSION=$(cat .sdk-version)
+PY_TAG=cp310-cp310-linux_x86_64
 curl -L --fail \
-  "https://github.com/smore-robotics/smrcore_sdk/releases/download/${RELEASE_TAG}/rcore_sdk_py-${VERSION}-${PY_TAG}.whl" \
+  "https://github.com/smore-robotics/smrcore_sdk/releases/download/v${VERSION}/rcore_sdk_py-${VERSION}-${PY_TAG}.whl" \
   -o "rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
 python3 -m pip install "./rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
 ```
@@ -67,6 +64,8 @@ python3 -m pip install "./rcore_sdk_py-${VERSION}-${PY_TAG}.whl"
 python3 -m pip install --force-reinstall python/dist/*.whl   # 若尚未安装 rcore-peripherals-py
 python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip>
 ```
+
+完整的四类外设示例和各自依赖见 [Python 应用](app/README.md)，下载包选择见[版本与下载](../docs/releases.md)。
 
 ## API
 
@@ -99,7 +98,7 @@ while True:
         print(sample.fx, sample.fy, sample.fz, sample.tx, sample.ty, sample.tz)
 ```
 
-SpaceMouse 使用 `SpaceMouseOptions` 初始化；对应 C++ `app_peripherals_read_spacemouse.cpp` 见 `app/app_peripherals_read_spacemouse.py`。
+SpaceMouse 使用 `SpaceMouseOptions` 初始化；对应 C++ `app_peripherals_read_spacemouse.cpp` 见 `python/app/app_peripherals_read_spacemouse.py`。
 
 PICO 使用 `PicoOptions` 初始化。它只启动 localhost WebXR 接收服务，不连接机器人，也不做坐标映射：
 

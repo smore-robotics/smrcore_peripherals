@@ -29,3 +29,5 @@
 - build_manual.py: validates version and builds bilingual HTML/PDF; shell entry delegates unchanged arguments.
 
 - assemble_manual.py: one Peripheral Integration chapter with four peer subsections; C++ and Python remain language entry points.
+
+- release_notes.py: render versioned bilingual release notes from user guides; enforce SDK pin alignment.
