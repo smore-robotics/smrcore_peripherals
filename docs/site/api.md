@@ -8,11 +8,11 @@ Namespace: `smrcore::peripherals`.
 
 | Interface | Header |
 | --- | --- |
-| Peripheral | [Base reader](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/peripheral.hpp) |
-| SpaceMouse | [SpaceMouse reader](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/spacemouse/spacemouse.hpp) |
-| FtSensor | [Force/torque reader](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/ft_sensor/ft_sensor.hpp) |
-| Pico | [WebXR reader](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/pico/pico.hpp) |
-| Options and samples | [types.hpp](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/types.hpp) |
+| Peripheral | [Base reader](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/peripheral.hpp) |
+| SpaceMouse | [SpaceMouse reader](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/spacemouse/spacemouse.hpp) |
+| FtSensor | [Force/torque reader](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/ft_sensor/ft_sensor.hpp) |
+| Pico | [WebXR reader](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/pico/pico.hpp) |
+| Options and samples | [types.hpp](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/types.hpp) |
 
 ## Lifecycle
 

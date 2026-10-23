@@ -8,11 +8,11 @@
 
 | 接口 | 参考 |
 | --- | --- |
-| Peripheral | [读取器基类](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/peripheral.hpp) |
-| SpaceMouse | [SpaceMouse 读取器](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/spacemouse/spacemouse.hpp) |
-| FtSensor | [六维力读取器](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/ft_sensor/ft_sensor.hpp) |
-| Pico | [Pico WebXR 读取器](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/pico/pico.hpp) |
-| 配置与采样类型 | [types.hpp](https://github.com/smore-robotics/smrcore_peripherals/blob/fa68bdc/src/peripherals/types.hpp) |
+| Peripheral | [读取器基类](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/peripheral.hpp) |
+| SpaceMouse | [SpaceMouse 读取器](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/spacemouse/spacemouse.hpp) |
+| FtSensor | [六维力读取器](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/ft_sensor/ft_sensor.hpp) |
+| Pico | [Pico WebXR 读取器](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/pico/pico.hpp) |
+| 配置与采样类型 | [types.hpp](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/fa68bdc/src/peripherals/types.hpp) |
 
 ## 生命周期
 
