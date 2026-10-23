@@ -20,7 +20,7 @@
 
 ## 自动构建与发布
 
-每次 push/PR 和手动触发都会运行读数包、wheel、SDK bridge 和说明书任务。PR 无 Release 写权限，只有仓库内 `vX.Y.Z` 标签 push 且全部任务通过，才发布 Release、自动提交摘要及 SHA256SUMS。
+每次 push/PR 和手动触发都会运行读数包、wheel、SDK bridge 和说明书任务。PR 不发布 Release；`vX.Y.Z` 标签 push 或每周发版检查且全部任务通过后，发布 Release、自动提交摘要及 SHA256SUMS。
 
 正式发布前确保该提交已审阅，并设置合适的 tag 保护规则。标签版本同时传入 C++ 和 wheel；SDK 版本独立记录。Release 失败时先检查 Actions 日志；同名 Release 已存在时不会覆盖已有资产。
 
@@ -38,3 +38,13 @@ python3 scripts/package_release.py --install build_Release/install --version 0.1
 SDK bridge 包需先用 `--with-sdk ON --with-pico OFF` 构建，然后为打包脚本增加 `--sdk-root third_party/smrcore_sdk`。使用独立干净构建目录/安装树，避免旧的可选程序混入。
 
 打包脚本不执行机器人程序。SDK runtime 包保留 SDK 的 share/归属文件；发布 wheel 和二进制不代表实机验收完成。
+
+## 每周自动发版
+
+每周一北京时间 09:17（UTC 01:17）检查默认分支。默认分支有新提交时，按最新正式格式 tag 的补丁号递增，例如 `v0.0.1 → v0.0.2`；没有 tag 时从 `v0.0.1` 开始。没有新提交且 Release 已发布则跳过，同一提交只有 tag、尚未成功发布时复用该 tag 重试。
+
+打 tag 后在同一次工作流内构建，全部制品和说明书任务成功后才创建 Release；不依赖自动 token 的 tag push 再次触发 CI，也不需要额外 PAT。版本号与 SDK 版本相互独立。回退或偏离最新版本历史时会失败，需要人工处理，不强推标签。
+
+需要提前检查时，在 Actions → Build and Release → Run workflow 勾选 `weekly_release`，必须选择默认分支；不勾选只构建开发制品。定时任务也仅运行默认分支，当前个人 fork 使用 `feat/pico-readers-and-release`，官方仓库保持不变。
+
+GitHub 的定时任务可能延迟；公共仓库长期无活动时可能自动暂停，需在 Actions 重新启用。规则参考 [GitHub Actions scheduled events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。

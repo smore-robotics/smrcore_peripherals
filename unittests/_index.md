@@ -21,3 +21,5 @@
 - test_zhonglin.py: mapping, invalid/stale samples, bridge rejection and cleanup without hardware.
 
 - test_pico_python_launcher.py: no-hardware argument forwarding, exit status, missing binary and help tests.
+
+- test_weekly_release.py: temporary Git repo checks for initial/patch tags, skip/retry and rollback refusal.

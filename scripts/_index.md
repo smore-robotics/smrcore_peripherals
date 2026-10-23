@@ -21,3 +21,5 @@
 - build_manual.sh: 使用 Pandoc/XeLaTeX 合成中英文 HTML/PDF。
 
 - build_manual.sh: include Zhonglin reader/ServoJ instructions in both language manuals.
+
+- weekly_release.py: plan immutable weekly patch tags, skip published unchanged commits, retry unpublished tags; reject divergent history.

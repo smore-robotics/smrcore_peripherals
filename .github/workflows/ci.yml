@@ -3,29 +3,48 @@ name: Build and Release
 on:
   push:
   pull_request:
+  schedule:
+    # Monday 09:17 Asia/Shanghai (UTC+8).
+    - cron: '17 1 * * 1'
   workflow_dispatch:
+    inputs:
+      weekly_release:
+        description: Check for changes and publish the next patch release
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'schedule' || inputs.weekly_release == true }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') && github.event_name != 'schedule' && inputs.weekly_release != true }}
 
 jobs:
   metadata:
+    permissions:
+      contents: write
     runs-on: ubuntu-22.04
     outputs:
+      build: ${{ steps.version.outputs.build }}
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - id: version
         env:
+          AUTO_RELEASE: ${{ github.event_name == 'schedule' || inputs.weekly_release == true }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
         run: |
-          if [[ "$REF_TYPE" == tag ]]; then
+          if [[ "$AUTO_RELEASE" == true ]]; then
+            [[ "$GITHUB_REF" == "refs/heads/$DEFAULT_BRANCH" ]] || { echo "Weekly release must run on the default branch"; exit 1; }
+            python3 scripts/weekly_release.py
+          elif [[ "$REF_TYPE" == tag ]]; then
             [[ "$REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected vX.Y.Z tag"; exit 1; }
             echo "version=${REF_NAME#v}" >> "$GITHUB_OUTPUT"
             echo "tag=$REF_NAME" >> "$GITHUB_OUTPUT"
@@ -33,9 +52,23 @@ jobs:
             echo "version=0.0.0-dev.$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
             echo "tag=" >> "$GITHUB_OUTPUT"
           fi
+          if [[ "$AUTO_RELEASE" != true ]]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
           [[ "$(cat .sdk-version)" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 
+      - name: Create immutable weekly tag
+        if: steps.version.outputs.create_tag == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git tag "$RELEASE_TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$RELEASE_TAG"
+          # GITHUB_TOKEN tag pushes do not trigger another run. This run builds
+          # the exact checkout and publishes the tag after all jobs succeed.
+
   readers:
+    if: needs.metadata.outputs.build == 'true'
     needs: metadata
     runs-on: ubuntu-22.04
     strategy:
@@ -59,7 +92,7 @@ jobs:
         run: |
           ./scripts/build.sh --with-sdk OFF --tests ON
           ./scripts/run_tests.sh -t Release
-          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py unittests/test_zhonglin.py unittests/test_pico_python_launcher.py -q
+          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py unittests/test_zhonglin.py unittests/test_pico_python_launcher.py unittests/test_weekly_release.py -q
           ./scripts/check_python_examples.sh
       - name: Build and test wheel
         run: |
@@ -79,6 +112,7 @@ jobs:
           retention-days: 14
 
   sdk-bridge:
+    if: needs.metadata.outputs.build == 'true'
     needs: metadata
     runs-on: ubuntu-22.04
     env:
@@ -114,6 +148,7 @@ jobs:
           retention-days: 14
 
   manual:
+    if: needs.metadata.outputs.build == 'true'
     needs: metadata
     runs-on: ubuntu-22.04
     env:
@@ -134,7 +169,7 @@ jobs:
           retention-days: 14
 
   release:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: needs.metadata.outputs.tag != '' && (github.event_name == 'push' || github.event_name == 'schedule' || inputs.weekly_release == true)
     needs: [metadata, readers, sdk-bridge, manual]
     runs-on: ubuntu-22.04
     permissions:

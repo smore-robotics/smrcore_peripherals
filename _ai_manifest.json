@@ -130,5 +130,7 @@
   "docs/site/zhonglin.md": "docs/site/_index.md",
   "docs/site/zhonglin.zh.md": "docs/site/_index.md",
   "python/app/app_peripherals_pico_bridge.py": "python/app/_index.md",
-  "unittests/test_pico_python_launcher.py": "unittests/_index.md"
+  "unittests/test_pico_python_launcher.py": "unittests/_index.md",
+  "scripts/weekly_release.py": "scripts/_index.md",
+  "unittests/test_weekly_release.py": "unittests/_index.md"
 }

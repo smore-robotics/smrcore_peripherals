@@ -34,3 +34,13 @@ python3 scripts/package_release.py --install build_Release/install --version 0.1
 ```
 
 For SDK bridge archives, first build with `--with-sdk ON --with-pico OFF`, then add `--sdk-root third_party/smrcore_sdk` to the packager. Use clean build/install trees to avoid stale optional programs. Packaging does not run robot applications and retains SDK attribution files.
+
+## Weekly releases
+
+Every Monday at 01:17 UTC (09:17 Asia/Shanghai), check the default branch. New commits increment the highest stable-format tag's patch version (for example `v0.0.1` to `v0.0.2`); an untagged repository starts at `v0.0.1`. An unchanged published release is skipped. An existing tag on the same commit without a successful release is retried without moving the tag.
+
+The same workflow builds and publishes after all artifact and manual jobs succeed; it does not rely on a GITHUB_TOKEN tag push triggering another run and needs no additional PAT. SDK versions remain independent. A rollback or divergent release history fails instead of force-updating tags.
+
+To check manually, select the default branch in Actions → Build and Release → Run workflow and enable `weekly_release`. Without it, a manual run only builds development artifacts. The personal fork currently uses `feat/pico-readers-and-release` as its default branch; the upstream repository is unchanged.
+
+Scheduled runs can be delayed, and GitHub may disable schedules in inactive public repositories. Re-enable in Actions when necessary. See [GitHub scheduled events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).

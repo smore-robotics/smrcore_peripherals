@@ -8,3 +8,5 @@
 - ci.yml: numpy dependency and Zhonglin Python regression tests.
 
 - ci.yml: includes Python Pico launcher regression tests.
+
+- ci.yml: weekly Monday 01:17 UTC or manual weekly_release; default-branch tag planning and same-run artifact publication, no recursive push dependency.
