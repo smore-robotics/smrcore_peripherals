@@ -106,37 +106,7 @@ be injected by this repository's `app_peripherals_bridge --spacemouse` (or the
 default dual-peripheral bridge) via
 `Robot::Peripheral().UpdateSpaceMouseSample()`.
 
-Run the PICO ServoP bridge separately:
 
-```bash
-./build_Release/bin/app_peripherals_pico_bridge \
-  --enable-motion --robot-ip <robot-ip> --port 8765
-```
+## Pico
 
-PICO Cartesian ServoP applies MoveIt-Servo-style approaching/leaving
-condition-number slowdown by default. Each arm samples its current Jacobian
-independently at 20 Hz, takes the last column of U as the weakest Cartesian
-direction, and classifies the unscaled command twist in Base (SVD sign is
-resolved from the previous TCP twist and Δκ because the SDK has no J(q+dq)
-look-ahead). Approaching uses `sqrt(80 / condition)` above condition 80;
-leaving multiplies that threshold by 2 (MoveIt's
-`leaving_singularity_threshold_multiplier`). Slowdown takes effect immediately
-while recovery is filtered with a 0.2 s time constant. If a Jacobian update is
-stale for more than 250 ms, that arm freezes and re-clutches from its current
-TCP. The thumbstick J6 joint passthrough is not scaled by this Cartesian
-limiter.
-
-The `Pico` peripheral class and `app_peripherals_read_pico` have no robot IP;
-`--robot-ip` belongs only to this SDK bridge.
-
-## Safety
-
-> Robots are hazardous machines. Before running bridge apps, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. F/T and teleop data directly affect controller behavior.
-
-### Guarded PICO ServoP (2026-09-18)
-
-The current source uses a conservative test guard: condition 30 starts linear slowdown, 60 stops both arms; leaving direction does not relax this boundary. A background SDK IK/FK preflight checks each approved target (numerical target Jacobian, B3 elbow/wrist clearance >=10 degrees). Only approved targets younger than 200 ms stream. Stale telemetry/input, reference changes or validation failure stops and exits; restart is required. The client no longer applies a fixed 3-degree joint-step rejection or a 20 mm / 5 degree tracking-error stop: IK branch continuity belongs to the backend ServoP IK chain, which also keeps joint limits, speed protection and E-stop. J6 passthrough is disabled in this guarded version. Release uses StopMotion. Existing executables are unchanged until rebuilt.
-
-Pico bridge build: `./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk`. Pico reading remains available with `--with-sdk OFF`.
-
-This example embeds the B3 mounting-bracket transforms and targets the corresponding B3 dual-arm mounting configuration. It is not a generic dual-arm configuration; other mounts require adjusted and validated transforms.
+[Complete Pico reading, B3 teleoperation, gripper and CLI guide](../docs/site/pico.md). Requires `--with-sdk ON --with-pico ON` and matching dual-arm SDK. Default packages exclude this executable.

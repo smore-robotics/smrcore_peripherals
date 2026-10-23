@@ -66,3 +66,5 @@ python -c "import rcore_peripherals; print('import OK')"
 
 - [读取 SpaceMouse、力传感器和 Pico](readers.md)
 - [配置机器人 SDK bridge](robot-integration.md)
+
+详见 [Pico 完整用法](pico.md)和[平台权限配置](platform.md)。

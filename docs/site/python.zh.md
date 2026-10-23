@@ -1,13 +1,82 @@
-# Python 示例
+# Python 应用
 
-基础 wheel 导入名为 `rcore_peripherals`，读取外设不依赖机器人 SDK。
 
-| 脚本 | 用途 |
-| --- | --- |
-| app_peripherals_read_spacemouse.py | SpaceMouse 采样 |
-| app_peripherals_read_ft_sensor.py | 六维力/力矩采样 |
-| app_peripherals_read_pico.py | Pico 位置与按键 |
-| app_peripherals_bridge.py | 采样桥接，需要兼容机器人 Python SDK |
-| app_peripherals_ft_sensor_calib.py | 机器人六维力标定，需要机器人 SDK |
 
-先看[安装](getting-started.md)和[外设读取](readers.md)。后两个脚本需另装机器人 SDK，若缺少 Peripheral 更新 API，应使用 C++ bridge。外设 wheel 不包含 Pico 机器人遥操核心。
+本目录包含与 C++ `app/` 对应的 Python 脚本，使用 `rcore_peripherals` Python API。
+
+设备权限与节点配置见 [平台配置](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.md)。
+
+## 构建和安装 wheel
+
+在仓库根目录执行：
+
+```bash
+./scripts/build.sh --with-sdk OFF --tests OFF
+./scripts/build_py.sh
+python3 -m pip install --force-reinstall python/dist/*.whl
+```
+
+包名：`rcore-peripherals-py`；import 名：`rcore_peripherals`。
+
+## 应用列表
+
+| 脚本 | 说明 |
+|---|---|
+| `app_peripherals_read_spacemouse.py` | 流式输出解码后的 6-DOF + 夹爪采样 |
+| `app_peripherals_read_ft_sensor.py` | 在首帧有效数据后流式输出六维力矩 |
+| `app_peripherals_bridge.py` | 向机器人 SDK 推送 SpaceMouse / F/T 采样 |
+| `app_peripherals_ft_sensor_calib.py` | MoveJ 静态六维力标定（Preview / `--save`） |
+
+```bash
+python3 python/app/app_peripherals_read_spacemouse.py --device /dev/input/event5 --sample-rate 125
+python3 python/app/app_peripherals_read_ft_sensor.py \
+  --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
+```
+
+探测与原始 SpaceMouse 采样请使用 C++ `app_peripherals_probe` 与 `app_peripherals_read_spacemouse_raw`，见 [app/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/app/README.md)。
+
+## 机器人 SDK 桥接
+
+`app_peripherals_bridge.py` 需要同时安装外设 wheel 和机器人 SDK Python 包（`rcore-sdk-py`）。若当前 Python SDK 尚未暴露与 C++ 一致的 `Peripheral().Update*Sample()` API，请使用 C++ `app_peripherals_bridge` 作为生产 bridge。
+
+```bash
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip>
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --spacemouse
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
+```
+
+机器人 SDK 安装说明见 [python/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/python/README.md)。
+
+## 六维力静态标定
+
+`app_peripherals_ft_sensor_calib.py` 镜像 C++ `app_peripherals_ft_sensor_calib`，仅依赖 `rcore-sdk-py`（不直接打开串口）。须先由 bridge 注入 raw。
+
+```bash
+# 1) 注入 raw（Python 或 C++ bridge 均可）
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
+
+# 2) Preview；确认合格后再 --save
+python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip <robot-ip>
+python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip <robot-ip> --save
+```
+
+CLI 与 C++ 对齐：`--robot-ip`、`--nominal`、`--settle-ms`、`--sample-ms`、`--velocity-ratio`、`--joint0-deg`、`--joint5-deg`、`--save`。
+
+## 安全提示
+
+> 机器人是危险设备。运行 bridge 或标定脚本前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。力控前须先完成一次 `--save` 标定。
+
+## Pico 只读位置
+
+需安装包含 Pico 接口的 `rcore-peripherals-py` wheel，无需机器人 SDK。
+
+```bash
+python3 python/app/app_peripherals_read_pico.py --port 8765
+adb reverse tcp:8765 tcp:8765
+```
+
+在另一终端执行 adb，在头显浏览器打开 http://localhost:8765/ 并进入 VR。位置为 WebXR 参考空间 XYZ（米），未追踪显示 N/A；Ctrl+C 退出。
+
+## Pico
+
+[Pico 只读、坐标与连接说明](pico.md)。外设 wheel 不包含 Python 双臂遥操核心。

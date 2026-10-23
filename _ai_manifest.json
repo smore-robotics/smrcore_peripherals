@@ -118,5 +118,9 @@
   "docs/site/assets/NOTICE.txt": "docs/site/assets/_index.md",
   "docs/site/assets/stylesheets/extra.css": "docs/site/assets/stylesheets/_index.md",
   "docs/site/api.md": "docs/site/_index.md",
-  "docs/site/api.zh.md": "docs/site/_index.md"
+  "docs/site/api.zh.md": "docs/site/_index.md",
+  "docs/site/pico.md": "docs/site/_index.md",
+  "docs/site/pico.zh.md": "docs/site/_index.md",
+  "docs/site/platform.md": "docs/site/_index.md",
+  "docs/site/platform.zh.md": "docs/site/_index.md"
 }

@@ -55,3 +55,5 @@ python -c "import rcore_peripherals; print('import OK')"
 ```
 
 The wheel contains peripheral readers, not the robot SDK or a teleoperation core. See [downloads](downloads.md) for prebuilt packages and [readers](readers.md) for examples.
+
+See the [complete Pico guide](pico.md) and [platform permissions](platform.md).

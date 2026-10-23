@@ -25,3 +25,5 @@ Configure the actual devices before connecting with `--robot-ip <robot-ip>`. The
 Default CI and release packages exclude this optional executable. A passing reader build does not establish hardware acceptance. Grippers use each robot's EndBoard DH interface and require compatible hardware and firmware.
 
 Before running motion, verify the robot, tool, payload and workspace, and keep the emergency stop accessible.
+
+See the [complete Pico guide](pico.md) and [platform permissions](platform.md).

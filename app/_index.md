@@ -23,3 +23,5 @@
 - `app_peripherals_pico_bridge.cpp` is CLI-only; delegates to `smrcore_pico_teleop`, retains motion flags and exposes no coordinate calibration knob. Core behavior is documented in `../teleop/_index.md`.
 
 - app_peripherals_pico_bridge 仅在 SMR_PERIPHERAL_WITH_PICO_TELEOP=ON 时构建，原有 bridge/calib 仅依赖 WITH_SDK。
+
+- README.md / README.en.md: 保留原桥接/标定说明，Pico 使用说明统一指向 docs/site/pico，移除过时的减速和 J6 描述。

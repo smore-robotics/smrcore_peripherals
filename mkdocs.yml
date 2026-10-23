@@ -37,6 +37,8 @@ plugins:
             Peripheral Readers: 外设读取
             Robot Integration: 机器人接入
             Troubleshooting: 常见问题
+            Platform Setup: 平台配置
+            Pico: Pico 读取与遥操
 
 theme:
   name: material
@@ -76,7 +78,9 @@ nav:
       - Overview: cpp.md
       - Peripheral Readers: readers.md
       - Robot Integration: robot-integration.md
+      - Pico: pico.md
   - Python Examples: python.md
+  - Platform Setup: platform.md
   - API Reference: api.md
   - Troubleshooting: troubleshooting.md
 

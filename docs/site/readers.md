@@ -36,3 +36,5 @@ Open `http://localhost:8765/` in the headset browser and enter VR. Positions are
 
 !!! note "Wi-Fi"
     localhost works here through adb reverse. For ordinary Wi-Fi, localhost means the headset itself. WebXR also requires a secure context: use a headset-accessible HTTPS endpoint with a trusted certificate rather than simply replacing localhost with an HTTP PC address.
+
+See the [complete Pico guide](pico.md) and [platform permissions](platform.md).

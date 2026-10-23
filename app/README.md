@@ -102,38 +102,7 @@ SpaceMouse 遥操同样**不会**由 SDK 示例直接打开 `/dev/input/*`，必
 `app_peripherals_bridge --spacemouse`（或默认双外设）通过
 `Robot::Peripheral().UpdateSpaceMouseSample()` 注入。
 
-PICO ServoP 桥接单独运行：
 
-```bash
-./build_Release/bin/app_peripherals_pico_bridge \
-  --enable-motion --robot-ip <robot-ip> --port 8765
+## Pico
 
-# 可选：调整手柄推杆控制 J6 的最大速度（rad/s）
-./build_Release/bin/app_peripherals_pico_bridge \
-  --enable-motion --robot-ip <robot-ip> --j6-speed 0.8
-```
-
-PICO 的笛卡尔 ServoP 默认启用条件数奇异点减速（学习 MoveIt Servo 的朝奇异/
-离开）：每臂独立以 20 Hz 获取当前 Jacobian 做 SVD；用 U 末列与 Base 系指令
-twist 的点积判断方向（符号由上一拍 TCP 速度与 Δκ 定号，因 SDK 无 J(q+dq)
-微扰）。朝奇异走时条件数 30..60 二次缩放到零，并收回目标积压；离开时门槛
-乘 2，恢复时以 0.2 秒时间常数平滑放开。Jacobian 超过 250 ms 未刷新时停止
-会话。按住 Grip 时推杆 Y 轴通过 ServoJ 控制对应机械臂 J6，回中后
-从当前 TCP 重新离合 ServoP；J6 不经过笛卡尔奇异点比例。
-
-`Pico` 外设类和 `app_peripherals_read_pico` 均没有机器人 IP；
-`--robot-ip` 只属于上述 SDK bridge。
-
-## 安全提示
-
-> 机器人是危险设备。运行 bridge 前，请确认工作空间已清空、急停可触达，且外设输入不会导致非预期运动。F/T 与遥操作数据将直接影响控制器行为。
-
-### Guarded PICO ServoP (2026-09-18)
-
-The guarded ServoP path quadratically slows from condition 30 to zero at 60 while approaching and uses doubled thresholds while leaving. A background SDK IK/FK preflight checks each approved Cartesian target. Stale telemetry/input, reference changes, and controller faults stop and exit. While Grip is held, thumbstick Y controls J6 through ServoJ; returning to neutral re-clutches ServoP from the measured TCP. Backend joint limits, speed protection, and E-stop remain active.
-
-Pico bridge build: `./scripts/build.sh --with-sdk ON --with-pico ON --sdk-root /path/to/compatible-sdk`. Pico reading remains available with `--with-sdk OFF`.
-
-只读程序 `app_peripherals_read_pico --port 8765` 输出头显和左右手柄 `xyz[m]`，保留 4 位小数；坐标属于 `ref` 指定的 WebXR 参考空间，非机器人坐标。未追踪时位置显示 `N/A`。
-
-本示例内置 B3 支架变换，适用于对应 B3 双臂安装构型，不是通用双臂配置。其他支架或安装方式需重新配置并验证坐标变换。
+[Pico 读取、B3 双臂遥操、夹爪与参数完整说明](../docs/site/pico.zh.md)。需要 `--with-sdk ON --with-pico ON` 和匹配双臂 SDK。默认发布包不含此程序。

@@ -1,13 +1,71 @@
-# Python Examples
+# Python Applications
 
-The reader wheel imports as `rcore_peripherals` and does not require the robot SDK.
+
+
+This directory contains Python scripts aligned with the C++ `app/` tools, using the `rcore_peripherals` Python API.
+
+For platform permissions and device setup, see [Platform setup](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.en.md).
+
+## Build and Install the Wheel
+
+From the repository root:
+
+```bash
+./scripts/build.sh --with-sdk OFF --tests OFF
+./scripts/build_py.sh
+python3 -m pip install --force-reinstall python/dist/*.whl
+```
+
+Distribution name: `rcore-peripherals-py`; import name: `rcore_peripherals`.
+
+## Read Peripherals Only
 
 | Script | Purpose |
-| --- | --- |
-| app_peripherals_read_spacemouse.py | Read SpaceMouse samples |
-| app_peripherals_read_ft_sensor.py | Read force/torque samples |
-| app_peripherals_read_pico.py | Print Pico positions and buttons |
-| app_peripherals_bridge.py | Optional sample bridge; requires compatible robot Python SDK APIs |
-| app_peripherals_ft_sensor_calib.py | Robot-based F/T calibration; requires robot SDK |
+|---|---|
+| `app_peripherals_read_spacemouse.py` | Stream decoded 6-DOF + gripper samples |
+| `app_peripherals_read_ft_sensor.py` | Stream wrench samples after the first valid frame |
+| `app_peripherals_bridge.py` | Push SpaceMouse / F/T samples into the robot SDK |
+| `app_peripherals_ft_sensor_calib.py` | MoveJ static F/T calibration (Preview / `--save`) |
 
-Start with [installation](getting-started.md) and [reader examples](readers.md). A separate Python robot SDK is required for the last two scripts. If its Peripheral update APIs are unavailable, use the C++ bridge. The wheel does not provide Pico robot teleoperation.
+```bash
+python3 python/app/app_peripherals_read_spacemouse.py --device /dev/input/event5 --sample-rate 125
+python3 python/app/app_peripherals_read_ft_sensor.py \
+  --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
+```
+
+For probe and raw SpaceMouse sampling, use the C++ `app_peripherals_probe` and `app_peripherals_read_spacemouse_raw` tools. See [app/README.en.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/app/README.en.md).
+
+## Robot SDK Bridge
+
+`app_peripherals_bridge.py` requires both the peripherals wheel and the robot SDK Python package (`rcore-sdk-py`). If the current Python SDK does not yet expose the same `Peripheral().Update*Sample()` APIs as C++, use C++ `app_peripherals_bridge` for production bridge workflows.
+
+```bash
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip>
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --spacemouse
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
+```
+
+See [python/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/python/README.md) for robot SDK installation notes.
+
+## Static F/T Calibration
+
+`app_peripherals_ft_sensor_calib.py` mirrors C++ `app_peripherals_ft_sensor_calib` and depends only on `rcore-sdk-py` (it does not open the serial port). Start a bridge first so raw samples are available.
+
+```bash
+# 1) Inject raw (Python or C++ bridge)
+python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
+
+# 2) Preview; use --save only after Preview looks good
+python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip <robot-ip>
+python3 python/app/app_peripherals_ft_sensor_calib.py --robot-ip <robot-ip> --save
+```
+
+CLI matches C++: `--robot-ip`, `--nominal`, `--settle-ms`, `--sample-ms`, `--velocity-ratio`, `--joint0-deg`, `--joint5-deg`, `--save`.
+
+## Safety
+
+> Robots are hazardous machines. Before running bridge or calibration scripts, verify the workspace is clear, the emergency stop is reachable, and peripheral input cannot cause unintended motion. Force control requires a one-time `--save` calibration first.
+
+## Pico
+
+[Pico reader, coordinates and connection guide](pico.md). The peripheral wheel does not include a Python dual-arm teleoperation core.

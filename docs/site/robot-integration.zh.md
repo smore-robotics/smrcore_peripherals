@@ -36,3 +36,5 @@ Pico 读取器属于基础库；Pico 双臂遥操属于独立的可选 C++ 程�
 夹爪通过各机械臂 SDK 的 EndBoard / DH 接口操作，需要柜端、末端板及夹爪协议配套。完整参数见[源码应用说明](https://github.com/smore-robotics/smrcore_peripherals/blob/main/app/README.md)。
 
 执行运动示例前确认目标、工具、负载与工作空间匹配，急停可触达。
+
+详见 [Pico 完整用法](pico.md)和[平台权限配置](platform.md)。
