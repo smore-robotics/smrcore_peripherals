@@ -1,5 +1,13 @@
 # Smartmore 外设 SDK
 
+## 文档导航
+
+- [快速开始](getting-started.md)
+- [版本说明](downloads.md)
+- [C++ 示例](cpp.md)
+- [Python 示例](python.md)
+- [API 参考](api.md)
+
 读取 **SpaceMouse、六维力/力矩传感器和 Pico**，构建机器人输入应用。
 
 本仓库提供 C++ 源码库、Python 外设读取 wheel，以及可选的机器人 SDK 桥接示例。
@@ -19,4 +27,4 @@
 
 Pico 双臂遥操示例内置 B3 支架变换，仅适用于对应安装构型；当前默认下载包不包含此程序。
 
-[机器人 SDK 文档](https://smore-robotics.github.io/smrcore_sdk/getting-started/) · [源码仓库](https://github.com/smore-robotics/smrcore_peripherals)
+[机器人 SDK 文档](https://smore-robotics.github.io/smrcore_sdk/zh/getting-started/) · [源码仓库](https://github.com/smore-robotics/smrcore_peripherals)

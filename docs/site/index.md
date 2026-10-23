@@ -1,5 +1,13 @@
 # Smartmore Peripherals SDK
 
+## Documentation
+
+- [Getting Started](getting-started.md)
+- [Release Notes](downloads.md)
+- [C++ Examples](cpp.md)
+- [Python Examples](python.md)
+- [API Reference](api.md)
+
 <div class="smr-hero" markdown>
 
 **Read SpaceMouse, force/torque sensors and Pico inputs.**
