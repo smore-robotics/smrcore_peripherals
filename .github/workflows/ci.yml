@@ -101,11 +101,15 @@ jobs:
       - name: Package C++ readers
         if: matrix.python == '3.10'
         run: python scripts/package_release.py --install build_Release/install --output dist --version "$ASSET_VERSION"
+      - name: Stage reader artifacts in one directory
+        run: |
+          mkdir -p dist
+          cp python/dist/*.whl dist/
       - uses: actions/upload-artifact@v4
         with:
           name: readers-python-${{ matrix.python }}
           path: |
-            python/dist/*.whl
+            dist/*.whl
             dist/*.tar.gz
             dist/*.sha256
           if-no-files-found: error
