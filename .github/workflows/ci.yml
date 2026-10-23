@@ -162,7 +162,7 @@ jobs:
       - name: Install documentation tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex texlive-lang-chinese fonts-noto-cjk fonts-dejavu-core lmodern texlive-fonts-recommended
+          sudo apt-get install -y pandoc texlive-xetex texlive-lang-chinese fonts-noto-cjk fonts-dejavu-core lmodern texlive-fonts-recommended texlive-latex-extra
       - name: Build Chinese and English PDF and HTML manuals
         run: ./scripts/build_manual.sh dist "$ASSET_VERSION"
       - uses: actions/upload-artifact@v4

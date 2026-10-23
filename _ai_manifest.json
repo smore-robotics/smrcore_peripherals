@@ -132,5 +132,13 @@
   "python/app/app_peripherals_pico_bridge.py": "python/app/_index.md",
   "unittests/test_pico_python_launcher.py": "unittests/_index.md",
   "scripts/weekly_release.py": "scripts/_index.md",
-  "unittests/test_weekly_release.py": "unittests/_index.md"
+  "unittests/test_weekly_release.py": "unittests/_index.md",
+  "scripts/assemble_manual.py": "scripts/_index.md",
+  "docs/manual/README.md": "docs/manual/_index.md",
+  "docs/manual/style.css": "docs/manual/_index.md",
+  "docs/manual/style.yaml": "docs/manual/_index.md",
+  "docs/manual/eisvogel.latex": "docs/manual/_index.md",
+  "docs/manual/EISVOGEL-LICENSE": "docs/manual/_index.md",
+  "docs/manual/layout.tex": "docs/manual/_index.md",
+  "scripts/build_manual.py": "scripts/_index.md"
 }

@@ -40,3 +40,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - Python Zhonglin reader and single-i3 ServoJ bridge preserve the original master-arm pairing; see docs/site/zhonglin.md.
 
 - docs/releases.md / docs/releases.en.md: weekly patch release cadence and manual retry instructions.
+
+- docs/manual/: pinned Eisvogel template, bilingual PDF/HTML branding and attribution; see docs/manual/_index.md.

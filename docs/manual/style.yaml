@@ -1,0 +1,31 @@
+title: Smartmore Peripherals
+subtitle: Integration & Operation Guide
+author: Smartmore Robotics
+subject: Peripheral SDK integration guide
+keywords: [SDK, robotics, peripherals, Pico]
+lang: en
+papersize: a4
+fontsize: 10pt
+mainfont: Noto Sans CJK SC
+sansfont: Noto Sans CJK SC
+monofont: DejaVu Sans Mono
+CJKmainfont: Noto Sans CJK SC
+CJKsansfont: Noto Sans CJK SC
+CJKmonofont: Noto Sans Mono CJK SC
+geometry: [top=24mm, bottom=24mm, left=22mm, right=22mm]
+colorlinks: true
+linkcolor: SmrBlue
+urlcolor: SmrLink
+titlepage: true
+titlepage-color: '162D4D'
+titlepage-text-color: 'FFFFFF'
+titlepage-rule-color: '08A8C4'
+titlepage-rule-height: 6
+toc-own-page: true
+toc-depth: 2
+numbersections: true
+header-left: Smartmore Peripherals
+header-right: Integration Guide
+footer-left: Smartmore Robotics
+code-block-font-size: '\small'
+listings-disable-line-numbers: true

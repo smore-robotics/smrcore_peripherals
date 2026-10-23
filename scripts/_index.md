@@ -23,3 +23,7 @@
 - build_manual.sh: include Zhonglin reader/ServoJ instructions in both language manuals.
 
 - weekly_release.py: plan immutable weekly patch tags, skip published unchanged commits, retry unpublished tags; reject divergent history.
+
+- assemble_manual.py / build_manual.sh: named chapters, resolved links and template license; branded Eisvogel PDF plus self-contained HTML.
+
+- build_manual.py: validates version and builds bilingual HTML/PDF; shell entry delegates unchanged arguments.

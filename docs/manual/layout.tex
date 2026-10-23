@@ -1,0 +1,13 @@
+% Brand headings, readable wrapping and deliberate chapter starts.
+\usepackage{fvextra}
+\definecolor{SmrBlue}{HTML}{1E3A63}
+\definecolor{SmrCyan}{HTML}{08A8C4}
+\definecolor{SmrLink}{HTML}{087E96}
+\addtokomafont{section}{\color{SmrBlue}}
+\addtokomafont{subsection}{\color{SmrBlue}}
+\RecustomVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},breaklines=true,breakanywhere=true,fontsize=\small}
+\setlength{\emergencystretch}{3em}
+\let\OriginalSection\section
+\renewcommand{\section}{\clearpage\OriginalSection}
+\definecolor{SmrCode}{HTML}{F3F5F8}
+\renewenvironment{Shaded}{\begin{mdframed}[backgroundcolor=SmrCode,linecolor=SmrCyan,linewidth=0.6pt,leftline=true,rightline=false,topline=false,bottomline=false,innerleftmargin=10pt,innerrightmargin=8pt,innertopmargin=8pt,innerbottommargin=8pt,skipabove=8pt,skipbelow=8pt]}{\end{mdframed}}
