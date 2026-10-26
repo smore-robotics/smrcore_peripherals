@@ -10,7 +10,7 @@
 
 - 每次 push / PR：构建和验证，上传 Actions 制品，保留 14 天。
 - `vX.Y.Z` tag：构建全部制品与说明书；通过后生成校验和和 Release 正文，发布经审核的用户版本说明。
-- 定时发版默认关闭。维护者设置仓库变量 `ENABLE_WEEKLY_RELEASE=true` 后，每周一北京时间 09:17：检查默认分支；有新提交递增补丁版本，无更新且已发布则跳过。同提交未发布的 tag 复用重试，不移动 tag。
+- 工作流进入默认分支后，每周一北京时间 09:17：检查默认分支；有新提交递增补丁版本，无更新且已发布则跳过。同提交未发布的 tag 复用重试，不移动 tag。
 - 手动检查：Actions → Build and Release → Run workflow，在默认分支勾选 `weekly_release`。不勾选只构建开发制品。
 
 发布作用于工作流所在仓库。官方默认分支为 `main`；个人 fork 的标签、制品、Pages 设置和凭据不会随 PR 迁移。首次正式版本由维护者选择并打 tag。
@@ -58,7 +58,9 @@ Release-note-en: Pico can read left and right controller poses.
 基线后的条目仅收录已审核摘要或 `Release-note-zh` / `Release-note-en`，内部维护提交不自动显示。提交功能变更时必须提供两种语言的条目，或在发版前审核归档草稿并写入 `docs/reviewed-release-notes.json`。
 C++ 包只打包用户文档与示例；本目录、AI 索引和模板源码不进入安装包。
 
-## 合入后启用
+## 分支文档部署与定时发布
 
-Pages 默认仅构建验证；配置 Settings → Pages → GitHub Actions，确认域名后设置 `ENABLE_DOCS_PUBLISH=true` 才部署。每周发版仅在 `ENABLE_WEEKLY_RELEASE=true` 时运行；手动打 tag 或手动选择 weekly_release 仍可显式发布。
+`main` 和 `feat/peripheral-integration` 的 push 自动构建并部署同一个 Pages 网站，后部署的版本会更新网站；PR 仅构建。管理员须在 Settings → Pages 选择 GitHub Actions，并在 Environments → github-pages 的部署分支规则中允许上述分支。无需 `ENABLE_DOCS_PUBLISH` 开关。
+
+每周发版无需额外变量，但 GitHub 的 schedule 只运行默认分支中的工作流；仅推送功能分支不会启动定时任务。workflow_dispatch 也须先在默认分支注册。保持 main 不变时，功能分支 push 仍会构建读取包、bridge、wheel 和 PDF/HTML 手册，正式发布可使用该提交上的版本 tag。不要为开启定时任务直接修改默认分支或覆盖 main。
 更新分支保护的必需检查名称：原 CI 的 main-checks / linux-peripherals-smoke 已由 metadata、readers、sdk-bridge、manual 及文档 build 替代。Codex API Secret 和本机登录均不随 PR 迁移；未配置时不调用自动模型生成。

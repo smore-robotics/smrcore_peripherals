@@ -24,7 +24,6 @@ concurrency:
 
 jobs:
   metadata:
-    if: github.event_name != 'schedule' || vars.ENABLE_WEEKLY_RELEASE == 'true'
     permissions:
       contents: write
     runs-on: ubuntu-22.04
