@@ -35,3 +35,5 @@
 - version_history.py: reachable immutable Git tag ranges, path categories and bilingual release-note trailers shared by site/manual/Release.
 
 - docs_history.py: MkDocs pre-build hook generates bilingual version pages, including clean checkouts.
+
+- assemble_manual.py: omit GitHub README branding/badges from print chapters to avoid remote image dependencies.

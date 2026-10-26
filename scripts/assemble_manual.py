@@ -38,6 +38,7 @@ def assemble(language):
         text = re.sub(r'^# .+\n', '', text, count=1)
         text = re.sub(r'^(#{2,6}) \d+\.\s+', r'\1 ', text, flags=re.MULTILINE)
         if source.startswith('README'):
+            text = re.sub(r'<!-- project-header:start -->.*?<!-- project-header:end -->', '', text, flags=re.DOTALL)
             text = re.sub(r'^.*(?:\[English\]|\[简体中文\]).*\n', '', text, flags=re.MULTILINE)
             text = re.sub(r'^---\s*$', '', text, count=1, flags=re.MULTILINE)
         # Links in concatenated documents no longer have their original base.

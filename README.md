@@ -1,8 +1,19 @@
-# smrcore_peripherals
+<!-- project-header:start -->
+<p align="center">
+  <img src="docs/site/assets/logo.png" alt="Smartmore Robotics" width="120">
+</p>
+<h1 align="center">smrcore_peripherals</h1>
+<p align="center"><strong>SpaceMouse、六维力传感器、Pico 和主从臂的外设接入库与机器人应用示例。</strong></p>
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="License: Apache 2.0"></a>
+  <a href="https://zhanhui-li-smore.github.io/smrcore_peripherals/zh/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
+  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=feat%2Fpico-readers-and-release" alt="Build and Release"></a>
+  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/zhanhui-li-smore/smrcore_peripherals?label=Release" alt="Latest release"></a>
+</p>
+<p align="center"><a href="README.en.md">English</a> · <strong>简体中文</strong></p>
 
-**SpaceMouse、六维力传感器、Pico 和主从臂的外设接入库与机器人应用示例。**
-
-[English](README.en.md) · **简体中文**
+---
+<!-- project-header:end -->
 
 本仓库提供外设读取、协议处理和应用示例。读取库独立于机器人 SDK；机器人控制由应用组合配套 SDK 完成。
 

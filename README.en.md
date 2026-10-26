@@ -1,8 +1,19 @@
-# smrcore_peripherals
+<!-- project-header:start -->
+<p align="center">
+  <img src="docs/site/assets/logo.png" alt="Smartmore Robotics" width="120">
+</p>
+<h1 align="center">smrcore_peripherals</h1>
+<p align="center"><strong>Peripheral input and robot integration examples for SpaceMouse, force/torque sensors, Pico and master–follower arms.</strong></p>
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="License: Apache 2.0"></a>
+  <a href="https://zhanhui-li-smore.github.io/smrcore_peripherals/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
+  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=feat%2Fpico-readers-and-release" alt="Build and Release"></a>
+  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/zhanhui-li-smore/smrcore_peripherals?label=Release" alt="Latest release"></a>
+</p>
+<p align="center"><strong>English</strong> · <a href="README.md">简体中文</a></p>
 
-**Peripheral input and robot integration examples for SpaceMouse, force/torque sensors, Pico and master–follower arms.**
-
-**English** · [简体中文](README.md)
+---
+<!-- project-header:end -->
 
 The repository provides readers, protocols and application examples. Readers are independent of the robot SDK; applications combine them with the matching SDK for robot control.
 
