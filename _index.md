@@ -46,3 +46,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - mkdocs.yml and docs/site: unified peripheral integration navigation for SpaceMouse, F/T, Pico and master–follower arms.
 
 - docs/releases.md / docs/releases.en.md: canonical user release/asset guides; docs/releasing.md: maintainer workflow; website and release notes consume the guides.
+
+- scripts/version_history.py generates categorized version history for website, manuals and Releases.

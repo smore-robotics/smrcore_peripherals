@@ -5,6 +5,9 @@ docs_dir: docs/site
 repo_url: https://github.com/smore-robotics/smrcore_peripherals
 repo_name: smore-robotics/smrcore_peripherals
 
+hooks:
+  - scripts/docs_history.py
+
 plugins:
   - search
   - i18n:
@@ -24,6 +27,7 @@ plugins:
             Home: 首页
             Getting Started: 快速开始
             Release Notes: 版本说明
+            Downloads: 下载与兼容性
             C++ Examples: C++ 示例
             Python Examples: Python 示例
             Overview: 总览
@@ -76,7 +80,8 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - Release Notes: downloads.md
+  - Release Notes: release-notes.md
+  - Downloads: downloads.md
   - Peripheral Integration:
       - SpaceMouse: spacemouse.md
       - Force/Torque Sensor: ft-sensor.md

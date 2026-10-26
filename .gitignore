@@ -85,3 +85,7 @@ python/.deps/
 
 # MkDocs output
 /site/
+
+# Generated version history (rebuilt from Git for docs deployment)
+/docs/site/release-notes.md
+/docs/site/release-notes.zh.md

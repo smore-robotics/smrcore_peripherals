@@ -34,3 +34,16 @@ python3 scripts/release_notes.py --tag vX.Y.Z --repository owner/repo --output /
 最后一条的 vX.Y.Z 应替换为实际版本。使用干净安装树打包；wheel 与压缩包统一暂存于 dist 后上传。缺失制品时修复原因，不能跳过文件校验后发布不完整版本。
 
 失败先查看各 job。只有发布步骤失败、构建已通过时，可核对原 tag、提交、版本和校验和后用原始制品补发；不要重打或移动已有 tag。已发布资产不覆盖，正文纠错不得声称旧版包含后续代码修改。
+
+## 自动版本记录
+
+`version_history.py` 从目标提交可达的正式 `vX.Y.Z` tag 计算累计范围，未打 tag 的提交显示为“未发布”。按变更路径归类并保留提交链接；原始标题作为缺少发布文案时的回退，不推断代码行为。合并提交不重复列出，其包含的普通提交仍收录。版本说明按 Git tag 标记，不代表该 tag 的制品已发布成功；下载状态以 Releases 页为准。
+
+要得到面向用户的双语条目，可以在同一提交消息正文增加：
+
+```text
+Release-note-zh: Pico 支持读取左右手柄姿态。
+Release-note-en: Pico can read left and right controller poses.
+```
+
+网站构建、PDF/HTML 手册、正式 Release 均使用同一个 Git 汇总器。网站在 push 和默认分支构建成功后更新，因此每周自动创建 tag 后也会刷新版本说明；不由 CI 写回源代码。网站生成文件是构建产物。本地运行 MkDocs 时，构建 hook 自动生成版本页；也可单独执行 `python3 scripts/version_history.py`。需要完整 Git 历史与 tag，浅克隆应执行 `git fetch --unshallow --tags`。

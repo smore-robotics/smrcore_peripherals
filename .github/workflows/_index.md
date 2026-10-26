@@ -16,3 +16,5 @@
 - ci.yml: manual job installs texlive-latex-extra for the vendored Eisvogel template.
 
 - ci.yml: release notes generated from shared bilingual guides; commit summaries appended by GitHub.
+
+- Full Git history feeds version notes; successful default-branch builds refresh Pages after automatic tags.

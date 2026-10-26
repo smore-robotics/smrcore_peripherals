@@ -38,7 +38,9 @@ def main():
     args = parser.parse_args()
     sdk = (ROOT / '.sdk-version').read_text().strip()
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    args.output.write_text(render(args.tag, args.repository, sdk, commit))
+    from version_history import history
+    changes = '\n\n'.join(history(lang, args.tag, args.repository, latest_only=True) for lang in ('zh', 'en'))
+    args.output.write_text(changes + '\n\n' + render(args.tag, args.repository, sdk, commit))
 
 
 if __name__ == '__main__':

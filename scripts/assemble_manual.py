@@ -3,6 +3,7 @@
 import argparse
 import re
 from pathlib import Path
+from version_history import history
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://zhanhui-li-smore.github.io/smrcore_peripherals/'
@@ -21,7 +22,7 @@ def assemble(language):
         ('SpaceMouse', 'spacemouse'), ('六维力传感器' if zh else 'Force/torque sensor', 'ft-sensor'),
         ('Pico', 'pico'), ('主从臂' if zh else 'Master–follower arms', 'zhonglin')]]
     sources.insert(1, ('外设接入' if zh else 'Peripheral integration', devices))
-    chapters = []
+    chapters = [history(language)]
     for i, (title, source) in enumerate(sources, 1):
         if isinstance(source, list):
             parts = []

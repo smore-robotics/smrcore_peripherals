@@ -3,12 +3,12 @@
 ## 文档导航
 
 - [快速开始](getting-started.md)
-- [版本说明](downloads.md)
+- [版本说明](release-notes.md)
 - [C++ 示例](cpp.md)
 - [Python 示例](python.md)
 - [API 参考](api.md)
 
-读取 **SpaceMouse、六维力/力矩传感器和 Pico**，构建机器人输入应用。
+接入 **SpaceMouse、六维力/力矩传感器、Pico 和主从臂**，构建机器人输入应用。
 
 本仓库提供 C++ 源码库、Python 外设读取 wheel，以及可选的机器人 SDK 桥接示例。
 

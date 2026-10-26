@@ -31,3 +31,7 @@
 - assemble_manual.py: one Peripheral Integration chapter with four peer subsections; C++ and Python remain language entry points.
 
 - release_notes.py: render versioned bilingual release notes from user guides; enforce SDK pin alignment.
+
+- version_history.py: reachable immutable Git tag ranges, path categories and bilingual release-note trailers shared by site/manual/Release.
+
+- docs_history.py: MkDocs pre-build hook generates bilingual version pages, including clean checkouts.

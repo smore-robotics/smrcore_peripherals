@@ -25,3 +25,5 @@
 - test_weekly_release.py: temporary Git repo checks for initial/patch tags, skip/retry and rollback refusal.
 
 - test_release_notes.py: release identity, four-chain scope, invalid tags and SDK-doc consistency.
+
+- test_version_history.py: version boundaries, bilingual trailers, unreleased commits and unrelated-tag exclusion.

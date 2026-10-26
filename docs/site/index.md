@@ -3,14 +3,14 @@
 ## Documentation
 
 - [Getting Started](getting-started.md)
-- [Release Notes](downloads.md)
+- [Release Notes](release-notes.md)
 - [C++ Examples](cpp.md)
 - [Python Examples](python.md)
 - [API Reference](api.md)
 
 <div class="smr-hero" markdown>
 
-**Read SpaceMouse, force/torque sensors and Pico inputs.**
+**Integrate SpaceMouse, force/torque sensors, Pico and master–follower arms.**
 
 Build C++ and Python applications with the peripheral library, and connect robot applications through an optional Smartmore Robot SDK bridge.
 

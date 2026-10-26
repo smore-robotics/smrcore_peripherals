@@ -80,6 +80,8 @@ jobs:
       ASSET_VERSION: ${{ needs.metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -92,7 +94,7 @@ jobs:
         run: |
           ./scripts/build.sh --with-sdk OFF --tests ON
           ./scripts/run_tests.sh -t Release
-          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py unittests/test_zhonglin.py unittests/test_pico_python_launcher.py unittests/test_weekly_release.py unittests/test_release_notes.py -q
+          python -m pytest unittests/test_pico_legacy_release.py unittests/test_pico_stop_worker.py unittests/test_zhonglin.py unittests/test_pico_python_launcher.py unittests/test_weekly_release.py unittests/test_release_notes.py unittests/test_version_history.py -q
           ./scripts/check_python_examples.sh
       - name: Build and test wheel
         run: |
@@ -124,6 +126,8 @@ jobs:
       ASSET_VERSION: ${{ needs.metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -159,6 +163,8 @@ jobs:
       ASSET_VERSION: ${{ needs.metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install documentation tools
         run: |
           sudo apt-get update
@@ -180,6 +186,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
           path: dist
