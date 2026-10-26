@@ -9,3 +9,5 @@
 - manual/: branded Eisvogel PDF and standalone HTML templates; see manual/_index.md.
 
 - releases.md / releases.en.md: four-chain delivery and asset selection; releasing.md: maintainer automation/recovery.
+
+- codex-release-notes.md: OPENAI_API_KEY setup, automatic draft workflow and output status.

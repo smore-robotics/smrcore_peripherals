@@ -1,0 +1,119 @@
+name: Codex release notes
+
+on:
+  push:
+    branches: [main, feat/pico-readers-and-release]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-release-notes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-22.04
+    outputs:
+      configured: ${{ steps.key.outputs.configured }}
+      has_changes: ${{ steps.diff.outputs.has_changes }}
+    steps:
+      - name: Check API key configuration
+        id: key
+        env:
+          RELEASE_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -n "$RELEASE_KEY" ]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::Set repository secret OPENAI_API_KEY to enable Codex. Git summaries remain available.'
+            echo 'Codex is not enabled: add OPENAI_API_KEY in repository Settings → Secrets and variables → Actions, then rerun this workflow.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Find published release baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '.[]' | jq -s '.' > /tmp/peripheral-releases.json
+      - name: Prepare exact diff and fallback notes
+        id: diff
+        run: |
+          python3 scripts/codex_release_notes.py prepare \
+            --repository "$GITHUB_REPOSITORY" --releases /tmp/peripheral-releases.json \
+            --output .codex-release-input
+      - uses: actions/upload-artifact@v4
+        with:
+          name: codex-release-input-${{ github.sha }}
+          path: .codex-release-input/*
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
+
+  codex:
+    needs: prepare
+    if: needs.prepare.outputs.configured == 'true' && needs.prepare.outputs.has_changes == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    outputs:
+      final_message: ${{ steps.notes.outputs.final-message }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: codex-release-input-${{ github.sha }}
+          path: .codex-release-input
+      # Keep Codex last. Validation and artifact publication run on a fresh runner.
+      - name: Draft bilingual release notes
+        id: notes
+        uses: openai/codex-action@1d82a3dba7c7988ec71ecae1ed5b8e8db96495c5 # v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: .github/codex/release-notes.md
+          output-schema-file: .github/codex/release-notes.schema.json
+          sandbox: read-only
+          safety-strategy: drop-sudo
+          model: ${{ vars.RELEASE_CODEX_MODEL }}
+
+  package:
+    needs: [prepare, codex]
+    if: always() && !cancelled() && needs.prepare.result == 'success'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: codex-release-input-${{ github.sha }}
+          path: .codex-release-input
+      - name: Validate evidence and render draft
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.codex.outputs.final_message }}
+          CODEX_RESULT: ${{ needs.codex.result }}
+          CONFIGURED: ${{ needs.prepare.outputs.configured }}
+          HAS_CHANGES: ${{ needs.prepare.outputs.has_changes }}
+        run: |
+          status=failed
+          if [ "$CONFIGURED" != true ]; then status=missing-key
+          elif [ "$HAS_CHANGES" != true ]; then status=no-changes
+          elif [ "$CODEX_RESULT" = success ]; then status=generated
+          fi
+          python3 scripts/codex_release_notes.py render --input .codex-release-input \
+            --output codex-release-draft --status "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codex-release-notes-${{ github.sha }}
+          path: codex-release-draft/*
+          retention-days: 90
+          if-no-files-found: error

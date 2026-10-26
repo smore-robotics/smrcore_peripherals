@@ -47,3 +47,7 @@ Release-note-en: Pico can read left and right controller poses.
 ```
 
 网站构建、PDF/HTML 手册、正式 Release 均使用同一个 Git 汇总器。网站在 push 和默认分支构建成功后更新，因此每周自动创建 tag 后也会刷新版本说明；不由 CI 写回源代码。网站生成文件是构建产物。本地运行 MkDocs 时，构建 hook 自动生成版本页；也可单独执行 `python3 scripts/version_history.py`。需要完整 Git 历史与 tag，浅克隆应执行 `git fetch --unshallow --tags`。
+
+## Codex 草稿
+
+默认分支 push 可自动生成基于源码差异的双语草稿，独立于正式发布流水线。Key 配置、下载位置和状态见 [Codex 自动版本说明](codex-release-notes.md)。

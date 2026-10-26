@@ -150,5 +150,11 @@
   "docs/releasing.md": "docs/_index.md",
   "scripts/version_history.py": "scripts/_index.md",
   "unittests/test_version_history.py": "unittests/_index.md",
-  "scripts/docs_history.py": "scripts/_index.md"
+  "scripts/docs_history.py": "scripts/_index.md",
+  "scripts/codex_release_notes.py": "scripts/_index.md",
+  "unittests/test_codex_release_notes.py": "unittests/_index.md",
+  ".github/workflows/codex-release-notes.yml": ".github/workflows/_index.md",
+  ".github/codex/release-notes.md": ".github/codex/_index.md",
+  ".github/codex/release-notes.schema.json": ".github/codex/_index.md",
+  "docs/codex-release-notes.md": "docs/_index.md"
 }

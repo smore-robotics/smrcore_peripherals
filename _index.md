@@ -50,3 +50,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - scripts/version_history.py generates categorized version history for website, manuals and Releases.
 
 - README.md / README.en.md: centered project logo, bilingual identity and live license/docs/CI/release badges.
+
+- Codex release-note drafts: docs/codex-release-notes.md; isolated default-branch workflow, no automatic publication.

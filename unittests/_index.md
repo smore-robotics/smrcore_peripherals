@@ -27,3 +27,5 @@
 - test_release_notes.py: release identity, four-chain scope, invalid tags and SDK-doc consistency.
 
 - test_version_history.py: version boundaries, bilingual trailers, unreleased commits and unrelated-tag exclusion.
+
+- test_codex_release_notes.py: published baseline, evidence and bilingual output validation, failure fallback.

@@ -1,0 +1,81 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "groups",
+    "uncertainties"
+  ],
+  "properties": {
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "category",
+          "entries"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "spacemouse",
+              "ft",
+              "pico",
+              "master",
+              "python",
+              "sdk",
+              "docs",
+              "other"
+            ]
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "zh",
+                "en",
+                "commits"
+              ],
+              "properties": {
+                "zh": {
+                  "type": "string"
+                },
+                "en": {
+                  "type": "string"
+                },
+                "commits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "zh",
+          "en"
+        ],
+        "properties": {
+          "zh": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

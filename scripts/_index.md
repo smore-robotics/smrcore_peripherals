@@ -37,3 +37,5 @@
 - docs_history.py: MkDocs pre-build hook generates bilingual version pages, including clean checkouts.
 
 - assemble_manual.py: omit GitHub README branding/badges from print chapters to avoid remote image dependencies.
+
+- codex_release_notes.py: published-release diff context, evidence validation and bilingual draft/fallback renderer.
