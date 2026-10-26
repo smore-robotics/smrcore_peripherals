@@ -31,3 +31,5 @@
 - test_codex_release_notes.py: published baseline, evidence and bilingual output validation, failure fallback.
 
 - test_local_codex_notes.py: subscription auth environment and retry/deduplication gates.
+
+- test_version_history.py: reviewed range deduplication and historical target isolation.

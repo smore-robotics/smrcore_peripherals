@@ -54,3 +54,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - Codex release-note drafts: docs/codex-release-notes.md; isolated default-branch workflow, no automatic publication.
 
 - Local Codex subscription automation is the default draft path; API workflow remains manual-only.
+
+- docs/reviewed-release-notes.json: approved Codex summaries with immutable Git range and commit evidence.

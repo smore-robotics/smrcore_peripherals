@@ -42,3 +42,32 @@ def test_categories():
     assert h.category(['python/app/zhonglin.py']) == 'master'
     assert h.category(['src/peripherals/ft_sensor/reader.cpp']) == 'ft'
     assert h.category(['.sdk-version']) == 'sdk'
+
+
+def test_reviewed_notes_are_versioned_and_deduplicated(tmp_path):
+    import json
+    def git(*args):
+        return subprocess.check_output(['git', *args], cwd=tmp_path, text=True).strip()
+    git('init', '-q'); git('config', 'user.name', 'Test'); git('config', 'user.email', 'test@example.com')
+    def commit(message):
+        git('add', '.'); git('commit', '-qm', message)
+        return git('rev-parse', 'HEAD')
+    (tmp_path / 'x').write_text('one')
+    base = commit('Initial'); git('tag', 'v0.0.1')
+    (tmp_path / 'x').write_text('two')
+    source = commit('raw source title')
+    record = dict(base_sha=base, target_sha=source, commits=[source], groups=[dict(category='docs', entries=[dict(zh='审核摘要', en='Reviewed summary', commits=[source])])])
+    docs = tmp_path / 'docs'; docs.mkdir()
+    path = docs / 'reviewed-release-notes.json'
+    path.write_text(json.dumps([record]))
+    commit('docs: integrate notes')
+    text = h.history('zh', root=tmp_path, latest_only=True)
+    assert '审核摘要' in text and 'raw source title' not in text
+    assert 'integrate notes' in text
+    old = h.history('zh', target=source, root=tmp_path, latest_only=True)
+    assert '审核摘要' not in old and 'raw source title' in old
+    record['commits'] = [base]
+    path.write_text(json.dumps([record])); commit('bad evidence')
+    import pytest
+    with pytest.raises(ValueError, match='Git range'):
+        h.history('zh', root=tmp_path)

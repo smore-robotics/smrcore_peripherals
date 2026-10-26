@@ -26,14 +26,14 @@ Actions 运行完成后下载 `codex-release-notes-<完整提交 SHA>`：
 没有 Key 时状态为 `missing-key`；没有新提交为 `no-changes`。
 模型失败或证据校验不通过时，该工作流报告失败，同时保留带状态的 Git 摘要，不能当作 Codex 已成功生成。
 草稿保留 90 天；该工作流不自动提交、不提 PR、不覆盖旧 Release，也不修改机器人代码。
-原有网站/PDF/Release 继续采用 Git 版本记录，避免把未核实的草稿直接写入正式说明。
+网站、PDF 和 Release 共用版本说明入口，读取已审核的摘要；未审核草稿保留在独立归档分支。
 
 ## 说明质量与发布
 
 Codex 合并相关变更，说明接口、使用方式和兼容影响，每条带该范围内的提交依据；不把编译配置当成实机验收。
-人工核实后可把条目整理为提交中的 `Release-note-zh` / `Release-note-en`（见[维护者流程](releasing.md)），正式发版继续按 tag 固定内容。
+审核后将摘要、基线 SHA、目标 SHA 和覆盖提交列表写入 `docs/reviewed-release-notes.json`。构建从目标版本的 Git 树读取记录，验证覆盖范围并替代对应提交标题；后续提交继续使用 `Release-note-zh` / `Release-note-en` 或标题。正式发版按 tag 固定内容，旧版本不受影响。
 
-工作流仅接受默认分支的 push/手动触发；不对外部 PR 暴露 Key。Codex 无仓库写权限、采用只读沙箱和 `drop-sudo`；验证与打包在另一个干净 runner 进行。
+工作流仅接受默认分支的手动触发；不对外部 PR 暴露 Key。Codex 无仓库写权限、采用只读沙箱和 `drop-sudo`；验证与打包在另一个干净 runner 进行。
 模型只能输出结构化草稿，输出不会作为 shell 脚本执行。该校验确认格式及提交范围，不代替语义审核。
 
 接入依据：[官方 Codex GitHub Action 文档](https://developers.openai.com/codex/github-action)。

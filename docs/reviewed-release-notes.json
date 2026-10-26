@@ -1,0 +1,45 @@
+[
+  {
+    "base_sha": "993cfd6eaa0a6f241e3adfa14ff962f29fde248e",
+    "target_sha": "9328e9dc620632ce67417ee216667f75b095a8ba",
+    "commits": [
+      "2d6f647a6002c5f2dc56c39131af8d42455783cc",
+      "9328e9dc620632ce67417ee216667f75b095a8ba"
+    ],
+    "groups": [
+      {
+        "category": "sdk",
+        "entries": [
+          {
+            "zh": "新增中英文版本说明草稿：比较上一已发布正式版本与当前提交，按功能归纳变化，并保留提交依据。生成结果校验格式和引用范围；API 方式可在 Actions 中手动运行。",
+            "en": "Generate bilingual release-note drafts from the last published stable release to the current commit, grouped by functionality with commit evidence. Validate the output format and evidence range. The API workflow is available as a manual Actions run.",
+            "commits": [
+              "2d6f647a6002c5f2dc56c39131af8d42455783cc",
+              "9328e9dc620632ce67417ee216667f75b095a8ba"
+            ]
+          },
+          {
+            "zh": "支持使用本机 ChatGPT 登录的 Codex 自动生成草稿，无需 API Key。安装定时器后每十分钟检查默认分支，有新提交时生成并归档至 automation/release-notes；同一提交不重复生成，失败后一小时重试。",
+            "en": "Support automatic drafts through locally authenticated Codex with ChatGPT login, without an API key. The installed timer checks the default branch every ten minutes, generating and archiving new revisions to automation/release-notes. Completed revisions are skipped and failures retry after one hour.",
+            "commits": [
+              "9328e9dc620632ce67417ee216667f75b095a8ba"
+            ]
+          }
+        ]
+      },
+      {
+        "category": "docs",
+        "entries": [
+          {
+            "zh": "新增本机定时任务与手动 API 工作流的配置说明，涵盖认证要求、草稿位置、状态检查、停用和失败恢复。维护者流程明确要求审核草稿后再纳入正式版本说明。",
+            "en": "Add setup guides for the local timer and manual API workflow, covering authentication requirements, draft locations, status checks, disabling the timer and failure recovery. The maintainer guide requires draft review before inclusion in official release notes.",
+            "commits": [
+              "2d6f647a6002c5f2dc56c39131af8d42455783cc",
+              "9328e9dc620632ce67417ee216667f75b095a8ba"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

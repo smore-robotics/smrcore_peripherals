@@ -41,3 +41,5 @@
 - codex_release_notes.py: published-release diff context, evidence validation and bilingual draft/fallback renderer.
 
 - local_codex_notes.py / install_local_codex_notes.py: local ChatGPT-auth polling, failure backoff, isolated checkout and immutable draft archive branch; systemd user timer.
+
+- version_history.py: consume reviewed bilingual summaries from target Git trees, validate range/evidence and retain uncovered commit fallback.

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build version history from reachable tags and auditable Git changes."""
 import argparse
+import json
 from collections import defaultdict
 from pathlib import Path
 import re
@@ -63,6 +64,39 @@ def boundaries(target='HEAD', root=ROOT):
     return points
 
 
+def reviewed_entries(tip, base, commits, root=ROOT):
+    """Read approved notes from the target tree, never from a newer checkout."""
+    path = 'docs/reviewed-release-notes.json'
+    if path not in git('ls-tree', '--name-only', tip, '--', path, root=root).splitlines():
+        return [], set()
+    records = json.loads(git('show', f'{tip}:{path}', root=root))
+    entries, covered = [], set()
+    for record in records:
+        if not base or record['base_sha'] != base[1]:
+            continue
+        source = record['target_sha']
+        if source not in commits:
+            continue
+        expected = set(git('rev-list', '--no-merges', f'{base[1]}..{source}', root=root).splitlines())
+        if set(record['commits']) != expected or not expected <= set(commits):
+            raise ValueError('Reviewed notes do not match their Git range')
+        if covered & expected:
+            raise ValueError('Overlapping reviewed release notes')
+        for group in record['groups']:
+            if group['category'] not in GROUPS:
+                raise ValueError('Unknown reviewed category')
+            for entry in group['entries']:
+                if not entry['commits'] or not set(entry['commits']) <= expected:
+                    raise ValueError('Reviewed evidence is outside its Git range')
+                if not all(isinstance(entry[lang], str) and entry[lang].strip() for lang in ('zh', 'en')):
+                    raise ValueError('Reviewed notes require both languages')
+                entries.append((group['category'], entry))
+        if not entries:
+            raise ValueError('Reviewed notes must contain entries')
+        covered.update(expected)
+    return entries, covered
+
+
 def section(label, tip, base, language, repository, root=ROOT):
     zh = language == 'zh'
     title = ('未发布' if zh else 'Unreleased') if label == 'Unreleased' else label.removeprefix('v')
@@ -77,7 +111,14 @@ def section(label, tip, base, language, repository, root=ROOT):
         lines += ['首个版本的提交记录。' if zh else 'Commit history for the first release.', '']
     grouped = defaultdict(list)
     commits = git('rev-list', '--reverse', '--no-merges', revision, root=root).splitlines()
+    reviewed, covered = reviewed_entries(tip, base, commits, root)
+    for key, entry in reviewed:
+        text = entry[language].replace('<', '&lt;').replace('>', '&gt;')
+        links = ', '.join(f'[{sha[:7]}](https://github.com/{repository}/commit/{sha})' for sha in entry['commits'])
+        grouped[key].append(f'- {text} ({links})')
     for commit in commits:
+        if commit in covered:
+            continue
         message = git('show', '-s', '--format=%B', commit, root=root)
         subject = message.splitlines()[0]
         note = re.search(r'^Release-note-' + language + r':\s*(.+)$', message, re.MULTILINE | re.IGNORECASE)
@@ -96,8 +137,8 @@ def section(label, tip, base, language, repository, root=ROOT):
 def history(language='zh', target='HEAD', repository='zhanhui-li-smore/smrcore_peripherals', root=ROOT, latest_only=False):
     points = boundaries(target, root)
     lines = ['# 版本说明' if language == 'zh' else '# Release notes', '',
-             '按 Git 版本范围自动整理；条目优先使用提交中的发布说明，未提供时使用原始提交标题。分类依据变更文件，具体行为以链接的代码差异为准。' if language == 'zh' else
-             'Generated from Git version ranges. Entries use release-note trailers when supplied, otherwise original commit titles. Categories follow changed files; linked diffs provide the implementation details.', '']
+             '按 Git 版本范围整理，优先收录审核后的双语变更摘要；其余提交使用发布说明或原始标题。每条保留代码依据。' if language == 'zh' else
+             'Generated from Git version ranges, preferring reviewed bilingual summaries. Remaining commits use release-note trailers or original titles. Entries retain links to their implementation evidence.', '']
     for i, (label, tip) in enumerate(points):
         lines.append(section(label, tip, points[i+1] if i+1 < len(points) else None, language, repository, root))
         if latest_only:

@@ -160,5 +160,6 @@
   "scripts/local_codex_notes.py": "scripts/_index.md",
   "scripts/install_local_codex_notes.py": "scripts/_index.md",
   "unittests/test_local_codex_notes.py": "unittests/_index.md",
-  "docs/local-codex-notes.md": "docs/_index.md"
+  "docs/local-codex-notes.md": "docs/_index.md",
+  "docs/reviewed-release-notes.json": "_index.md"
 }
