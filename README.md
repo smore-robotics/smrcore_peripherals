@@ -31,7 +31,6 @@
 - [Release 下载](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases)：编译包、Python wheel、中英文说明书和校验和。
 - [选择制品与 SDK 兼容性](docs/releases.md)：两种 C++ 包如何选、Python 依赖与各链路交付形式。
 - [在线文档](https://zhanhui-li-smore.github.io/smrcore_peripherals/zh/) · [C++ 示例](app/README.md) · [Python 示例](python/app/README.md)。
-- [维护者发布流程](docs/releasing.md)：每周检查、打 tag 与发布恢复。
 
 ## 从源码开始
 

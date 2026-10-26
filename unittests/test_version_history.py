@@ -71,3 +71,27 @@ def test_reviewed_notes_are_versioned_and_deduplicated(tmp_path):
     import pytest
     with pytest.raises(ValueError, match='Git range'):
         h.history('zh', root=tmp_path)
+
+
+def test_user_baseline_hides_development_history(tmp_path):
+    import json
+    def git(*args):
+        return subprocess.check_output(['git', *args], cwd=tmp_path, text=True).strip()
+    git('init', '-q'); git('config', 'user.name', 'Test'); git('config', 'user.email', 'test@example.com')
+    (tmp_path / 'x').write_text('old')
+    git('add', '.'); git('commit', '-qm', 'experimental diary'); git('tag', 'v0.0.1')
+    (tmp_path / 'docs').mkdir()
+    (tmp_path / 'docs/release-baseline.json').write_text(json.dumps(dict(tag='v0.1.0', zh='四类外设', en='Four peripherals')))
+    git('add', '.'); git('commit', '-qm', 'baseline'); git('tag', 'v0.1.0')
+    assert '四类外设' in h.history(root=tmp_path)
+    assert 'experimental diary' not in h.history(root=tmp_path)
+    assert 'experimental diary' in h.history(target='v0.0.1', root=tmp_path)
+    (tmp_path / 'x').write_text('next')
+    git('add', '.'); git('commit', '-qm', 'internal cleanup')
+    (tmp_path / 'x').write_text('new')
+    git('add', '.'); git('commit', '-qm', 'feature\n\nRelease-note-zh: 新增读取\nRelease-note-en: New reader')
+    git('tag', 'v0.1.1')
+    text = h.history(root=tmp_path)
+    assert '新增读取' in text and '四类外设' in text
+    assert 'internal cleanup' not in text
+    assert '四类外设' not in h.history(root=tmp_path, latest_only=True)

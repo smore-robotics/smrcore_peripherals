@@ -14,6 +14,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def copy_user_docs(stage):
+    """Ship usage guides; maintenance metadata stays in the source repository."""
+    dest = stage / 'docs'
+    dest.mkdir(parents=True, exist_ok=True)
+    for name in ('platform_setup.md', 'platform_setup.en.md', 'releases.md', 'releases.en.md'):
+        shutil.copy2(ROOT / 'docs' / name, dest / name)
+    shutil.copytree(ROOT / 'docs/site', dest / 'site',
+                    ignore=shutil.ignore_patterns('_index.md', '__pycache__', '*.pyc'))
+    from version_history import history
+    for lang, name in [('zh', 'release-notes.zh.md'), ('en', 'release-notes.md')]:
+        (dest / 'site' / name).write_text(history(lang))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--install", type=Path, required=True)
@@ -61,14 +74,14 @@ def main():
         shutil.copy2(ROOT / "LICENSE", stage / "LICENSE")
         shutil.copy2(ROOT / "README.md", stage / "README.md")
         shutil.copy2(ROOT / "README.en.md", stage / "README.en.md")
-        shutil.copytree(ROOT / "docs", stage / "docs")
+        copy_user_docs(stage)
         (stage / "app").mkdir(exist_ok=True)
         for doc_name in ("README.md", "README.en.md"):
             shutil.copy2(ROOT / "app" / doc_name, stage / "app" / doc_name)
         (stage / "python").mkdir(exist_ok=True)
         shutil.copy2(ROOT / "python/TELEOP.md", stage / "python/TELEOP.md")
         shutil.copytree(ROOT / "python/app", stage / "python/app",
-                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "_index.md"))
         (stage / "run.sh").write_text(
             '#!/usr/bin/env bash\nset -euo pipefail\n'
             'root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"\n'

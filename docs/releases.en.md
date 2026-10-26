@@ -51,7 +51,7 @@ For a complete download use `sha256sum -c SHA256SUMS`. For one archive download 
 ## SDK and robot configuration
 
 - Prebuilt SpaceMouse / F/T bridges use SDK **0.2.0**, pinned in `.sdk-version`. Each C++ archive records the commit and SDK in `build-info.json`.
-- Pico needs a matching C++ SDK including `sdk/dual_arm_robot.hpp`. The currently pinned official package omits this header, so **prebuilt archives do not include the Pico teleoperation binary**. Build it from source with a corrected SDK. The example embeds B3 mounting transforms.
+- Pico needs a matching C++ SDK including `sdk/dual_arm_robot.hpp`. The currently pinned official package omits this header, so **prebuilt archives do not include the Pico teleoperation binary**. Build it from source with a matching SDK that provides this interface. The example embeds B3 mounting transforms.
 - The master–follower example retains its calibrated master/single-i3 mapping. See that guide for hardware and calibration details.
 - Update headers and runtime together. Build validation is not hardware acceptance; verify the robot configuration, tool, workspace and emergency stop before motion.
 
@@ -59,4 +59,4 @@ For a complete download use `sha256sum -c SHA256SUMS`. For one archive download 
 
 Releases correspond to `vX.Y.Z` tags; the version is applied to both C++ packages and wheels. Development artifacts remain in Actions for 14 days: archive names include a commit hash, while wheels use `0.0.0`; identify the commit through the run record.
 
-The website follows development. For an installed version use its tag and bundled manual. Weekly checks and manual release procedures are in the [maintainer guide](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/HEAD/docs/releasing.md).
+The website follows development. For an installed version use its tag and bundled manual.

@@ -78,7 +78,7 @@ Arguments are processed in order; later options override earlier scale settings.
 
 Approaching singularities uses quadratic slowdown between condition numbers 30 and 60; leaving uses doubled thresholds. A transient stale Jacobian freezes/brakes the affected arm. Pico input older than 250 ms freezes/brakes both arms and cancels unsent gripper commands; recovered input re-clutches from measured TCP. Stale robot state, controller faults and guard infrastructure failures terminate the session.
 
-Pending/rejected candidate checks hold the last approved target. J6 bypasses Cartesian singularity scaling but retains joint constraints. These describe source behavior, not completed hardware acceptance. No independent Python dual-arm control example is provided.
+Pending/rejected candidate checks hold the last approved target. J6 bypasses Cartesian singularity scaling but retains joint constraints. The Python launcher reuses this C++ bridge. Validate motion examples on the target robot configuration before deployment.
 
 ## Start Pico dual-arm teleoperation from Python
 

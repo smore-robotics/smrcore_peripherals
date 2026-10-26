@@ -28,4 +28,4 @@ This enables the i3. Default operation uses relative startup anchors and a nomin
 Incomplete samples do not resend cached targets. A complete-input timeout (`--stale-timeout`, default 0.5 s), rejected ServoJ, exception or Ctrl+C requests StopMotion. Stop requests can fail if communication is lost; cabinet communication and motion protection must remain active.
 `--max-offset-deg` caps motion around the startup pose; `--max-step-deg` caps each transmitted joint step. Both default to 0 (disabled; example joint bounds still apply).
 
-The original HOME PWM, directions, J5 scale of 2 and i3 bounds reside in `python/src/rcore_peripherals/zhonglin.py`. They describe this particular master/i3 pairing and require calibration review for another installation. This integration has software-only validation; real-robot acceptance has not been performed.
+The original HOME PWM, directions, J5 scale of 2 and i3 bounds reside in `python/src/rcore_peripherals/zhonglin.py`. They describe this particular master/i3 pairing and require calibration review for another installation. Validate the motion example on the target hardware before deployment.

@@ -18,3 +18,5 @@
 - downloads.md / downloads.zh.md: include canonical bilingual release guides instead of duplicating support claims.
 
 - release-notes(.zh).md: generated Git version history, separate from downloads and SDK compatibility.
+
+- Device guides describe current operation and configuration; obsolete integration report removed.

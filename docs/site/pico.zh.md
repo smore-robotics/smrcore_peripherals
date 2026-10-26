@@ -33,7 +33,7 @@ adb reverse tcp:8765 tcp:8765
 
 输出包含 `seq`、`ref`、头显及左右手柄 `xyz[m]`、`grip` 和 `trigger`。位置属于 WebXR 参考空间，单位米、保留四位小数，**不是机械臂 Base/TCP 坐标**。未追踪时为 `N/A`。没有新样本时 `GetSample()` 返回空，不应当作新的有效位置。
 
-普通 Wi-Fi 中 localhost 指头显自身；需使用头显能访问且受信任的 HTTPS 入口，同时转发 WebSocket。不能直接把上述地址改成电脑 HTTP IP 就假定 WebXR 可用。当前文档提供的可复现命令使用 adb 转发，不修改现有机器人网络链路。
+普通 Wi-Fi 中 localhost 指头显自身；需使用头显能访问且受信任的 HTTPS 入口，同时转发 WebSocket。不能直接把上述地址改成电脑 HTTP IP 就假定 WebXR 可用。上述命令使用 adb 转发。
 
 ## 2. 编译双臂程序
 
@@ -43,7 +43,7 @@ adb reverse tcp:8765 tcp:8765
 ./build_Release/bin/app_peripherals_pico_bridge --help
 ```
 
-SDK 需要 `sdk/dual_arm_robot.hpp` 及匹配动态库。官方 v0.2.0 原包漏装该头文件；当前基础包和默认 CI 不包含这个可选遥操程序。不要将补入不匹配版本头文件视为兼容性验证。
+SDK 需要 `sdk/dual_arm_robot.hpp` 及匹配动态库。发布使用的 SDK 0.2.0 包不包含该头文件，因此预编译包不包含 Pico 遥操程序。请使用提供此接口及匹配运行库的 SDK 从源码构建。
 
 示例**内置 B3 支架变换**，只适用于对应安装构型，没有通用支架配置参数。连接使用 `DualArmRobot::Initialize(robot_ip)`，当前 CLI 没有 domain/interface 覆盖参数。
 
@@ -93,7 +93,7 @@ SDK 需要 `sdk/dual_arm_robot.hpp` 及匹配动态库。官方 v0.2.0 原包漏
 
 候选目标检查尚未完成或不通过时保持最后获批目标，不能理解为强行越过限位。J6 不使用笛卡尔奇异点减速比例，但仍受关节控制约束。
 
-上述为当前源码行为，不代表双臂实机验收已完成。Python 启动入口复用同一 C++ bridge。
+Python 启动入口复用同一 C++ bridge。运动示例需在目标构型上完成现场验证。
 
 ## Python 启动 Pico 双臂遥操
 

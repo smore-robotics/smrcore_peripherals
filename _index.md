@@ -28,7 +28,6 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 
 - teleop/: optional SDK-backed PICO core used by the independent C++ CLI; see `teleop/_index.md`.
 
-- docs/pico-integration-status.md: Pico 接入方式、SDK 兼容性与验证范围。
 
 - Pico 读取保留在基础库；SMR_PERIPHERAL_WITH_PICO_TELEOP 默认 OFF，显式启用并依赖 SDK，配置阶段检查 standalone 双臂头文件。
 
@@ -45,14 +44,16 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 
 - mkdocs.yml and docs/site: unified peripheral integration navigation for SpaceMouse, F/T, Pico and master–follower arms.
 
-- docs/releases.md / docs/releases.en.md: canonical user release/asset guides; docs/releasing.md: maintainer workflow; website and release notes consume the guides.
+- docs/releases.md / docs/releases.en.md: canonical user release/asset guides; docs/maintainers/releasing.md: maintainer workflow; website and release notes consume the guides.
 
 - scripts/version_history.py generates categorized version history for website, manuals and Releases.
 
 - README.md / README.en.md: centered project logo, bilingual identity and live license/docs/CI/release badges.
 
-- Codex release-note drafts: docs/codex-release-notes.md; isolated default-branch workflow, no automatic publication.
+- Codex release-note drafts: docs/maintainers/codex-release-notes.md; isolated default-branch workflow, no automatic publication.
 
 - Local Codex subscription automation is the default draft path; API workflow remains manual-only.
 
 - docs/reviewed-release-notes.json: approved Codex summaries with immutable Git range and commit evidence.
+
+- User releases start at v0.1.0 capability baseline; maintainer guides live in docs/maintainers and are excluded from binary archives.

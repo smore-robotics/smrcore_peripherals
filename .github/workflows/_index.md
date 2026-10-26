@@ -22,3 +22,5 @@
 - codex-release-notes.yml: prepare → read-only Codex → fresh-runner validation/artifacts; optional API key, default branch only.
 
 - Codex API workflow is manual-only; CI excludes automation/release-notes documents-only branch.
+
+- ci.yml: test documentation packaging and publish only curated release text, without generated commit diaries.

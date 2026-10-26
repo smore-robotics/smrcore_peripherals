@@ -97,7 +97,7 @@ def reviewed_entries(tip, base, commits, root=ROOT):
     return entries, covered
 
 
-def section(label, tip, base, language, repository, root=ROOT):
+def section(label, tip, base, language, repository, root=ROOT, user_only=False):
     zh = language == 'zh'
     title = ('未发布' if zh else 'Unreleased') if label == 'Unreleased' else label.removeprefix('v')
     lines = [f'## {title}', '']
@@ -122,12 +122,14 @@ def section(label, tip, base, language, repository, root=ROOT):
         message = git('show', '-s', '--format=%B', commit, root=root)
         subject = message.splitlines()[0]
         note = re.search(r'^Release-note-' + language + r':\s*(.+)$', message, re.MULTILINE | re.IGNORECASE)
+        if user_only and not note:
+            continue
         text = note.group(1) if note else subject
         paths = git('diff-tree', '--root', '--no-commit-id', '--name-only', '-r', commit, root=root).splitlines()
         text = text.replace('<', '&lt;').replace('>', '&gt;').replace('[', '\\[').replace(']', '\\]')
         grouped['docs' if subject.startswith('docs:') else category(paths)].append(f'- {text} ([{commit[:7]}](https://github.com/{repository}/commit/{commit}))')
     if not grouped:
-        lines += ['无新增提交。' if zh else 'No new commits.', '']
+        lines += [('无面向用户的新增变更。' if user_only else '无新增提交。') if zh else ('No additional user-facing changes.' if user_only else 'No new commits.'), '']
     for key, titles in GROUPS.items():
         if key in grouped:
             lines += [f'### {titles[0 if zh else 1]}', '', *grouped[key], '']
@@ -136,6 +138,21 @@ def section(label, tip, base, language, repository, root=ROOT):
 
 def history(language='zh', target='HEAD', repository='zhanhui-li-smore/smrcore_peripherals', root=ROOT, latest_only=False):
     points = boundaries(target, root)
+    tip = git('rev-parse', target, root=root)
+    baseline_path = 'docs/release-baseline.json'
+    if baseline_path in git('ls-tree', '--name-only', tip, '--', baseline_path, root=root).splitlines():
+        baseline = json.loads(git('show', f'{tip}:{baseline_path}', root=root))
+        if not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', baseline['tag']):
+            raise ValueError('Invalid public release baseline')
+        lines = ['# 版本说明' if language == 'zh' else '# Release notes', '']
+        # Before the first baseline tag, show its release candidate content.
+        stop = next((i for i, point in enumerate(points) if point[0] == baseline['tag']), 0)
+        for i, (label, sha) in enumerate(points[:stop]):
+            lines.append(section(label, sha, points[i+1], language, repository, root, user_only=True))
+            if latest_only:
+                return '\n'.join(lines) + '\n'
+        lines += ['## ' + baseline['tag'][1:], '', baseline[language]]
+        return '\n'.join(lines) + '\n'
     lines = ['# 版本说明' if language == 'zh' else '# Release notes', '',
              '按 Git 版本范围整理，优先收录审核后的双语变更摘要；其余提交使用发布说明或原始标题。每条保留代码依据。' if language == 'zh' else
              'Generated from Git version ranges, preferring reviewed bilingual summaries. Remaining commits use release-note trailers or original titles. Entries retain links to their implementation evidence.', '']

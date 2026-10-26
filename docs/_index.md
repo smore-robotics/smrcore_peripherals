@@ -1,15 +1,9 @@
 > DIR: docs/
 
-- platform_setup.md / platform_setup.en.md: 外设权限及平台设置。
-- releases.md / releases.en.md: 支持平台、SDK 版本、制品格式、说明书和标签发布流程。
-- pico-integration-status.md: Pico 接入和验证范围，不代表实机验收。
-
-- site/: 中英文在线使用指南与 SDK 同款 Material 样式；requirements.txt 固定站点依赖。
-
-- manual/: branded Eisvogel PDF and standalone HTML templates; see manual/_index.md.
-
-- releases.md / releases.en.md: four-chain delivery and asset selection; releasing.md: maintainer automation/recovery.
-
-- codex-release-notes.md: OPENAI_API_KEY setup, automatic draft workflow and output status.
-
-- local-codex-notes.md: subscription-based local automation, timer operations, archives and runtime limits.
+- platform_setup.md / platform_setup.en.md: device permissions and platform configuration.
+- releases.md / releases.en.md: user download guide, supported platforms and SDK compatibility.
+- release-baseline.json: bilingual v0.1.0 feature baseline shared by website, manuals and Releases.
+- reviewed-release-notes.json: reviewed summaries with Git evidence for subsequent history.
+- site/: bilingual user documentation; requirements.txt pins documentation dependencies.
+- manual/: PDF/HTML templates and license notices.
+- maintainers/: release workflow and Codex draft automation, excluded from binary archives.

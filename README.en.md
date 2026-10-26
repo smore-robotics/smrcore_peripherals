@@ -31,7 +31,6 @@ The repository provides readers, protocols and application examples. Readers are
 - [Releases](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases): compiled packages, wheels, bilingual manuals and checksums.
 - [Asset selection and SDK compatibility](docs/releases.en.md): C++ package choices, Python dependencies and delivery scope.
 - [Documentation](https://zhanhui-li-smore.github.io/smrcore_peripherals/) · [C++ examples](app/README.en.md) · [Python examples](python/app/README.en.md).
-- [Maintainer release guide](docs/releasing.md): weekly checks, tags and recovery.
 
 ## Build from source
 

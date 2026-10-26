@@ -9,7 +9,7 @@
 ## 自动化
 
 - 每次 push / PR：构建和验证，上传 Actions 制品，保留 14 天。
-- `vX.Y.Z` tag：构建全部制品与说明书；通过后生成校验和和 Release 正文，附加 GitHub 提交摘要并发布。
+- `vX.Y.Z` tag：构建全部制品与说明书；通过后生成校验和和 Release 正文，发布经审核的用户版本说明。
 - 每周一北京时间 09:17：检查默认分支；有新提交递增补丁版本，无更新且已发布则跳过。同提交未发布的 tag 复用重试，不移动 tag。
 - 手动检查：Actions → Build and Release → Run workflow，在默认分支勾选 `weekly_release`。不勾选只构建开发制品。
 
@@ -51,3 +51,9 @@ Release-note-en: Pico can read left and right controller poses.
 ## Codex 草稿
 
 本机订阅定时任务自动检查默认分支，生成基于源码差异的双语草稿，独立于正式发布流水线。配置与归档位置见[本机 Codex 自动流](local-codex-notes.md)；API 方式仅保留手动触发。
+
+## 用户发布基线
+
+`docs/release-baseline.json` 汇总 v0.1.0 交付能力，网站、说明书和 Release 共用。此前开发日志不再展开；旧 tag 和制品保留在 GitHub。
+基线后的条目仅收录已审核摘要或 `Release-note-zh` / `Release-note-en`，内部维护提交不自动显示。提交功能变更时必须提供两种语言的条目，或在发版前审核归档草稿并写入 `docs/reviewed-release-notes.json`。
+C++ 包只打包用户文档与示例；本目录、AI 索引和模板源码不进入安装包。

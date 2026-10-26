@@ -43,3 +43,5 @@
 - local_codex_notes.py / install_local_codex_notes.py: local ChatGPT-auth polling, failure backoff, isolated checkout and immutable draft archive branch; systemd user timer.
 
 - version_history.py: consume reviewed bilingual summaries from target Git trees, validate range/evidence and retain uncovered commit fallback.
+
+- version_history.py: v0.1.0 user baseline replaces development history; later releases show approved notes/trailers. package_release.py copies only user documentation.

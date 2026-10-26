@@ -33,3 +33,5 @@
 - test_local_codex_notes.py: subscription auth environment and retry/deduplication gates.
 
 - test_version_history.py: reviewed range deduplication and historical target isolation.
+
+- test_package_release.py: user guide allowlist excludes maintenance, templates and AI indices. test_version_history.py checks public baseline and historical tag isolation.

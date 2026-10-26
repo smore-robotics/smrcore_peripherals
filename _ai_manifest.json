@@ -87,7 +87,6 @@
   "src/peripherals/pico/teleop.hpp": "src/peripherals/pico/teleop.md",
   "python/TELEOP.md": "python/_index.md",
   "teleop/latency_trace.hpp": "teleop/_index.md",
-  "docs/pico-integration-status.md": "_index.md",
   "scripts/build.sh": "scripts/_index.md",
   "python/app/app_peripherals_read_pico.py": "python/app/_index.md",
   ".github/workflows/ci.yml": ".github/workflows/_index.md",
@@ -147,7 +146,6 @@
   "docs/site/ft-sensor.zh.md": "docs/site/_index.md",
   "scripts/release_notes.py": "scripts/_index.md",
   "unittests/test_release_notes.py": "unittests/_index.md",
-  "docs/releasing.md": "docs/_index.md",
   "scripts/version_history.py": "scripts/_index.md",
   "unittests/test_version_history.py": "unittests/_index.md",
   "scripts/docs_history.py": "scripts/_index.md",
@@ -156,10 +154,13 @@
   ".github/workflows/codex-release-notes.yml": ".github/workflows/_index.md",
   ".github/codex/release-notes.md": ".github/codex/_index.md",
   ".github/codex/release-notes.schema.json": ".github/codex/_index.md",
-  "docs/codex-release-notes.md": "docs/_index.md",
   "scripts/local_codex_notes.py": "scripts/_index.md",
   "scripts/install_local_codex_notes.py": "scripts/_index.md",
   "unittests/test_local_codex_notes.py": "unittests/_index.md",
-  "docs/local-codex-notes.md": "docs/_index.md",
-  "docs/reviewed-release-notes.json": "_index.md"
+  "docs/reviewed-release-notes.json": "_index.md",
+  "docs/maintainers/releasing.md": "docs/maintainers/_index.md",
+  "docs/maintainers/codex-release-notes.md": "docs/maintainers/_index.md",
+  "docs/maintainers/local-codex-notes.md": "docs/maintainers/_index.md",
+  "docs/release-baseline.json": "docs/_index.md",
+  "unittests/test_package_release.py": "unittests/_index.md"
 }
