@@ -7,3 +7,5 @@
 - site/: bilingual user documentation; requirements.txt pins documentation dependencies.
 - manual/: PDF/HTML templates and license notices.
 - maintainers/: release workflow and Codex draft automation, excluded from binary archives.
+
+- Baseline contains capability text without a pinned fork tag; reviewed notes reset for upstream integration.

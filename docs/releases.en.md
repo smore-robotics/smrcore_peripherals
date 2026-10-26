@@ -1,6 +1,6 @@
 # Versions and downloads
 
-[Release downloads](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases) · [Development builds](https://github.com/zhanhui-li-smore/smrcore_peripherals/actions)
+[Release downloads](https://github.com/smore-robotics/smrcore_peripherals/releases) · [Development builds](https://github.com/smore-robotics/smrcore_peripherals/actions)
 
 Four peripheral chains share the structure “input → application → robot SDK”. Readers do not connect to robots; run the corresponding application for motion or gripper control.
 

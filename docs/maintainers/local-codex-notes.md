@@ -6,7 +6,7 @@ GitHub 不保存 ChatGPT 登录凭据，也不使用 API Key。任务消耗账�
 ## 链路
 
 每 10 分钟检查远端 → 有新 SHA 才分析 → 比较上一已发布正式 Release → Codex 只读生成 → 校验提交依据 → 归档草稿。
-草稿在 [automation/release-notes 分支](https://github.com/zhanhui-li-smore/smrcore_peripherals/tree/automation/release-notes)，其 README 链接最新结果。
+草稿在 [automation/release-notes 分支](https://github.com/smore-robotics/smrcore_peripherals/tree/automation/release-notes)，其 README 链接最新结果。
 不修改源码分支、不提 PR、不自动发布未经审核的说明；原有编译、网站和正式发布继续运行。
 该归档分支不触发源码编译。GitHub API 版 Codex 工作流改为仅手动运行。
 

@@ -6,7 +6,7 @@ import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENTED_REPO = 'zhanhui-li-smore/smrcore_peripherals'
+DOCUMENTED_REPO = 'smore-robotics/smrcore_peripherals'
 
 
 def render(tag, repository, sdk, commit):

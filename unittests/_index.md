@@ -35,3 +35,5 @@
 - test_version_history.py: reviewed range deduplication and historical target isolation.
 
 - test_package_release.py: user guide allowlist excludes maintenance, templates and AI indices. test_version_history.py checks public baseline and historical tag isolation.
+
+- test_version_history.py: pre-release and upstream-selected version tags work without fork tags.

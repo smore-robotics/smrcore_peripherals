@@ -6,9 +6,9 @@
 <p align="center"><strong>Peripheral input and robot integration examples for SpaceMouse, force/torque sensors, Pico and master–follower arms.</strong></p>
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="License: Apache 2.0"></a>
-  <a href="https://zhanhui-li-smore.github.io/smrcore_peripherals/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
-  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=feat%2Fpico-readers-and-release" alt="Build and Release"></a>
-  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/zhanhui-li-smore/smrcore_peripherals?label=Release" alt="Latest release"></a>
+  <a href="https://smore-robotics.github.io/smrcore_peripherals/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
+  <a href="https://github.com/smore-robotics/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/smore-robotics/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build and Release"></a>
+  <a href="https://github.com/smore-robotics/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/smore-robotics/smrcore_peripherals?label=Release" alt="Latest release"></a>
 </p>
 <p align="center"><strong>English</strong> · <a href="README.md">简体中文</a></p>
 
@@ -28,14 +28,14 @@ The repository provides readers, protocols and application examples. Readers are
 
 ## Downloads and documentation
 
-- [Releases](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases): compiled packages, wheels, bilingual manuals and checksums.
+- [Releases](https://github.com/smore-robotics/smrcore_peripherals/releases): compiled packages, wheels, bilingual manuals and checksums.
 - [Asset selection and SDK compatibility](docs/releases.en.md): C++ package choices, Python dependencies and delivery scope.
-- [Documentation](https://zhanhui-li-smore.github.io/smrcore_peripherals/) · [C++ examples](app/README.en.md) · [Python examples](python/app/README.en.md).
+- [Documentation](https://smore-robotics.github.io/smrcore_peripherals/) · [C++ examples](app/README.en.md) · [Python examples](python/app/README.en.md).
 
 ## Build from source
 
 ```bash
-git clone https://github.com/zhanhui-li-smore/smrcore_peripherals.git
+git clone https://github.com/smore-robotics/smrcore_peripherals.git
 cd smrcore_peripherals
 python3 -m pip install 'conan>=2,<3'
 ./scripts/build.sh --with-sdk OFF --tests ON

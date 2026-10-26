@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Assemble chapters, namespace anchors and resolve repository document links."""
 import argparse
+import os
 import re
 from pathlib import Path
 from version_history import history
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = 'https://zhanhui-li-smore.github.io/smrcore_peripherals/'
+REPOSITORY = os.environ.get('GITHUB_REPOSITORY', 'smore-robotics/smrcore_peripherals')
+BASE = os.environ.get('PERIPHERALS_SITE_URL', f'https://{REPOSITORY.split("/")[0]}.github.io/{REPOSITORY.split("/")[1]}/')
 
 
 def assemble(language):
@@ -54,7 +56,7 @@ def assemble(language):
                 relative = resolved.relative_to(ROOT).as_posix()
             except ValueError:
                 return match.group(0)
-            return f'[{label}](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/HEAD/{relative}{"#" + fragment if fragment else ""})'
+            return f'[{label}](https://github.com/{REPOSITORY}/blob/HEAD/{relative}{"#" + fragment if fragment else ""})'
         text = re.sub(r'\[([^\]\n]+)\]\(([^\s)]+)\)', link, text)
         chapters.append(f'# {title} {{#chapter-{i}}}\n\n{text.strip()}\n')
     license_text = (ROOT / 'docs/manual/EISVOGEL-LICENSE').read_text()

@@ -82,7 +82,11 @@ def test_user_baseline_hides_development_history(tmp_path):
     git('add', '.'); git('commit', '-qm', 'experimental diary'); git('tag', 'v0.0.1')
     (tmp_path / 'docs').mkdir()
     (tmp_path / 'docs/release-baseline.json').write_text(json.dumps(dict(tag='v0.1.0', zh='四类外设', en='Four peripherals')))
-    git('add', '.'); git('commit', '-qm', 'baseline'); git('tag', 'v0.1.0')
+    git('add', '.'); git('commit', '-qm', 'baseline')
+    preview = h.history(root=tmp_path)
+    assert '## 未发布' in preview and '四类外设' in preview
+    assert '## 0.1.0' not in preview
+    git('tag', 'v2.0.0')
     assert '四类外设' in h.history(root=tmp_path)
     assert 'experimental diary' not in h.history(root=tmp_path)
     assert 'experimental diary' in h.history(target='v0.0.1', root=tmp_path)
@@ -90,8 +94,10 @@ def test_user_baseline_hides_development_history(tmp_path):
     git('add', '.'); git('commit', '-qm', 'internal cleanup')
     (tmp_path / 'x').write_text('new')
     git('add', '.'); git('commit', '-qm', 'feature\n\nRelease-note-zh: 新增读取\nRelease-note-en: New reader')
-    git('tag', 'v0.1.1')
+    git('tag', 'v2.0.1')
     text = h.history(root=tmp_path)
     assert '新增读取' in text and '四类外设' in text
+    assert '## 2.0.1' in text and '## 2.0.0' in text
+    assert '## 0.1.0' not in text
     assert 'internal cleanup' not in text
     assert '四类外设' not in h.history(root=tmp_path, latest_only=True)

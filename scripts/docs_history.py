@@ -9,6 +9,6 @@ def on_pre_build(config):
     spec = importlib.util.spec_from_file_location('peripherals_history', script)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    repository = os.environ.get('GITHUB_REPOSITORY', 'zhanhui-li-smore/smrcore_peripherals')
+    repository = os.environ.get('GITHUB_REPOSITORY', 'smore-robotics/smrcore_peripherals')
     for language, filename in [('zh', 'release-notes.zh.md'), ('en', 'release-notes.md')]:
         (Path(config['docs_dir']) / filename).write_text(module.history(language, repository=repository))

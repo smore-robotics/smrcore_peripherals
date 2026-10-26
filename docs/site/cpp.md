@@ -4,7 +4,7 @@
 
 This directory contains peripheral diagnostic tools and SDK bridge/calibration executables using the `smrcore::peripherals` C++ API.
 
-For platform permissions and device setup, see [Platform setup](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.en.md).
+For platform permissions and device setup, see [Platform setup](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/docs/platform_setup.en.md).
 
 ## Build
 

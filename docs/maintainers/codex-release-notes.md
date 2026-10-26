@@ -11,7 +11,7 @@ Codex 读取上一已发布正式 Release 到本次提交的 diff 和相关源�
 - `OPENAI_API_KEY`：OpenAI API Key，只填在 GitHub Secret 中。
 - 可选 Repository Variable `RELEASE_CODEX_MODEL`：指定账号可用的 Codex 模型；不填使用官方 Action 默认模型。
 
-[打开 Secrets 设置](https://github.com/zhanhui-li-smore/smrcore_peripherals/settings/secrets/actions)。
+[打开 Secrets 设置](https://github.com/smore-robotics/smrcore_peripherals/settings/secrets/actions)。
 这里使用 API Key 调用模型，不复制本机 Codex 登录凭据。API 使用由该 Key 所属项目计费；可在对应项目设置用量限制。
 配置完成后 Actions → Codex release notes → Run workflow，选择默认分支即可验证。
 

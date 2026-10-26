@@ -6,9 +6,9 @@
 <p align="center"><strong>SpaceMouse、六维力传感器、Pico 和主从臂的外设接入库与机器人应用示例。</strong></p>
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="License: Apache 2.0"></a>
-  <a href="https://zhanhui-li-smore.github.io/smrcore_peripherals/zh/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
-  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/zhanhui-li-smore/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=feat%2Fpico-readers-and-release" alt="Build and Release"></a>
-  <a href="https://github.com/zhanhui-li-smore/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/zhanhui-li-smore/smrcore_peripherals?label=Release" alt="Latest release"></a>
+  <a href="https://smore-robotics.github.io/smrcore_peripherals/zh/"><img src="https://img.shields.io/badge/Docs-online-brightgreen" alt="Documentation"></a>
+  <a href="https://github.com/smore-robotics/smrcore_peripherals/actions/workflows/ci.yml"><img src="https://github.com/smore-robotics/smrcore_peripherals/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build and Release"></a>
+  <a href="https://github.com/smore-robotics/smrcore_peripherals/releases/latest"><img src="https://img.shields.io/github/v/release/smore-robotics/smrcore_peripherals?label=Release" alt="Latest release"></a>
 </p>
 <p align="center"><a href="README.en.md">English</a> · <strong>简体中文</strong></p>
 
@@ -28,14 +28,14 @@
 
 ## 下载与文档
 
-- [Release 下载](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases)：编译包、Python wheel、中英文说明书和校验和。
+- [Release 下载](https://github.com/smore-robotics/smrcore_peripherals/releases)：编译包、Python wheel、中英文说明书和校验和。
 - [选择制品与 SDK 兼容性](docs/releases.md)：两种 C++ 包如何选、Python 依赖与各链路交付形式。
-- [在线文档](https://zhanhui-li-smore.github.io/smrcore_peripherals/zh/) · [C++ 示例](app/README.md) · [Python 示例](python/app/README.md)。
+- [在线文档](https://smore-robotics.github.io/smrcore_peripherals/zh/) · [C++ 示例](app/README.md) · [Python 示例](python/app/README.md)。
 
 ## 从源码开始
 
 ```bash
-git clone https://github.com/zhanhui-li-smore/smrcore_peripherals.git
+git clone https://github.com/smore-robotics/smrcore_peripherals.git
 cd smrcore_peripherals
 python3 -m pip install 'conan>=2,<3'
 ./scripts/build.sh --with-sdk OFF --tests ON

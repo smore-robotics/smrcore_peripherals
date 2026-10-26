@@ -10,10 +10,10 @@
 
 - 每次 push / PR：构建和验证，上传 Actions 制品，保留 14 天。
 - `vX.Y.Z` tag：构建全部制品与说明书；通过后生成校验和和 Release 正文，发布经审核的用户版本说明。
-- 每周一北京时间 09:17：检查默认分支；有新提交递增补丁版本，无更新且已发布则跳过。同提交未发布的 tag 复用重试，不移动 tag。
+- 定时发版默认关闭。维护者设置仓库变量 `ENABLE_WEEKLY_RELEASE=true` 后，每周一北京时间 09:17：检查默认分支；有新提交递增补丁版本，无更新且已发布则跳过。同提交未发布的 tag 复用重试，不移动 tag。
 - 手动检查：Actions → Build and Release → Run workflow，在默认分支勾选 `weekly_release`。不勾选只构建开发制品。
 
-当前发布目标是个人 fork `zhanhui-li-smore/smrcore_peripherals`，默认分支 `feat/pico-readers-and-release`；不自动发布到官方仓库，不创建 PR。上游接收后由其维护者决定发布分支。
+发布作用于工作流所在仓库。官方默认分支为 `main`；个人 fork 的标签、制品、Pages 设置和凭据不会随 PR 迁移。首次正式版本由维护者选择并打 tag。
 
 定时任务可能延迟；GitHub 可能暂停长期无活动的公共仓库定时任务。自动打 tag 后由同一次工作流继续发布，不依赖 GITHUB_TOKEN 的 push 递归触发。
 
@@ -54,6 +54,11 @@ Release-note-en: Pico can read left and right controller poses.
 
 ## 用户发布基线
 
-`docs/release-baseline.json` 汇总 v0.1.0 交付能力，网站、说明书和 Release 共用。此前开发日志不再展开；旧 tag 和制品保留在 GitHub。
+`docs/release-baseline.json` 汇总首次整合发布的交付能力，网站、说明书和 Release 共用。此前开发日志不再展开；以当前仓库首个包含该文件的正式 tag 作为基线。未打 tag 时显示“未发布”，不引用 fork 版本号。
 基线后的条目仅收录已审核摘要或 `Release-note-zh` / `Release-note-en`，内部维护提交不自动显示。提交功能变更时必须提供两种语言的条目，或在发版前审核归档草稿并写入 `docs/reviewed-release-notes.json`。
 C++ 包只打包用户文档与示例；本目录、AI 索引和模板源码不进入安装包。
+
+## 合入后启用
+
+Pages 默认仅构建验证；配置 Settings → Pages → GitHub Actions，确认域名后设置 `ENABLE_DOCS_PUBLISH=true` 才部署。每周发版仅在 `ENABLE_WEEKLY_RELEASE=true` 时运行；手动打 tag 或手动选择 weekly_release 仍可显式发布。
+更新分支保护的必需检查名称：原 CI 的 main-checks / linux-peripherals-smoke 已由 metadata、readers、sdk-bridge、manual 及文档 build 替代。Codex API Secret 和本机登录均不随 PR 迁移；未配置时不调用自动模型生成。

@@ -1,6 +1,6 @@
 # 版本与下载
 
-[下载正式版本](https://github.com/zhanhui-li-smore/smrcore_peripherals/releases) · [查看开发构建](https://github.com/zhanhui-li-smore/smrcore_peripherals/actions)
+[下载正式版本](https://github.com/smore-robotics/smrcore_peripherals/releases) · [查看开发构建](https://github.com/smore-robotics/smrcore_peripherals/actions)
 
 本仓库提供四类外设接入，统一采用“外设输入 → 应用 → 机器人 SDK”的分层。只读采样不连接机器人；需要运动或夹爪控制时运行对应应用。
 

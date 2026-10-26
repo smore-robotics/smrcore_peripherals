@@ -4,7 +4,7 @@
 
 本目录包含外设调试与 SDK 桥接可执行工具，使用 `smrcore::peripherals` C++ API。
 
-平台权限与设备节点配置见 [平台配置](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.md)。
+平台权限与设备节点配置见 [平台配置](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/docs/platform_setup.md)。
 
 ## 构建
 

@@ -164,7 +164,7 @@ def cycle(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--repository',default='zhanhui-li-smore/smrcore_peripherals')
+    parser.add_argument('--repository',default='smore-robotics/smrcore_peripherals')
     parser.add_argument('--state',type=Path,default=Path.home()/'.local/share/smrcore-peripherals-notes')
     parser.add_argument('--force',action='store_true')
     cycle(parser.parse_args())

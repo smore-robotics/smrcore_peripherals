@@ -24,3 +24,5 @@
 - Codex API workflow is manual-only; CI excludes automation/release-notes documents-only branch.
 
 - ci.yml: test documentation packaging and publish only curated release text, without generated commit diaries.
+
+- Weekly release and Pages deployment require explicit repository variables; shell syntax checks retained.

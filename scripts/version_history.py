@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build version history from reachable tags and auditable Git changes."""
 import argparse
+import os
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -136,22 +137,27 @@ def section(label, tip, base, language, repository, root=ROOT, user_only=False):
     return '\n'.join(lines)
 
 
-def history(language='zh', target='HEAD', repository='zhanhui-li-smore/smrcore_peripherals', root=ROOT, latest_only=False):
+def history(language='zh', target='HEAD', repository=None, root=ROOT, latest_only=False):
+    repository = repository or os.environ.get("GITHUB_REPOSITORY", "smore-robotics/smrcore_peripherals")
     points = boundaries(target, root)
     tip = git('rev-parse', target, root=root)
     baseline_path = 'docs/release-baseline.json'
     if baseline_path in git('ls-tree', '--name-only', tip, '--', baseline_path, root=root).splitlines():
         baseline = json.loads(git('show', f'{tip}:{baseline_path}', root=root))
-        if not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', baseline['tag']):
-            raise ValueError('Invalid public release baseline')
         lines = ['# 版本说明' if language == 'zh' else '# Release notes', '']
-        # Before the first baseline tag, show its release candidate content.
-        stop = next((i for i, point in enumerate(points) if point[0] == baseline['tag']), 0)
+        # The first reachable release containing the summary is this repo's
+        # baseline. Fork tags are not required, including after a squash merge.
+        releases = [i for i, (label, sha) in enumerate(points)
+                    if label != 'Unreleased' and baseline_path in
+                    git('ls-tree', '--name-only', sha, '--', baseline_path, root=root).splitlines()]
+        stop = max(releases) if releases else 0
+        baseline_label = points[stop][0] if releases else 'Unreleased'
         for i, (label, sha) in enumerate(points[:stop]):
             lines.append(section(label, sha, points[i+1], language, repository, root, user_only=True))
             if latest_only:
                 return '\n'.join(lines) + '\n'
-        lines += ['## ' + baseline['tag'][1:], '', baseline[language]]
+        title = ('未发布' if language == 'zh' else 'Unreleased') if baseline_label == 'Unreleased' else baseline_label.removeprefix('v')
+        lines += ['## ' + title, '', baseline[language]]
         return '\n'.join(lines) + '\n'
     lines = ['# 版本说明' if language == 'zh' else '# Release notes', '',
              '按 Git 版本范围整理，优先收录审核后的双语变更摘要；其余提交使用发布说明或原始标题。每条保留代码依据。' if language == 'zh' else
@@ -165,7 +171,7 @@ def history(language='zh', target='HEAD', repository='zhanhui-li-smore/smrcore_p
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--repository', default='zhanhui-li-smore/smrcore_peripherals')
+    parser.add_argument('--repository', default=os.environ.get('GITHUB_REPOSITORY', 'smore-robotics/smrcore_peripherals'))
     args = parser.parse_args()
     for lang, filename in [('zh', 'release-notes.zh.md'), ('en', 'release-notes.md')]:
         (ROOT / 'docs/site' / filename).write_text(history(lang, repository=args.repository))

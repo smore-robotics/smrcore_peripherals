@@ -4,7 +4,7 @@
 
 本目录包含与 C++ `app/` 对应的 Python 脚本，使用 `rcore_peripherals` Python API。
 
-设备权限与节点配置见 [平台配置](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.md)。
+设备权限与节点配置见 [平台配置](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/docs/platform_setup.md)。
 
 ## 构建和安装 wheel
 
@@ -38,7 +38,7 @@ python3 python/app/app_peripherals_read_ft_sensor.py \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
 ```
 
-探测与原始 SpaceMouse 采样请使用 C++ `app_peripherals_probe` 与 `app_peripherals_read_spacemouse_raw`，见 [app/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/app/README.md)。
+探测与原始 SpaceMouse 采样请使用 C++ `app_peripherals_probe` 与 `app_peripherals_read_spacemouse_raw`，见 [app/README.md](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/app/README.md)。
 
 ## 机器人 SDK 桥接
 
@@ -50,7 +50,7 @@ python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --spacemouse
 python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
 ```
 
-机器人 SDK 安装说明见 [python/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/python/README.md)。
+机器人 SDK 安装说明见 [python/README.md](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/python/README.md)。
 
 ## 六维力静态标定
 

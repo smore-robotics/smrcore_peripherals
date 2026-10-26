@@ -4,7 +4,7 @@
 
 This directory contains Python scripts aligned with the C++ `app/` tools, using the `rcore_peripherals` Python API.
 
-For platform permissions and device setup, see [Platform setup](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/docs/platform_setup.en.md).
+For platform permissions and device setup, see [Platform setup](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/docs/platform_setup.en.md).
 
 ## Build and Install the Wheel
 
@@ -38,7 +38,7 @@ python3 python/app/app_peripherals_read_ft_sensor.py \
   --serial-port /dev/ttyUSB0 --sensor-type xjc_serial --baud-rate 460800
 ```
 
-For probe and raw SpaceMouse sampling, use the C++ `app_peripherals_probe` and `app_peripherals_read_spacemouse_raw` tools. See [app/README.en.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/app/README.en.md).
+For probe and raw SpaceMouse sampling, use the C++ `app_peripherals_probe` and `app_peripherals_read_spacemouse_raw` tools. See [app/README.en.md](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/app/README.en.md).
 
 ## Robot SDK Bridge
 
@@ -50,7 +50,7 @@ python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --spacemouse
 python3 python/app/app_peripherals_bridge.py --robot-ip <robot-ip> --ft-sensor
 ```
 
-See [python/README.md](https://github.com/zhanhui-li-smore/smrcore_peripherals/blob/17ea56f/python/README.md) for robot SDK installation notes.
+See [python/README.md](https://github.com/smore-robotics/smrcore_peripherals/blob/17ea56f/python/README.md) for robot SDK installation notes.
 
 ## Static F/T Calibration
 
