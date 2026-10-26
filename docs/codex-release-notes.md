@@ -1,6 +1,6 @@
 # Codex 自动版本说明
 
-默认分支每次 push 自动运行 **Codex release notes**；也可在 Actions 手动运行。
+当前默认采用[本机 ChatGPT 订阅自动流](local-codex-notes.md)。本文的 API 方式保留为 Actions 手动运行 **Codex release notes**，不再在 push 时自动调用 API。
 Codex 读取上一已发布正式 Release 到本次提交的 diff 和相关源码，生成中英文说明草稿。
 比较范围固定到提交 SHA；未发布成功的 tag 不作为基线。
 

@@ -29,3 +29,5 @@
 - test_version_history.py: version boundaries, bilingual trailers, unreleased commits and unrelated-tag exclusion.
 
 - test_codex_release_notes.py: published baseline, evidence and bilingual output validation, failure fallback.
+
+- test_local_codex_notes.py: subscription auth environment and retry/deduplication gates.

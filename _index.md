@@ -52,3 +52,5 @@ GitHub `smore-robotics/smrcore_peripherals` 是源码真源。
 - README.md / README.en.md: centered project logo, bilingual identity and live license/docs/CI/release badges.
 
 - Codex release-note drafts: docs/codex-release-notes.md; isolated default-branch workflow, no automatic publication.
+
+- Local Codex subscription automation is the default draft path; API workflow remains manual-only.

@@ -156,5 +156,9 @@
   ".github/workflows/codex-release-notes.yml": ".github/workflows/_index.md",
   ".github/codex/release-notes.md": ".github/codex/_index.md",
   ".github/codex/release-notes.schema.json": ".github/codex/_index.md",
-  "docs/codex-release-notes.md": "docs/_index.md"
+  "docs/codex-release-notes.md": "docs/_index.md",
+  "scripts/local_codex_notes.py": "scripts/_index.md",
+  "scripts/install_local_codex_notes.py": "scripts/_index.md",
+  "unittests/test_local_codex_notes.py": "unittests/_index.md",
+  "docs/local-codex-notes.md": "docs/_index.md"
 }

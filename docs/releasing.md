@@ -50,4 +50,4 @@ Release-note-en: Pico can read left and right controller poses.
 
 ## Codex 草稿
 
-默认分支 push 可自动生成基于源码差异的双语草稿，独立于正式发布流水线。Key 配置、下载位置和状态见 [Codex 自动版本说明](codex-release-notes.md)。
+本机订阅定时任务自动检查默认分支，生成基于源码差异的双语草稿，独立于正式发布流水线。配置与归档位置见[本机 Codex 自动流](local-codex-notes.md)；API 方式仅保留手动触发。

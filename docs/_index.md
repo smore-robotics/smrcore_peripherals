@@ -11,3 +11,5 @@
 - releases.md / releases.en.md: four-chain delivery and asset selection; releasing.md: maintainer automation/recovery.
 
 - codex-release-notes.md: OPENAI_API_KEY setup, automatic draft workflow and output status.
+
+- local-codex-notes.md: subscription-based local automation, timer operations, archives and runtime limits.
