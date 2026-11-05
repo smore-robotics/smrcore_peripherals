@@ -441,7 +441,6 @@ int Run(const AppConfig &config)
     const auto initial_motor_status = robot.GetMotorStatus();
     const bool initially_enabled = initial_motor_status.enabled;
     bool enabled_by_app = false;
-    bool sensor_started = false;
     bool moved = false;
 
     auto cleanup = [&]()
@@ -458,15 +457,6 @@ int Run(const AppConfig &config)
                           << std::endl;
             }
         }
-        if (sensor_started)
-        {
-            auto release = robot.Calib().ReleaseFtSensor();
-            if (release.IsFailure())
-            {
-                std::cerr << "ReleaseFtSensor failed: " << release.GetErrorMsg()
-                          << std::endl;
-            }
-        }
         if (enabled_by_app)
         {
             (void)robot.Disable();
@@ -474,18 +464,11 @@ int Run(const AppConfig &config)
         robot.Shutdown();
     };
 
-    auto sensor_result = robot.Calib().EnsureFtSensor();
-    if (sensor_result.IsFailure())
-    {
-        std::cerr << "EnsureFtSensor failed (" << sensor_result.GetErrorCode()
-                  << "): " << sensor_result.GetErrorMsg() << std::endl;
-        cleanup();
-        return 1;
-    }
-    sensor_started = true;
+    // The external bridge owns acquisition; legacy sensor lifecycle RPCs are
+    // internal-only. Wait for bridge samples instead of starting the sensor.
     if (!sampler.WaitForSample(1500))
     {
-        std::cerr << "No valid F/T raw sample after EnsureFtSensor; start "
+        std::cerr << "No valid F/T raw sample; start "
                      "app_peripherals_bridge --ft-sensor first."
                   << std::endl;
         cleanup();
